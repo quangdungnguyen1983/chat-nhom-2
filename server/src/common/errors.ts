@@ -11,6 +11,11 @@ export type ErrorCode =
   | "WRONG_CURRENT_PASSWORD"
   | "SAME_PASSWORD"
   | "NOT_FOUND"
+  | "CANNOT_CHAT_SELF"
+  | "USER_NOT_FOUND"
+  | "CONVERSATION_FORBIDDEN"
+  | "MESSAGE_EMPTY"
+  | "MESSAGE_TOO_LONG"
   | "INTERNAL";
 
 const table: Record<ErrorCode, { status: number; message: string }> = {
@@ -23,6 +28,13 @@ const table: Record<ErrorCode, { status: number; message: string }> = {
   WRONG_CURRENT_PASSWORD: { status: 400, message: M.M10 },
   SAME_PASSWORD: { status: 400, message: M.M11 },
   NOT_FOUND: { status: 404, message: "Không tìm thấy." },
+  CANNOT_CHAT_SELF: { status: 400, message: M.M15 },
+  USER_NOT_FOUND: { status: 404, message: M.M16 },
+  // Người ngoài hội thoại HOẶC hội thoại không tồn tại → CÙNG một phản hồi 403 + M-30 (không lộ hội thoại nào có thật).
+  // 09 GT-08 đề xuất 404; slice 2 dùng 403 theo yêu cầu review – xem PR.
+  CONVERSATION_FORBIDDEN: { status: 403, message: M.M30 },
+  MESSAGE_EMPTY: { status: 400, message: M.MESSAGE_EMPTY },
+  MESSAGE_TOO_LONG: { status: 400, message: M.M17 },
   INTERNAL: { status: 500, message: M.M34 },
 };
 

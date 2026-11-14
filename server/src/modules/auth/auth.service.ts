@@ -12,6 +12,7 @@ import * as sessions from "../../storage/sessions.repo.js";
 import { isUniqueViolation, withWriteTx } from "../../storage/prisma.js";
 import { getDummyHash, hashPassword, verifyPassword } from "./password.js";
 import { createSession, revoke, type AuthContext } from "./session.service.js";
+import { disconnectSession } from "../notifications/realtime.js";
 
 const sha = (s: string) => createHash("sha256").update(s, "utf8").digest();
 
@@ -94,9 +95,11 @@ export async function changePassword(auth: AuthContext, input: ChangePasswordInp
 
   const newHash = await hashPassword(next);
   const now = new Date();
-  return withWriteTx(async (tx) => {
+  const revoked = await withWriteTx(async (tx) => {
     await users.updatePasswordHash(user.id, newHash, tx);
     return sessions.revokeOtherSessions(user.id, auth.sessionId, "password_change", now, tx);
   });
-  // Slice sau (realtime): phát session:revoked + ngắt socket cho từng phiên bị hủy.
+  // Sau giao dịch: báo + ngắt socket của từng phiên bị hủy (QĐ-09, TK-03 R4).
+  for (const id of revoked) disconnectSession(id, "password_change");
+  return revoked;
 }

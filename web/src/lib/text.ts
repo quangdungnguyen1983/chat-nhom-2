@@ -10,6 +10,14 @@ export const M = {
   M08: "Mật khẩu tối đa 64 ký tự.",
   M09: "Tên đăng nhập hoặc mật khẩu không đúng.",
   M14: "Không tìm thấy người dùng phù hợp.",
+  M17: "Tin nhắn vượt quá 5.000 ký tự (hiện có {n} ký tự).",
+  M20: "Gửi không thành công.",
+  M21: "Đã hiển thị toàn bộ lịch sử.",
+  M22: "Không tải được tin nhắn cũ.",
+  M23: "Bạn chưa có cuộc trò chuyện nào. Hãy tìm đồng nghiệp ở ô phía trên để bắt đầu.",
+  M24: "Không tải được danh sách hội thoại.",
+  M30: "Không tìm thấy hội thoại hoặc bạn không có quyền truy cập.",
+  M33: "Mất kết nối. Đang thử kết nối lại…",
   M31: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
   M34: "Không kết nối được máy chủ. Vui lòng thử lại.",
   M35: "Vui lòng nhập đủ tên đăng nhập và mật khẩu.",
@@ -42,6 +50,15 @@ export function checkPassword(raw: string): string | null {
   if (!r.hasLetter || !r.hasDigit) return M.M07;
   return null;
 }
+
+// Nội dung tin – GIỐNG server (09 mục 4.1): NFC, \r\n → \n, không trim.
+export const MAX_MESSAGE_CHARS = 5000;
+export const normalizeContent = (s: string) => nfc(s).replace(/\r\n?/g, "\n");
+export const hasVisibleChar = (s: string) => /\S/u.test(s);
+export const formatCount = (n: number) => n.toLocaleString("vi-VN");
+export const tooLongMessage = (n: number) => M.M17.replace("{n}", formatCount(n));
+/** Badge: > 99 hiện "99+" (TB-01 R6). */
+export const badgeText = (n: number) => (n > 99 ? "99+" : String(n));
 
 /** Màu nền avatar cố định theo tài khoản: --avatar-(id % 6 + 1) (10-ui-ux.md mục 8.1). */
 export const avatarColorVar = (id: number) => `var(--avatar-${(id % 6) + 1})`;

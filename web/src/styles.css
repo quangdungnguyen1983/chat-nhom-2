@@ -87,3 +87,41 @@ h2 { font-size: var(--font-size-lg); margin: 0 0 var(--space-3); }
   .overlay { padding: 0; }
   .dialog { max-width: none; min-height: 100vh; border-radius: 0; }
 }
+
+/* Slice 2 – chat 1-1 (10-ui-ux.md mục 8.4) */
+.badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: var(--space-2); border-radius: var(--radius-full); background: var(--color-badge); color: #fff; font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); }
+.as-button { width: 100%; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.as-button:hover { background: var(--color-bg); }
+.conv-row.selected { background: var(--color-selected); }
+.conv-row.unread .name { font-weight: var(--font-weight-bold); }
+.conv-row .user-text { flex: 1; }
+.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
+.link-btn { border: 0; background: none; color: var(--color-primary); text-decoration: underline; cursor: pointer; font: inherit; padding: 0; }
+.content { display: flex; flex-direction: column; min-height: 0; }
+.app-shell { height: 100vh; }
+.sidebar { overflow-y: auto; }
+.chat { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.chat-head { display: flex; align-items: center; gap: var(--space-2); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-border); }
+.chat-head h2 { margin: 0; font-size: var(--font-size-lg); }
+.chat-head .back { display: none; }
+.conn-bar { background: var(--color-warning-bg); color: var(--color-warning-text); padding: var(--space-2); font-size: var(--font-size-sm); }
+.chat-log { flex: 1; overflow-y: auto; padding: var(--space-3) 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.older { align-self: center; }
+.history-end { text-align: center; color: var(--color-text-secondary); font-size: var(--font-size-sm); margin: 0; }
+.bubble-row { display: flex; }
+.bubble-row.mine { justify-content: flex-end; }
+.bubble { max-width: 70%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-lg); background: var(--color-surface); color: var(--color-text); }
+.bubble-row.mine .bubble { background: var(--color-primary); color: #fff; }
+.bubble-row.mine .bubble.failed { background: var(--color-error-bg); color: var(--color-text); border: 1px solid var(--color-error); }
+.bubble-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble-meta { font-size: var(--font-size-xs); opacity: .85; margin-top: var(--space-1); }
+.composer { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); align-items: end; border-top: 1px solid var(--color-border); padding-top: var(--space-2); }
+.composer textarea { width: 100%; min-height: var(--size-touch); max-height: 9em; padding: var(--space-2); font: inherit; border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); resize: vertical; }
+.composer textarea[aria-invalid="true"] { border: 2px solid var(--color-error); }
+.composer .send { width: auto; }
+.composer p { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 767px) {
+  .app-shell.has-active .sidebar { display: none; }
+  .app-shell.has-active .content { display: flex; }
+  .chat-head .back { display: inline-flex; }
+}

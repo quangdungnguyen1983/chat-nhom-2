@@ -14,6 +14,11 @@ export function findActiveByTokenHash(tokenHash: string, now: Date) {
   });
 }
 
+/** Kiểm tra lại phiên của socket mỗi lần gửi tin (GL-04). */
+export function findActiveById(id: number, now: Date) {
+  return prisma().session.findFirst({ where: { id, revokedAt: null, expiresAt: { gt: now } }, select: { id: true } });
+}
+
 export function revokeSession(id: number, reason: RevokedReason, now: Date) {
   return prisma().session.updateMany({
     where: { id, revokedAt: null },

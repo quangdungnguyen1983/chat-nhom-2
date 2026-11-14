@@ -56,6 +56,16 @@ export function checkPassword(pw: string): string | null {
   return null;
 }
 
+/** Đổi \r\n và \r thành \n – mỗi lần xuống dòng tính 1 ký tự (GS-18). */
+export const normalizeNewlines = (s: string): string => s.replace(/\r\n?/g, "\n");
+
+export const hasVisibleChar = (s: string): boolean => /\S/u.test(s);
+
+export const MAX_MESSAGE_CHARS = 5000; // PDF CH-02
+
+/** Nội dung tin: NFC → chuẩn hóa xuống dòng; KHÔNG trim (FRS NT-03). */
+export const normalizeContent = (raw: string): string => normalizeNewlines(nfc(raw));
+
 /** Thoát ký tự đặc biệt của LIKE (`\`, `%`, `_`) để dùng với ESCAPE '\' (GT-09). */
 export function escapeLike(s: string): string {
   return s.replace(/[\\%_]/g, (c) => `\\${c}`);

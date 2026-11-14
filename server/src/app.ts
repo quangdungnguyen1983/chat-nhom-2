@@ -9,6 +9,8 @@ import { env } from "./config/env.js";
 import { checkOrigin } from "./modules/auth/session.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
+import { conversationsRouter } from "./modules/chat/conversations.routes.js";
+import { readRouter } from "./modules/notifications/read.routes.js";
 import { log } from "./common/logger.js";
 
 export function createApp() {
@@ -38,6 +40,8 @@ export function createApp() {
   api.use(checkOrigin);
   api.use(authRouter);
   api.use(usersRouter);
+  api.use(readRouter);
+  api.use(conversationsRouter);
   api.use((_req, _res, next) => next(new AppError("NOT_FOUND")));
   app.use("/api", api);
 
@@ -45,7 +49,7 @@ export function createApp() {
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/dist");
   if (env().NODE_ENV === "production" && fs.existsSync(webDist)) {
     app.use(express.static(webDist));
-    app.get(/^\/(?!api\/).*/, (_req, res) => res.sendFile(path.join(webDist, "index.html")));
+    app.get(/^\/(?!api\/|socket\.io\/).*/, (_req, res) => res.sendFile(path.join(webDist, "index.html")));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

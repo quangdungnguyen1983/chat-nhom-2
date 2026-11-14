@@ -1,4 +1,4 @@
-// Kiểu dữ liệu trả ra API (09-detailed-design.md mục 6.2).
+// Kiểu dữ liệu trả ra API / sự kiện (09-detailed-design.md mục 6.2).
 import { avatarInitial } from "./avatar.js";
 
 export type UserDto = {
@@ -11,3 +11,66 @@ export type UserDto = {
 export function toUserDto(u: { id: number; username: string; displayName: string }): UserDto {
   return { id: u.id, username: u.username, displayName: u.displayName, avatarInitial: avatarInitial(u.displayName) };
 }
+
+export type MessageDto = {
+  id: number;
+  conversationId: number;
+  type: "text" | "system";
+  content: string;
+  sender: UserDto | null; // tên HIỆN TẠI của người gửi (GS-12)
+  eventType: string | null;
+  clientMessageId: string | null;
+  createdAt: string;
+};
+
+export type MessageRow = {
+  id: number;
+  conversationId: number;
+  type: string;
+  content: string;
+  eventType: string | null;
+  clientMsgId: string | null;
+  createdAt: Date;
+  sender: { id: number; username: string; displayName: string } | null;
+};
+
+export function toMessageDto(m: MessageRow): MessageDto {
+  return {
+    id: m.id,
+    conversationId: m.conversationId,
+    type: m.type as MessageDto["type"],
+    content: m.content,
+    sender: m.sender ? toUserDto(m.sender) : null,
+    eventType: m.eventType,
+    clientMessageId: m.clientMsgId,
+    createdAt: m.createdAt.toISOString(),
+  };
+}
+
+export type ConversationSummaryDto = {
+  id: number;
+  type: "direct" | "group";
+  title: string;
+  avatarInitial: string;
+  otherUser: UserDto | null;
+  memberCount: number;
+  myRole: "owner" | "member";
+  lastMessage: null | {
+    id: number;
+    type: "text" | "system";
+    preview: string;
+    senderDisplayName: string | null;
+    isMine: boolean;
+    createdAt: string;
+  };
+  lastMessageAt: string | null;
+  unreadCount: number; // 0…100; 100 nghĩa là "100 trở lên"
+};
+
+export type ConversationDetailDto = ConversationSummaryDto & {
+  name: string | null;
+  members: Array<{ user: UserDto; role: "owner" | "member" }>;
+};
+
+export const PREVIEW_CHARS = 100; // GT-13
+export const preview = (s: string): string => Array.from(s).slice(0, PREVIEW_CHARS).join("");
