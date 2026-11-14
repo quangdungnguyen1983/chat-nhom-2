@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/01-brd.md` |
+| Tệp | `01-brd.md` |
 | Phiên bản | 1.1 – Draft |
 | Ngày | 2026-11-13 |
 | Người soạn | Nhóm BA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
@@ -27,7 +27,7 @@
 | `[QĐ-xx]` | Quyết định đã được Product Owner xác nhận ngày 2026-11-13. PDF không quy định điểm này; đây là quyết định bổ sung của dự án. Xem phần 10.1. |
 | `[OQ-xx]` | Câu hỏi mở cần người có thẩm quyền trả lời. Xem phần 10.3. |
 
-> Tài liệu này **chưa chứa bất kỳ kết quả chạy thử hay số đo nào**. Mọi con số về thời gian là ngưỡng mục tiêu lấy từ PDF, cần được kiểm chứng và ghi vào `docs/12-test-reports.md`.
+> Tài liệu này **chưa chứa bất kỳ kết quả chạy thử hay số đo nào**. Mọi con số về thời gian là ngưỡng mục tiêu lấy từ PDF, cần được kiểm chứng và ghi vào `12-test-reports.md`.
 
 ---
 

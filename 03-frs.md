@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/03-frs.md` |
+| Tệp | `03-frs.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-13 |
 | Người soạn | Nhóm BA / Designer / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
 | Trạng thái | Draft – chờ Product Owner rà soát mục 10 |
-| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `docs/01-brd.md` v1.1; (3) `docs/02-srs.md` v1.1 (cả hai đều đang ở trạng thái Draft) |
+| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `01-brd.md` v1.1; (3) `02-srs.md` v1.1 (cả hai đều đang ở trạng thái Draft) |
 
 **Quy ước ký hiệu**
 

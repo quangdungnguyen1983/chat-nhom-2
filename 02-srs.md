@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/02-srs.md` |
+| Tệp | `02-srs.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-13 |
 | Người soạn | Nhóm BA / Architect (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
 | Trạng thái | Draft – chờ Product Owner rà soát mục 9 |
-| Nguồn yêu cầu | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)", ngày 13~14/11/2026 – **nguồn duy nhất của yêu cầu nghiệp vụ**; (2) `docs/01-brd.md` v1.1 trên repository (trạng thái trong tài liệu: Draft) |
+| Nguồn yêu cầu | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)", ngày 13~14/11/2026 – **nguồn duy nhất của yêu cầu nghiệp vụ**; (2) `01-brd.md` v1.1 trên repository (trạng thái trong tài liệu: Draft) |
 
 **Quy ước ký hiệu**
 
@@ -22,7 +22,7 @@
 | `[OQ-xx]` | Câu hỏi mở. OQ-01…OQ-11 kế thừa từ BRD; OQ-12 trở đi phát sinh ở SRS. Xem mục 9.2. |
 | `AT-01…AT-06` | 6 bước nghiệm thu MVP theo PDF §5, đánh số theo đúng thứ tự trong PDF. |
 
-> Tài liệu này **không chứa kết quả chạy thử hay số đo nào**. Các ngưỡng thời gian lấy từ PDF và phải được kiểm chứng bằng phép đo thực tế, ghi tại `docs/12-test-reports.md`.
+> Tài liệu này **không chứa kết quả chạy thử hay số đo nào**. Các ngưỡng thời gian lấy từ PDF và phải được kiểm chứng bằng phép đo thực tế, ghi tại `12-test-reports.md`.
 
 ---
 
@@ -124,7 +124,7 @@ Không có vai trò **quản trị hệ thống** vì gói mở rộng A (QT-01,
 
 ## 4. Đặc tả từng yêu cầu chức năng
 
-Mỗi mã gồm: đầu vào/đầu ra, quy tắc, trạng thái lỗi và tiêu chí chấp nhận đo được (dạng Cho trước / Khi / Thì). Câu chữ thông báo lỗi chính xác trên giao diện sẽ chốt tại `docs/03-frs.md`. Bảng lỗi dưới đây mô tả **điều kiện lỗi và hành vi bắt buộc**.
+Mỗi mã gồm: đầu vào/đầu ra, quy tắc, trạng thái lỗi và tiêu chí chấp nhận đo được (dạng Cho trước / Khi / Thì). Câu chữ thông báo lỗi chính xác trên giao diện sẽ chốt tại `03-frs.md`. Bảng lỗi dưới đây mô tả **điều kiện lỗi và hành vi bắt buộc**.
 
 Quy tắc chung cho mọi chức năng cần đăng nhập:
 - **QT-CHUNG-1:** Yêu cầu không có phiên hợp lệ (chưa đăng nhập, hết hạn, đã đăng xuất) bị từ chối và không trả dữ liệu nào `[PDF TK-03, §4]`.
