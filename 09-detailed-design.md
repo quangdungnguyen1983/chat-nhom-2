@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/09-detailed-design.md` |
+| Tệp | `09-detailed-design.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-14 |
 | Người soạn | Nhóm Architect / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
@@ -49,7 +49,8 @@
 /                               – gốc repository, npm workspaces
 ├── package.json                – workspaces: ["server", "web"]; script dev, build, test
 ├── .env.example                – mẫu biến môi trường (mục 11), KHÔNG chứa giá trị thật
-├── docs/                       – 01…12
+├── 01-brd.md … 12-test-reports.md – tài liệu dự án, nằm ngay ở thư mục gốc
+├── wireframe.html, ui-design.html – tệp đi kèm 10-ui-ux.md (mục 6, 8.5)
 ├── server/
 │   ├── package.json
 │   ├── prisma/

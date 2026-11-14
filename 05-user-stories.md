@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/05-user-stories.md` |
+| Tệp | `05-user-stories.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-13 |
 | Người soạn | Nhóm BA / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
 | Trạng thái | Draft – chờ Product Owner rà soát mục 7 |
-| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `docs/01-brd.md` v1.1; (3) `docs/02-srs.md` v1.1. Mã UC lấy từ bản nháp `docs/04-use-cases.md` **chưa có trên repository** `[OQ-19]` |
+| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `01-brd.md` v1.1; (3) `02-srs.md` v1.1. Mã UC lấy từ bản nháp `04-use-cases.md` **chưa có trên repository** `[OQ-19]` |
 
 **Quy ước ký hiệu**
 
@@ -513,7 +513,7 @@ Một story chỉ được đánh dấu **Xong** khi đạt **toàn bộ** các 
 - [ ] Làm trên nhánh riêng cho story, ví dụ `feature/US-09-gui-tin` `[GUS-09]`.
 - [ ] Thông điệp commit có mã story, ví dụ `feat(US-09): gui nhan tin realtime CH-02`.
 - [ ] Gộp vào nhánh `main` qua pull request đã được rà soát (5.3); `main` luôn chạy được.
-- [ ] README và tài liệu liên quan (`docs/`) được cập nhật nếu cách cài đặt hoặc hành vi thay đổi.
+- [ ] README và tài liệu liên quan (các tệp `01-…md`–`12-…md` ở thư mục gốc) được cập nhật nếu cách cài đặt hoặc hành vi thay đổi.
 - [ ] Bản trên môi trường demo trực tuyến được cập nhật sau khi gộp `[QĐ-02]`.
 
 ---

@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/06-erd.md` |
+| Tệp | `06-erd.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-14 |
 | Người soạn | Nhóm BA / Architect / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |

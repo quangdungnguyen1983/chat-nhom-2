@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/10-ui-ux.md` |
+| Tệp | `10-ui-ux.md` |
 | Phiên bản | 1.0 – Draft |
 | Ngày | 2026-11-14 |
 | Người soạn | Nhóm Designer / BA / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
 | Trạng thái | Draft – **wireframe chờ duyệt** (mục 13). Bản UI design là bản nháp dựng trên wireframe chưa duyệt |
 | Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)", ngày 13~14/11/2026 – **nguồn duy nhất của yêu cầu nghiệp vụ**; (2) `01-brd.md` v1.1; (3) `02-srs.md` (bản trên repository ghi v1.0); (4) `03-frs.md` v1.0 – mục 2, 4, 5 (màn hình, trường nhập, thông báo); (5) `04-use-cases.md` v1.1; (6) `05-user-stories.md` v1.0; (7) `09-detailed-design.md` v1.0 – bản nháp **chưa có trên repository** (OQ-27) |
-| Tệp đi kèm | `docs/wireframes/wireframe.html` (khung xám, duyệt bố cục) · `docs/ui-design/ui-design.html` (màu sắc, chữ, thành phần theo mục 8) |
+| Tệp đi kèm | `wireframe.html` (khung xám, duyệt bố cục) · `ui-design.html` (màu sắc, chữ, thành phần theo mục 8) |
 
 **Quy ước ký hiệu**
 
@@ -170,7 +170,7 @@ Trạng thái chung mọi màn hình: **hết phiên** → thông báo M-31, v�
 
 ## 6. Wireframe low-fidelity
 
-- Tệp: **`docs/wireframes/wireframe.html`** – một file HTML, không dùng thư viện ngoài, mở trực tiếp bằng trình duyệt.
+- Tệp: **`wireframe.html`** – một file HTML, không dùng thư viện ngoài, mở trực tiếp bằng trình duyệt.
 - Chỉ dùng trắng, đen, xám; khung chữ nhật + nhãn; mỗi màn hình hoặc trạng thái là một khung có tiêu đề SC-xx; chú thích số ①②③ giải thích thành phần.
 - Có khung máy tính (≥ 1024 px, 3 cột) và khung điện thoại (390 px, 1 cột).
 - Mục đích: **duyệt bố cục và luồng**, chưa duyệt màu. Duyệt theo mục 13.
@@ -265,7 +265,7 @@ Không dùng **chỉ màu** để truyền thông tin: hội thoại chưa đọ
 
 ### 8.5 Tệp UI design
 
-- Tệp: **`docs/ui-design/ui-design.html`** – HTML tĩnh, CSS nội tuyến, chỉ dùng token ở mục 8; dữ liệu mẫu tiếng Việt có dấu là **dữ liệu giả lập**.
+- Tệp: **`ui-design.html`** – HTML tĩnh, CSS nội tuyến, chỉ dùng token ở mục 8; dữ liệu mẫu tiếng Việt có dấu là **dữ liệu giả lập**.
 - Thể hiện: badge từng hội thoại và tổng trên đầu trang (và mẫu tiêu đề tab); tin hệ thống trong nhóm; avatar chữ cái; tên người gửi trong nhóm; tin gửi lỗi với "Gửi lại"; thanh mất kết nối; trạng thái hover/focus/disabled/lỗi của nút và ô nhập; khung điện thoại 390 px cho trang chính.
 - Có dòng chữ "MẪU THIẾT KẾ – không phải ảnh sản phẩm đang chạy" ở đầu trang.
 
@@ -370,7 +370,7 @@ PDF không yêu cầu bước duyệt này; đây là quy trình nhóm đề xu�
 
 Cách duyệt:
 
-1. Mở `docs/wireframes/wireframe.html` bằng Chrome, Edge, Firefox hoặc Safari.
+1. Mở `wireframe.html` bằng Chrome, Edge, Firefox hoặc Safari.
 2. Với từng khung SC-xx: đối chiếu với bảng mục 5 và với FRS mục 4 (đủ trường, đủ nút, đúng chữ).
 3. Đi hết hành trình mục 4.1 trên wireframe: có màn hình nào thiếu, có bước nào phải đoán không?
 4. Ghi ý kiến vào bảng dưới; sửa xong thì đổi trạng thái tài liệu.
