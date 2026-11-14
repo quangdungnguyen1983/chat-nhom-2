@@ -4,7 +4,7 @@ import {
   checkDisplayName, checkPassword, checkUsername, countChars, escapeLike, nfc, normalizeDisplayName,
   normalizeUsername, searchKey,
 } from "../../src/common/validation.js";
-import { avatarInitial } from "../../src/common/avatar.js";
+import { avatarInitial, groupInitial } from "../../src/common/avatar.js";
 import { M } from "../../src/common/messages.js";
 
 describe("countChars / nfc", () => {
@@ -64,5 +64,13 @@ describe("UT-AVT-01 – avatar", () => {
     expect(avatarInitial("Nguyễn Văn An")).toBe("A");
     expect(avatarInitial("bình")).toBe("B");
     expect(avatarInitial("đức".normalize("NFD"))).toBe("Đ");
+  });
+});
+
+describe("avatar nhóm (ui-design.html)", () => {
+  it("chữ cái đầu của tên nhóm, in hoa, giữ dấu", () => {
+    expect(groupInitial("Phòng Kế hoạch")).toBe("P");
+    expect(groupInitial("  nhóm Đổi Mới 2026")).toBe("N");
+    expect(groupInitial("ẩn danh")).toBe("Ẩ");
   });
 });

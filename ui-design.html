@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>(5) Chat nội bộ – UI design (mẫu thiết kế)</title>
 <style>
-  /* ===== Design token – khớp docs/10-ui-ux.md mục 8 ===== */
+  /* ===== Design token – khớp 10-ui-ux.md mục 8 ===== */
   :root {
     --color-primary: #1D4ED8;
     --color-primary-hover: #1E40AF;
@@ -126,10 +126,11 @@
   .skeleton { background: linear-gradient(90deg, var(--color-surface), var(--color-border), var(--color-surface)); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); height: 12px; }
   @keyframes shimmer { to { background-position: -200% 0; } }
   .chipsel { display: inline-flex; gap: var(--space-1); align-items: center; background: var(--color-selected); border-radius: var(--radius-full); padding: 0 var(--space-2); font-size: var(--font-size-sm); min-height: 32px; }
+  .btn-sm { min-height: 32px; padding: 0 var(--space-2); font-size: var(--font-size-sm); }
   .role { font-size: var(--font-size-xs); border: 1px solid var(--color-primary); color: var(--color-primary); border-radius: var(--radius-full); padding: 0 var(--space-2); }
 
   /* ===== App layout ===== */
-  .browser { overflow-x: auto; border: 1px solid var(--color-text-muted); border-radius: var(--radius-md); overflow: hidden; background: var(--color-bg); }
+  .browser { overflow-x: auto; border: 1px solid var(--color-text-muted); border-radius: var(--radius-md); background: var(--color-bg); }
   .browser-tab { background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: var(--space-1) var(--space-3); font-size: var(--font-size-sm); display: flex; gap: var(--space-2); }
   .browser-tab .tab { background: var(--color-bg); border: 1px solid var(--color-border); border-bottom: 0; border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: 0 var(--space-3); }
   .app { min-width: 720px; display: grid; grid-template-columns: var(--width-sidebar) 1fr var(--width-sidebar); height: 620px; }
@@ -164,16 +165,16 @@
   .auth { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr)); gap: var(--space-4); }
   .auth .card { display: flex; flex-direction: column; gap: var(--space-3); }
   .auth h3 { font-size: var(--font-size-xl); margin: 0; }
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-  @media (max-width: 1100px) { .app { grid-template-columns: 280px 1fr; } .app .info { display: none; } }
+  @media (max-width: 1023px) { .app { grid-template-columns: 280px 1fr; } .app .info { display: none; } } /* 768–1023: SC-06 là bảng trượt phủ lên – xem wireframe */
 </style>
 </head>
 <body>
-<div class="mockup-banner" role="note">MẪU THIẾT KẾ – không phải ảnh sản phẩm đang chạy, không dùng để báo cáo nghiệm thu. Dữ liệu là dữ liệu giả lập. Bản nháp dựng trên wireframe CHƯA DUYỆT (docs/10-ui-ux.md mục 13).</div>
+<div class="mockup-banner" role="note">MẪU THIẾT KẾ – không phải ảnh sản phẩm đang chạy, không dùng để báo cáo nghiệm thu. Dữ liệu là dữ liệu giả lập. Dựng trên wireframe.html – bản nháp chờ Product Owner ký duyệt (10-ui-ux.md mục 13).</div>
 <main>
   <h1>UI design – Ứng dụng chat nội bộ (MVP)</h1>
-  <p class="lead">Dùng đúng design token ở <code>docs/10-ui-ux.md</code> mục 8. Mã màn hình SC-xx như trong wireframe. Rê chuột, bấm Tab trên các nút và ô nhập để xem trạng thái hover/focus thật.</p>
+  <p class="lead">Dùng đúng design token ở <code>10-ui-ux.md</code> mục 8. Mã màn hình SC-xx như trong wireframe. Rê chuột, bấm Tab trên các nút và ô nhập để xem trạng thái hover/focus thật.</p>
 
   <!-- ================= 1. TOKENS ================= -->
   <h2 id="tokens">1. Design token</h2>
@@ -324,9 +325,9 @@ Phòng họp tầng 3.<div class="msg-time">08:41</div></div></div></div>
         <div class="row" style="flex-wrap:nowrap"><strong style="flex:1">Phòng Kế hoạch</strong><button class="btn btn-ghost" aria-label="Đổi tên nhóm">✎ Sửa</button></div>
         <div class="caption">Thành viên (4)</div>
         <div class="member"><span class="avatar sm a1">A</span><span class="n">Nguyễn Văn An (bạn)</span><span class="role">Trưởng nhóm</span></div>
-        <div class="member"><span class="avatar sm a2">B</span><span class="n">Trần Thị Bình</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Trần Thị Bình khỏi nhóm">Xóa</button></div>
-        <div class="member"><span class="avatar sm a3">C</span><span class="n">Lê Cường</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Lê Cường khỏi nhóm">Xóa</button></div>
-        <div class="member"><span class="avatar sm a4">D</span><span class="n">Phạm Dũng</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Phạm Dũng khỏi nhóm">Xóa</button></div>
+        <div class="member"><span class="avatar sm a2">B</span><span class="n">Trần Thị Bình</span><button class="btn btn-danger btn-sm" aria-label="Xóa Trần Thị Bình khỏi nhóm">Xóa</button></div>
+        <div class="member"><span class="avatar sm a3">C</span><span class="n">Lê Cường</span><button class="btn btn-danger btn-sm" aria-label="Xóa Lê Cường khỏi nhóm">Xóa</button></div>
+        <div class="member"><span class="avatar sm a4">D</span><span class="n">Phạm Dũng</span><button class="btn btn-danger btn-sm" aria-label="Xóa Phạm Dũng khỏi nhóm">Xóa</button></div>
         <button class="btn btn-secondary">+ Thêm thành viên</button>
         <button class="btn btn-danger">Rời nhóm</button>
       </aside>
@@ -342,7 +343,7 @@ Phòng họp tầng 3.<div class="msg-time">08:41</div></div></div></div>
       <aside class="sidebar">
         <div class="side-head">
           <div class="brand"><strong>Chat nội bộ</strong><span class="badge" aria-label="5 tin chưa đọc">5</span><span class="avatar sm a1">A</span></div>
-          <div class="row" style="flex-wrap:nowrap"><div class="field" style="flex:1"><label class="sr-only" for="m-search">Tìm đồng nghiệp</label><input id="m-search" placeholder="Tìm đồng nghiệp…"></div><button class="btn btn-primary" aria-label="Tạo nhóm">+ Nhóm</button></div>
+          <div class="row" style="flex-wrap:nowrap"><div class="field" style="flex:1"><label class="sr-only" for="m-search">Tìm đồng nghiệp</label><input id="m-search" placeholder="Tìm đồng nghiệp…"></div><button class="btn btn-primary">+ Tạo nhóm</button></div>
         </div>
         <div class="offline" role="status">Mất kết nối. Đang thử kết nối lại…</div>
         <nav class="list">

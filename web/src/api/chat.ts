@@ -18,5 +18,8 @@ export const listConversations = () =>
   api<{ conversations: ConversationSummaryDto[]; totalUnread: number }>("GET", "/api/conversations");
 export const getMessages = (id: number, before?: number) =>
   api<MessagePage>("GET", `/api/conversations/${id}/messages${before ? `?before=${before}` : ""}`);
+/** Tin bị lỡ sau khi mất kết nối (09 C4 `after`, GL-06). */
+export const getMessagesAfter = (id: number, after: number) =>
+  api<MessagePage>("GET", `/api/conversations/${id}/messages?after=${after}`);
 export const markRead = (id: number) =>
   api<{ conversationId: number; unreadCount: number; totalUnread: number }>("POST", `/api/conversations/${id}/read`, {});

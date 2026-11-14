@@ -5,7 +5,7 @@ import {
   preview, toMessageDto, toUserDto,
   type ConversationDetailDto, type ConversationSummaryDto, type MessageDto,
 } from "../../common/dto.js";
-import { avatarInitial } from "../../common/avatar.js";
+import { avatarInitial, groupInitial } from "../../common/avatar.js";
 import { MAX_MESSAGE_CHARS, countChars, hasVisibleChar, normalizeContent } from "../../common/validation.js";
 import { isUniqueViolation, withWriteTx } from "../../storage/prisma.js";
 import * as convRepo from "../../storage/conversations.repo.js";
@@ -29,7 +29,7 @@ function toSummary(c: ViewRow, me: number, unread: number): ConversationSummaryD
     id: c.id,
     type: c.type as ConversationSummaryDto["type"],
     title,
-    avatarInitial: avatarInitial(title),
+    avatarInitial: other ? avatarInitial(title) : groupInitial(title), // người: từ cuối (GS-11); nhóm: chữ đầu tên nhóm
     otherUser: other ? toUserDto(other) : null,
     memberCount: c.members.length,
     myRole: (mine?.role ?? "member") as ConversationSummaryDto["myRole"],

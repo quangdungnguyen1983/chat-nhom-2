@@ -69,7 +69,8 @@ describe("SC-04 nhóm", () => {
     const bubble = screen.getByText("Chào cả nhóm").closest(".bubble-row")!;
     expect(within(bubble as HTMLElement).getByText("Trần Thị Bình")).toBeInTheDocument();
     expect(bubble.querySelector(".avatar")!.textContent).toBe("B");
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Phòng Kế hoạch · 3 thành viên");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Phòng Kế hoạch");
+    expect(screen.getByText("3 thành viên")).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole("button", { name: "Thông tin nhóm" }));
     expect(onShowInfo).toHaveBeenCalled();
   });
@@ -80,9 +81,9 @@ describe("SC-06 / SC-06b theo vai trò", () => {
     mockFetch(() => json({ conversation: detail("member", [[1, "Nguyễn Văn An", "owner"], [2, "Trần Thị Bình", "member"], [3, "Lê Văn Cường", "member"]]) }));
     render(<GroupInfoPanel conversationId={5} meId={2} refreshKey={0} onClose={() => {}} onLeft={() => {}} />);
     expect(await screen.findByText("Thành viên (3)")).toBeInTheDocument();
-    expect(screen.getByText(/· Trưởng nhóm/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Sửa tên" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Xóa" })).toBeNull();
+    expect(screen.getByText("Trưởng nhóm")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Sửa tên nhóm" })).toBeNull();
+    expect(screen.queryAllByRole("button", { name: /^Xóa / })).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Thêm thành viên" })).toBeNull();
     expect(screen.getByRole("button", { name: "Rời nhóm" })).toBeEnabled();
   });
@@ -93,7 +94,9 @@ describe("SC-06 / SC-06b theo vai trò", () => {
     const onLeft = vi.fn();
     render(<GroupInfoPanel conversationId={5} meId={1} refreshKey={0} onClose={() => {}} onLeft={onLeft} />);
     const u = userEvent.setup();
-    expect(await screen.findByRole("button", { name: "Xóa" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Xóa Trần Thị Bình khỏi nhóm" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sửa tên nhóm" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Xóa Nguyễn Văn An/ })).toBeNull(); // không có nút Xóa ở dòng của chính mình
     await u.click(screen.getByRole("button", { name: "Rời nhóm" }));
     const dlg = screen.getByRole("dialog", { name: "Rời nhóm" });
     expect(within(dlg).getByText('Rời nhóm "Phòng Kế hoạch"? Bạn sẽ không xem được lịch sử nhóm nữa.')).toBeInTheDocument();

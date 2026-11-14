@@ -8,16 +8,13 @@ import { listConversations, openDirect, type ConversationSummaryDto } from "../a
 import { Avatar } from "../components/Avatar";
 import { useAuth } from "../auth";
 import { M, badgeText } from "../lib/text";
+import { listTime } from "../lib/datetime";
+import { previewOf } from "../lib/preview";
+import { Dialog } from "../components/Dialog";
 import { ChatPanel } from "./ChatPanel";
 import { CreateGroupDialog } from "./CreateGroupDialog";
 import { GroupInfoPanel } from "./GroupInfoPanel";
 
-const shortTime = (iso: string) => {
-  const d = new Date(iso);
-  return d.toDateString() === new Date().toDateString()
-    ? d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-    : d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
-};
 
 /** Sắp theo tin mới nhất (CH-06 R1). */
 const sortConvs = (list: ConversationSummaryDto[]) =>
@@ -32,6 +29,8 @@ export function HomePage() {
   const [convError, setConvError] = useState<string | null>(null);
   const [active, setActive] = useState<ConversationSummaryDto | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  /** SC-04f: M-30 (không mở được) hoặc M-32 (bị xóa khỏi nhóm) – hộp thông báo, "Về danh sách". */
+  const [notice, setNotice] = useState<{ title: string; text: string } | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [infoKey, setInfoKey] = useState(0);
@@ -70,7 +69,7 @@ export function HomePage() {
       if (activeRef.current?.id !== conversationId) return;
       setActive(null);
       setShowInfo(false);
-      if (reason === "removed") setToast(M.M32);
+      if (reason === "removed") setNotice({ title: "Thông báo", text: M.M32 });
     };
     const onMemberChanged = ({ conversationId }: { conversationId: number }) => {
       if (activeRef.current?.id === conversationId) setInfoKey((k) => k + 1);
@@ -104,7 +103,7 @@ export function HomePage() {
   }
 
   const onForbidden = useCallback(() => {
-    setToast(M.M30);
+    setNotice({ title: "Không mở được hội thoại", text: M.M30 });
     setActive(null);
     loadConvs();
   }, [loadConvs]);
@@ -112,65 +111,77 @@ export function HomePage() {
   if (!user) return null;
   return (
     <div className={`app-shell ${active ? "has-active" : ""} ${active?.type === "group" && showInfo ? "has-info" : ""}`}>
-      <header className="topbar">
-        <span className="brand">
-          Chat nội bộ
-          {total > 0 && <span className="badge" aria-label={`${total} tin chưa đọc`}>{badgeText(total)}</span>}
-        </span>
-        <Link to="/ho-so" className="me-link" aria-label={`Hồ sơ của ${user.displayName}`}>
-          <Avatar user={user} size={36} />
-        </Link>
-      </header>
-      <aside className="sidebar">
-        <label htmlFor="search" className="sr-only">Tìm đồng nghiệp</label>
-        <div className="search-row">
-          <input id="search" type="search" className="search" placeholder="Tìm đồng nghiệp…" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" maxLength={50} />
-          <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(true)}>Tạo nhóm</button>
+      <aside className="sidebar" aria-label="Danh sách hội thoại">
+        <div className="side-head">
+          <div className="brand">
+            <strong>Chat nội bộ</strong>
+            {total > 0 && <span className="badge" aria-label={`${total} tin chưa đọc`}>{badgeText(total)}</span>}
+            <Link to="/ho-so" className="me-link" aria-label={`Hồ sơ của ${user.displayName}`}>
+              <Avatar user={user} size={32} />
+            </Link>
+          </div>
+          <div className="search-row">
+            <label htmlFor="search" className="sr-only">Tìm đồng nghiệp</label>
+            <input id="search" type="search" className="search" placeholder="Tìm đồng nghiệp…" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" maxLength={50} />
+            <button type="button" className="btn btn-primary create-btn" aria-label="Tạo nhóm" onClick={() => setShowCreate(true)}>+ Tạo nhóm</button>
+          </div>
         </div>
-        {error && <div role="alert" className="alert alert-error">{error}</div>}
-        {results ? (
-          <ul className="user-list" aria-label="Kết quả tìm kiếm">
-            {results.length === 0 && <li className="empty">{M.M14}</li>}
-            {results.map((u) => (
-              <li key={u.id}>
-                <button type="button" className="user-row as-button" onClick={() => startChat(u)}>
-                  <Avatar user={u} />
-                  <span className="user-text">
-                    <span className="name">{u.displayName}</span>
-                    <span className="sub">@{u.username}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <>
-            {convError && <div role="alert" className="alert alert-error">{convError} <button type="button" className="link-btn" onClick={loadConvs}>Thử lại</button></div>}
-            {convs === null && !convError && <p className="placeholder" role="status">Đang tải…</p>}
-            {convs?.length === 0 && <p className="placeholder">{M.M23}</p>}
-            <ul className="user-list" aria-label="Danh sách hội thoại">
-              {convs?.map((c) => (
-                <li key={c.id}>
-                  <button type="button" className={`user-row as-button conv-row ${active?.id === c.id ? "selected" : ""} ${c.unreadCount ? "unread" : ""}`}
-                    onClick={() => setActive(c)}>
-                    {c.otherUser ? <Avatar user={c.otherUser} /> : <Avatar user={{ id: c.id, avatarInitial: c.avatarInitial }} />}
+        <div className="list">
+          {error && <div role="alert" className="alert alert-error">{error}</div>}
+          {results ? (
+            <ul className="user-list" aria-label="Kết quả tìm kiếm">
+              {results.length === 0 && <li className="empty">{M.M14}</li>}
+              {results.map((u) => (
+                <li key={u.id}>
+                  <button type="button" className="user-row as-button" onClick={() => startChat(u)}>
+                    <Avatar user={u} />
                     <span className="user-text">
-                      <span className="name">{c.title}</span>
-                      <span className="sub">{c.lastMessage ? `${c.lastMessage.isMine ? "Bạn: " : ""}${c.lastMessage.preview}` : ""}</span>
-                    </span>
-                    <span className="conv-meta">
-                      {c.lastMessageAt && <span className="sub">{shortTime(c.lastMessageAt)}</span>}
-                      {c.unreadCount > 0 && <span className="badge" aria-label={`${c.unreadCount} tin chưa đọc`}>{badgeText(c.unreadCount)}</span>}
+                      <span className="name">{u.displayName}</span>
+                      <span className="sub">@{u.username}</span>
                     </span>
                   </button>
                 </li>
               ))}
             </ul>
-          </>
-        )}
+          ) : (
+            <>
+              {convError && (
+                <div role="alert" className="alert alert-error">{convError} <button type="button" className="btn btn-ghost" onClick={loadConvs}>Thử lại</button></div>
+              )}
+              {convs === null && !convError && (
+                <div role="status" aria-label="Đang tải danh sách hội thoại">
+                  {Array.from({ length: 5 }, (_, i) => ( // SC-03c: 5 dòng khung xám
+                    <div key={i} className="skeleton-row"><span className="avatar skeleton-avatar" /><span className="skeleton-lines"><span className="skeleton" /><span className="skeleton short" /></span></div>
+                  ))}
+                </div>
+              )}
+              {convs?.length === 0 && <p className="placeholder empty-hint"><span aria-hidden="true">↑</span><br />{M.M23}</p>}
+              <ul className="user-list" aria-label="Hội thoại">
+                {convs?.map((c) => {
+                  const pv = previewOf(c);
+                  return (
+                    <li key={c.id}>
+                      <button type="button" className={`user-row as-button conv-row ${active?.id === c.id ? "selected" : ""} ${c.unreadCount ? "unread" : ""}`}
+                        aria-current={active?.id === c.id || undefined} onClick={() => setActive(c)}>
+                        <Avatar user={c.otherUser ?? { id: c.id, avatarInitial: c.avatarInitial }} />
+                        <span className="user-text">
+                          <span className="name">{c.title}</span>
+                          <span className={`sub preview ${pv?.italic ? "italic" : ""}`}>{pv?.text ?? ""}</span>
+                        </span>
+                        <span className="conv-meta">
+                          {c.lastMessageAt && <span className="sub">{listTime(c.lastMessageAt)}</span>}
+                          {c.unreadCount > 0 && <span className="badge" aria-label={`${c.unreadCount} tin chưa đọc`}>{badgeText(c.unreadCount)}</span>}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
+        </div>
       </aside>
       <main className="content">
-        {toast && <div role="alert" className="alert alert-error">{toast} <button type="button" className="link-btn" onClick={() => setToast(null)} aria-label="Đóng">×</button></div>}
         {active
           ? <ChatPanel key={active.id} conversation={active} meId={user.id} socket={socket} onBack={() => { setActive(null); setShowInfo(false); }}
               onForbidden={onForbidden} onShowInfo={() => setShowInfo(true)} />
@@ -183,6 +194,17 @@ export function HomePage() {
       {showCreate && (
         <CreateGroupDialog onClose={() => setShowCreate(false)}
           onCreated={(c) => { setShowCreate(false); setActive(c); loadConvs(); }} />
+      )}
+      {notice && (
+        <Dialog title={notice.title} onClose={() => setNotice(null)}>
+          <p role="alert">{notice.text}</p>
+          <div className="actions"><button type="button" className="btn btn-primary" onClick={() => setNotice(null)}>Về danh sách</button></div>
+        </Dialog>
+      )}
+      {toast && ( // Thông báo nổi góc dưới, lỗi thì giữ tới khi đóng (10-ui-ux mục 8.4)
+        <div className="toast" role="alert">{toast}
+          <button type="button" className="btn btn-ghost" aria-label="Đóng thông báo" onClick={() => setToast(null)}>✕</button>
+        </div>
       )}
     </div>
   );
