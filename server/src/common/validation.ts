@@ -63,6 +63,13 @@ export const hasVisibleChar = (s: string): boolean => /\S/u.test(s);
 
 export const MAX_MESSAGE_CHARS = 5000; // PDF CH-02
 
+/** Tên nhóm: NFC → trim, 1–100 ký tự (NH-01 R1, GS-28). Trả tên đã chuẩn hóa hoặc null nếu sai. */
+export function normalizeGroupName(raw: string): string | null {
+  const name = nfc(raw).trim();
+  const n = countChars(name);
+  return n >= 1 && n <= 100 ? name : null;
+}
+
 /** Nội dung tin: NFC → chuẩn hóa xuống dòng; KHÔNG trim (FRS NT-03). */
 export const normalizeContent = (raw: string): string => normalizeNewlines(nfc(raw));
 

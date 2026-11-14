@@ -16,6 +16,16 @@ export type ErrorCode =
   | "CONVERSATION_FORBIDDEN"
   | "MESSAGE_EMPTY"
   | "MESSAGE_TOO_LONG"
+  | "GROUP_NAME_INVALID"
+  | "GROUP_TOO_FEW_MEMBERS"
+  | "USERS_NOT_FOUND"
+  | "MEMBER_CONFLICT"
+  | "NOT_GROUP_OWNER"
+  | "TARGET_NOT_MEMBER"
+  | "CANNOT_REMOVE_SELF"
+  | "NOT_A_GROUP"
+  | "NEW_OWNER_REQUIRED"
+  | "LAST_MEMBER_CANNOT_LEAVE"
   | "INTERNAL";
 
 const table: Record<ErrorCode, { status: number; message: string }> = {
@@ -35,6 +45,17 @@ const table: Record<ErrorCode, { status: number; message: string }> = {
   CONVERSATION_FORBIDDEN: { status: 403, message: M.M30 },
   MESSAGE_EMPTY: { status: 400, message: M.MESSAGE_EMPTY },
   MESSAGE_TOO_LONG: { status: 400, message: M.M17 },
+  // Nhóm (09 mục 5). 403 NOT_GROUP_OWNER chỉ trả cho người ĐÃ là thành viên (không lộ thông tin).
+  GROUP_NAME_INVALID: { status: 400, message: M.M25 },
+  GROUP_TOO_FEW_MEMBERS: { status: 400, message: M.M26 },
+  USERS_NOT_FOUND: { status: 400, message: M.M27 },
+  MEMBER_CONFLICT: { status: 409, message: M.M36 },
+  NOT_GROUP_OWNER: { status: 403, message: M.M29 },
+  TARGET_NOT_MEMBER: { status: 404, message: M.TARGET_NOT_MEMBER },
+  CANNOT_REMOVE_SELF: { status: 400, message: M.CANNOT_REMOVE_SELF },
+  NOT_A_GROUP: { status: 400, message: M.NOT_A_GROUP },
+  NEW_OWNER_REQUIRED: { status: 400, message: M.M37 },
+  LAST_MEMBER_CANNOT_LEAVE: { status: 409, message: M.M28 },
   INTERNAL: { status: 500, message: M.M34 },
 };
 

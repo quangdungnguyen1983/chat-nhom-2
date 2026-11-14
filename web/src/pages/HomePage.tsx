@@ -9,6 +9,8 @@ import { Avatar } from "../components/Avatar";
 import { useAuth } from "../auth";
 import { M, badgeText } from "../lib/text";
 import { ChatPanel } from "./ChatPanel";
+import { CreateGroupDialog } from "./CreateGroupDialog";
+import { GroupInfoPanel } from "./GroupInfoPanel";
 
 const shortTime = (iso: string) => {
   const d = new Date(iso);
@@ -30,6 +32,11 @@ export function HomePage() {
   const [convError, setConvError] = useState<string | null>(null);
   const [active, setActive] = useState<ConversationSummaryDto | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoKey, setInfoKey] = useState(0);
+  const activeRef = useRef<ConversationSummaryDto | null>(null);
+  activeRef.current = active; // handler socket đọc hội thoại đang mở mà không phải đăng ký lại
   const seq = useRef(0);
 
   useEffect(() => {
@@ -53,14 +60,32 @@ export function HomePage() {
   // Realtime: dòng hội thoại nhảy lên đầu, trích tin & số chưa đọc đổi mà không tải lại (CH-06 R4).
   useEffect(() => {
     if (!socket) return;
-    const onUpdated = ({ conversation }: { conversation: ConversationSummaryDto }) =>
+    const onUpdated = ({ conversation }: { conversation: ConversationSummaryDto }) => {
       setConvs((prev) => sortConvs([conversation, ...(prev ?? []).filter((c) => c.id !== conversation.id)]));
+      setActive((prev) => (prev && prev.id === conversation.id ? conversation : prev)); // tên nhóm / số thành viên mới
+    };
+    // NH-03: bị xóa hoặc đã rời → gỡ khỏi danh sách; đang mở thì đóng, bị xóa thì hiện M-32 (GF-18).
+    const onRemoved = ({ conversationId, reason }: { conversationId: number; reason: "removed" | "left" }) => {
+      setConvs((prev) => prev?.filter((c) => c.id !== conversationId) ?? prev);
+      if (activeRef.current?.id !== conversationId) return;
+      setActive(null);
+      setShowInfo(false);
+      if (reason === "removed") setToast(M.M32);
+    };
+    const onMemberChanged = ({ conversationId }: { conversationId: number }) => {
+      if (activeRef.current?.id === conversationId) setInfoKey((k) => k + 1);
+    };
     const onUnread = ({ conversationId, unreadCount }: { conversationId: number; unreadCount: number }) =>
       setConvs((prev) => prev?.map((c) => (c.id === conversationId ? { ...c, unreadCount } : c)) ?? prev);
     socket.on("conversation:updated", onUpdated);
     socket.on("unread:update", onUnread);
+    socket.on("conversation:removed", onRemoved);
+    socket.on("member:changed", onMemberChanged);
     socket.on("connect", loadConvs); // nối lại → tải lại danh sách để không lỡ cập nhật
-    return () => { socket.off("conversation:updated", onUpdated); socket.off("unread:update", onUnread); socket.off("connect", loadConvs); };
+    return () => {
+      socket.off("conversation:updated", onUpdated); socket.off("unread:update", onUnread);
+      socket.off("conversation:removed", onRemoved); socket.off("member:changed", onMemberChanged); socket.off("connect", loadConvs);
+    };
   }, [socket, loadConvs]);
 
   const total = (convs ?? []).reduce((s, c) => s + c.unreadCount, 0);
@@ -86,7 +111,7 @@ export function HomePage() {
 
   if (!user) return null;
   return (
-    <div className={`app-shell ${active ? "has-active" : ""}`}>
+    <div className={`app-shell ${active ? "has-active" : ""} ${active?.type === "group" && showInfo ? "has-info" : ""}`}>
       <header className="topbar">
         <span className="brand">
           Chat nội bộ
@@ -98,7 +123,10 @@ export function HomePage() {
       </header>
       <aside className="sidebar">
         <label htmlFor="search" className="sr-only">Tìm đồng nghiệp</label>
-        <input id="search" type="search" className="search" placeholder="Tìm đồng nghiệp…" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" maxLength={50} />
+        <div className="search-row">
+          <input id="search" type="search" className="search" placeholder="Tìm đồng nghiệp…" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" maxLength={50} />
+          <button type="button" className="btn btn-secondary" onClick={() => setShowCreate(true)}>Tạo nhóm</button>
+        </div>
         {error && <div role="alert" className="alert alert-error">{error}</div>}
         {results ? (
           <ul className="user-list" aria-label="Kết quả tìm kiếm">
@@ -125,7 +153,7 @@ export function HomePage() {
                 <li key={c.id}>
                   <button type="button" className={`user-row as-button conv-row ${active?.id === c.id ? "selected" : ""} ${c.unreadCount ? "unread" : ""}`}
                     onClick={() => setActive(c)}>
-                    {c.otherUser ? <Avatar user={c.otherUser} /> : <span className="avatar" aria-hidden="true">{c.avatarInitial}</span>}
+                    {c.otherUser ? <Avatar user={c.otherUser} /> : <Avatar user={{ id: c.id, avatarInitial: c.avatarInitial }} />}
                     <span className="user-text">
                       <span className="name">{c.title}</span>
                       <span className="sub">{c.lastMessage ? `${c.lastMessage.isMine ? "Bạn: " : ""}${c.lastMessage.preview}` : ""}</span>
@@ -144,9 +172,18 @@ export function HomePage() {
       <main className="content">
         {toast && <div role="alert" className="alert alert-error">{toast} <button type="button" className="link-btn" onClick={() => setToast(null)} aria-label="Đóng">×</button></div>}
         {active
-          ? <ChatPanel key={active.id} conversation={active} meId={user.id} socket={socket} onBack={() => setActive(null)} onForbidden={onForbidden} />
+          ? <ChatPanel key={active.id} conversation={active} meId={user.id} socket={socket} onBack={() => { setActive(null); setShowInfo(false); }}
+              onForbidden={onForbidden} onShowInfo={() => setShowInfo(true)} />
           : <p className="placeholder">Xin chào, <strong>{user.displayName}</strong>. Chọn một hội thoại hoặc tìm đồng nghiệp để bắt đầu.</p>}
       </main>
+      {active?.type === "group" && showInfo && (
+        <GroupInfoPanel conversationId={active.id} meId={user.id} refreshKey={infoKey} onClose={() => setShowInfo(false)}
+          onLeft={() => { setConvs((prev) => prev?.filter((c) => c.id !== active.id) ?? prev); setShowInfo(false); setActive(null); }} />
+      )}
+      {showCreate && (
+        <CreateGroupDialog onClose={() => setShowCreate(false)}
+          onCreated={(c) => { setShowCreate(false); setActive(c); loadConvs(); }} />
+      )}
     </div>
   );
 }

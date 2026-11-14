@@ -19,9 +19,10 @@ usersRouter.put("/me", requireAuth, async (req, res) => {
   res.json({ user: await svc.updateDisplayName(req.auth!.userId, body.displayName) });
 });
 
-// U3 – TK-06. `excludeConversationId` được nhận nhưng CHƯA có tác dụng ở slice 1
-// (chưa có bảng hội thoại); theo 09 U3, người gọi không phải thành viên thì bỏ qua tham số.
+// U3 – TK-06. `excludeConversationId`: loại thành viên hiện tại của nhóm (SCR-06a); người gọi không phải
+// thành viên thì bỏ qua tham số (09 U3).
 usersRouter.get("/users", requireAuth, async (req, res) => {
   const query = parseStrict({ q: str(), excludeConversationId: z.string().regex(/^\d+$/).optional() }, req.query);
-  res.json({ users: await svc.searchUsers(req.auth!.userId, query.q) });
+  const ex = query.excludeConversationId !== undefined ? Number(query.excludeConversationId) : undefined;
+  res.json({ users: await svc.searchUsers(req.auth!.userId, query.q, ex !== undefined && ex <= 2_147_483_647 ? ex : undefined) });
 });

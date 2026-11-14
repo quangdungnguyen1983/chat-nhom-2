@@ -15,7 +15,14 @@ export const M = {
   M15: "Bạn không thể tự nhắn tin cho chính mình.",
   M16: "Người dùng này không tồn tại.",
   M17: "Tin nhắn vượt quá 5.000 ký tự (hiện có {n} ký tự).",
+  M25: "Tên nhóm không được để trống và tối đa 100 ký tự.",
+  M26: "Hãy chọn ít nhất 2 thành viên.",
+  M27: "Có người dùng không còn tồn tại. Vui lòng chọn lại.",
+  M28: "Bạn là thành viên duy nhất của nhóm nên chưa thể rời nhóm.",
+  M29: "Chỉ trưởng nhóm mới thực hiện được thao tác này.",
   M30: "Không tìm thấy hội thoại hoặc bạn không có quyền truy cập.",
+  M36: "Người này đã ở trong nhóm hoặc không còn tồn tại.",
+  M37: "Hãy chọn người nhận quyền trưởng nhóm trước khi rời nhóm.",
   M31: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
   M34: "Không kết nối được máy chủ. Vui lòng thử lại.",
   M35: "Vui lòng nhập đủ tên đăng nhập và mật khẩu.",
@@ -23,4 +30,7 @@ export const M = {
   VALIDATION: "Dữ liệu không hợp lệ.",
   // [ĐX] 09 mục 5 / CR-04 – chờ cấp mã M-xx (OQ-38).
   MESSAGE_EMPTY: "Tin nhắn không được để trống.",
+  TARGET_NOT_MEMBER: "Người này không còn trong nhóm.",
+  CANNOT_REMOVE_SELF: "Trưởng nhóm không thể tự xóa mình. Hãy dùng chức năng Rời nhóm.",
+  NOT_A_GROUP: "Thao tác này chỉ áp dụng cho nhóm.",
 } as const;

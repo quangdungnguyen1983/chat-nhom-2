@@ -16,7 +16,14 @@ export const M = {
   M22: "Không tải được tin nhắn cũ.",
   M23: "Bạn chưa có cuộc trò chuyện nào. Hãy tìm đồng nghiệp ở ô phía trên để bắt đầu.",
   M24: "Không tải được danh sách hội thoại.",
+  M25: "Tên nhóm không được để trống và tối đa 100 ký tự.",
+  M26: "Hãy chọn ít nhất 2 thành viên.",
+  M28: "Bạn là thành viên duy nhất của nhóm nên chưa thể rời nhóm.",
   M30: "Không tìm thấy hội thoại hoặc bạn không có quyền truy cập.",
+  M32: "Bạn không còn là thành viên của nhóm này.",
+  M37: "Hãy chọn người nhận quyền trưởng nhóm trước khi rời nhóm.",
+  M43: "Xóa {tên} khỏi nhóm? Người này sẽ không xem được lịch sử nhóm nữa.",
+  M44: "Rời nhóm \"{tên nhóm}\"? Bạn sẽ không xem được lịch sử nhóm nữa.",
   M33: "Mất kết nối. Đang thử kết nối lại…",
   M31: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
   M34: "Không kết nối được máy chủ. Vui lòng thử lại.",
@@ -59,6 +66,11 @@ export const formatCount = (n: number) => n.toLocaleString("vi-VN");
 export const tooLongMessage = (n: number) => M.M17.replace("{n}", formatCount(n));
 /** Badge: > 99 hiện "99+" (TB-01 R6). */
 export const badgeText = (n: number) => (n > 99 ? "99+" : String(n));
+
+export const checkGroupName = (s: string) => {
+  const n = countChars(nfc(s).trim());
+  return n >= 1 && n <= 100 ? null : M.M25;
+};
 
 /** Màu nền avatar cố định theo tài khoản: --avatar-(id % 6 + 1) (10-ui-ux.md mục 8.1). */
 export const avatarColorVar = (id: number) => `var(--avatar-${(id % 6) + 1})`;

@@ -36,12 +36,14 @@ export function updatePasswordHash(id: number, passwordHash: string, tx?: Tx): P
  * Cả hai cột và từ khóa đều đã ở chữ thường nên kết quả không phụ thuộc chế độ
  * phân biệt hoa thường của LIKE trong SQLite (chỉ áp dụng A–Z).
  */
-export function searchUsers(pattern: string, excludeUserId: number, limit: number) {
+export function searchUsers(pattern: string, excludeUserId: number, limit: number, excludeConversationId = 0) {
   return prisma().$queryRaw<Array<{ id: number; username: string; displayName: string }>>`
     SELECT id, username, display_name AS displayName
     FROM users
     WHERE id <> ${excludeUserId}
       AND (username LIKE ${pattern} ESCAPE '\\' OR display_name_search LIKE ${pattern} ESCAPE '\\')
+      AND id NOT IN (SELECT user_id FROM conversation_members
+                     WHERE conversation_id = ${excludeConversationId} AND left_at IS NULL)
     ORDER BY display_name_search ASC, id ASC
     LIMIT ${limit}`;
 }

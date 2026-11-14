@@ -125,3 +125,30 @@ h2 { font-size: var(--font-size-lg); margin: 0 0 var(--space-3); }
   .app-shell.has-active .content { display: flex; }
   .chat-head .back { display: inline-flex; }
 }
+
+/* Slice 3 – nhóm (10-ui-ux.md mục 7, 8.4) */
+.search-row { display: flex; gap: var(--space-2); }
+.search-row .btn { flex-shrink: 0; }
+.chat-head h2 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-head h2 .sub { font-weight: var(--font-weight-regular); }
+.system-msg { text-align: center; margin: var(--space-1) 0; font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+.bubble-row.theirs { gap: var(--space-2); align-items: flex-end; }
+.bubble-sender { font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--color-text-secondary); margin-bottom: 2px; }
+.btn-danger { background: var(--color-error); color: #fff; border: 0; }
+.btn-danger:hover:not(:disabled) { filter: brightness(.9); }
+.btn.small { min-height: 32px; padding: 0 var(--space-2); font-size: var(--font-size-sm); margin-left: auto; }
+.group-info { position: fixed; top: 0; right: 0; bottom: 0; width: 320px; max-width: 100%; background: var(--color-bg); border-left: 1px solid var(--color-border); padding: var(--space-3); overflow-y: auto; box-shadow: -2px 0 8px rgba(0,0,0,.08); }
+.group-info h3 { font-size: var(--font-size-md); margin: var(--space-3) 0 var(--space-2); }
+.group-name { display: flex; gap: var(--space-2); align-items: baseline; }
+.chips { list-style: none; padding: 0; margin: 0 0 var(--space-2); display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.chip { display: inline-flex; align-items: center; gap: var(--space-1); background: var(--color-selected); border-radius: var(--radius-full); padding: 2px var(--space-2); font-size: var(--font-size-sm); }
+.chip button { border: 0; background: none; cursor: pointer; font-size: var(--font-size-md); min-width: 24px; }
+.picker-results { max-height: 240px; overflow-y: auto; }
+.user-row.selected { background: var(--color-selected); }
+.hint.warn { color: var(--color-error); }
+.checkbox { display: flex; gap: var(--space-2); align-items: center; margin: var(--space-2) 0; min-height: var(--size-touch); }
+.checkbox input { width: 20px; height: 20px; }
+select { width: 100%; min-height: var(--size-touch); font: inherit; border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); padding: 0 var(--space-2); background: var(--color-bg); }
+@media (max-width: 767px) { .group-info { width: 100%; } .info-btn { padding: 0 var(--space-2); } }
+/* ≥ 1024 px: Thông tin nhóm là cột thứ 3 (10-ui-ux.md mục 7) – không che khung chat. 768–1023: bảng trượt phủ lên. */
+@media (min-width: 1024px) { .app-shell.has-info .content { margin-right: 320px; } }
