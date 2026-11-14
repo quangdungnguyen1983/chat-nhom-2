@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>(5) Chat nội bộ – UI design (mẫu thiết kế)</title>
+<style>
+  /* ===== Design token – khớp docs/10-ui-ux.md mục 8 ===== */
+  :root {
+    --color-primary: #1D4ED8;
+    --color-primary-hover: #1E40AF;
+    --color-focus: #2563EB;
+    --color-bg: #FFFFFF;
+    --color-surface: #F3F4F6;
+    --color-selected: #DBEAFE;
+    --color-text: #111827;
+    --color-text-secondary: #4B5563;
+    --color-text-muted: #6B7280;
+    --color-border: #E5E7EB;
+    --color-badge: #C81E1E;
+    --color-error: #B91C1C;
+    --color-error-bg: #FEF2F2;
+    --color-success: #15803D;
+    --color-warning-bg: #FEF3C7;
+    --color-warning-text: #92400E;
+    --color-disabled-bg: #E5E7EB;
+    --color-disabled-text: #6B7280;
+    --avatar-1: #1D4ED8; --avatar-2: #0F766E; --avatar-3: #7C3AED;
+    --avatar-4: #B45309; --avatar-5: #BE185D; --avatar-6: #4D7C0F;
+
+    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-size-xs: 12px; --font-size-sm: 14px; --font-size-md: 16px; --font-size-lg: 20px; --font-size-xl: 24px;
+    --font-weight-regular: 400; --font-weight-bold: 600;
+    --line-height: 1.5;
+
+    --space-1: 4px; --space-2: 8px; --space-3: 16px; --space-4: 24px; --space-5: 32px; --space-6: 48px;
+    --radius-sm: 4px; --radius-md: 8px; --radius-lg: 16px; --radius-full: 999px;
+    --size-avatar: 40px; --size-avatar-sm: 32px; --size-touch: 44px;
+    --width-sidebar: 320px; --width-bubble-max: 70%;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-surface); }
+  .mockup-banner { position: sticky; top: 0; z-index: 10; background: var(--color-warning-bg); color: var(--color-warning-text); padding: var(--space-2) var(--space-3); font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); border-bottom: 1px solid var(--color-warning-text); }
+  main { padding: var(--space-4) var(--space-2); max-width: 1320px; margin: 0 auto; }
+  h1 { font-size: var(--font-size-xl); margin: 0 0 var(--space-2); }
+  h2 { font-size: var(--font-size-lg); margin: var(--space-6) 0 var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-2); }
+  h3 { font-size: var(--font-size-md); margin: var(--space-4) 0 var(--space-2); }
+  p.lead { color: var(--color-text-secondary); margin: 0 0 var(--space-3); }
+  .card { background: var(--color-bg); border-radius: var(--radius-md); padding: var(--space-4); border: 1px solid var(--color-border); }
+  .grid { display: grid; gap: var(--space-3); }
+  .g4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .row { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+  .stack { display: flex; flex-direction: column; gap: var(--space-2); }
+  .caption { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+  code { font-size: var(--font-size-xs); background: var(--color-surface); padding: 0 var(--space-1); border-radius: var(--radius-sm); }
+
+  /* swatches */
+  .swatch { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-bg); }
+  .swatch .chip { height: 56px; display: flex; align-items: flex-end; padding: var(--space-1) var(--space-2); font-size: var(--font-size-xs); }
+  .swatch .info { padding: var(--space-2); font-size: var(--font-size-xs); }
+
+  /* ===== Components ===== */
+  .btn { font: inherit; font-size: var(--font-size-md); min-height: var(--size-touch); padding: 0 var(--space-3); border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; display: inline-flex; white-space: nowrap; justify-content: center; align-items: center; gap: var(--space-2); }
+  .btn-primary { background: var(--color-primary); color: #FFFFFF; }
+  .btn-primary:hover, .btn-primary.is-hover { background: var(--color-primary-hover); }
+  .btn-secondary { background: var(--color-bg); color: var(--color-text); border-color: var(--color-text-muted); }
+  .btn-secondary:hover, .btn-secondary.is-hover { background: var(--color-surface); }
+  .btn-danger { background: var(--color-error); color: #FFFFFF; }
+  .btn-ghost { background: transparent; color: var(--color-primary); padding: 0 var(--space-2); }
+  .btn:focus-visible, .btn.is-focus, .field input:focus-visible, .composer textarea:focus-visible, a:focus-visible, .conv:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  .btn:disabled, .btn.is-disabled { background: var(--color-disabled-bg); color: var(--color-disabled-text); border-color: transparent; cursor: not-allowed; }
+  .spinner { width: 16px; height: 16px; border-radius: var(--radius-full); border: 2px solid rgba(255,255,255,.5); border-top-color: #FFFFFF; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner, .skeleton { animation: none !important; } }
+
+  .field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+  .field label { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); }
+  .field input { width: 100%; font: inherit; font-size: var(--font-size-md); height: var(--size-touch); padding: 0 var(--space-2); border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); background: var(--color-bg); color: var(--color-text); }
+  .field input::placeholder { color: var(--color-text-muted); }
+  .field input:hover, .field input.is-hover { border-color: var(--color-text); }
+  .field input.is-focus { outline: 2px solid var(--color-focus); outline-offset: 0; border-color: var(--color-focus); }
+  .field input[aria-invalid="true"] { border: 2px solid var(--color-error); }
+  .field input:disabled { background: var(--color-disabled-bg); color: var(--color-disabled-text); }
+  .hint { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+  .error-text { font-size: var(--font-size-sm); color: var(--color-error); }
+  .error-text::before { content: "⚠ "; }
+  .check-ok { color: var(--color-success); font-size: var(--font-size-sm); }
+  .check-no { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+
+  .avatar { width: var(--size-avatar); height: var(--size-avatar); border-radius: var(--radius-full); color: #FFFFFF; font-weight: var(--font-weight-bold); display: inline-flex; align-items: center; justify-content: center; flex: none; font-size: var(--font-size-md); }
+  .avatar.sm { width: var(--size-avatar-sm); height: var(--size-avatar-sm); font-size: var(--font-size-sm); }
+  .a1 { background: var(--avatar-1); } .a2 { background: var(--avatar-2); } .a3 { background: var(--avatar-3); }
+  .a4 { background: var(--avatar-4); } .a5 { background: var(--avatar-5); } .a6 { background: var(--avatar-6); }
+  .badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-full); background: var(--color-badge); color: #FFFFFF; font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); display: inline-flex; align-items: center; justify-content: center; }
+
+  .conv { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-3); min-height: 72px; cursor: pointer; text-decoration: none; color: inherit; border-radius: var(--radius-sm); }
+  .conv:hover, .conv.is-hover { background: var(--color-bg); }
+  .conv.is-selected { background: var(--color-selected); }
+  .conv .body { flex: 1; min-width: 0; }
+  .conv .name { display: block; font-size: var(--font-size-md); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv .preview { display: block; font-size: var(--font-size-sm); color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conv.is-unread .name, .conv.is-unread .preview { font-weight: var(--font-weight-bold); color: var(--color-text); }
+  .conv .side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
+  .conv .time { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+  .italic { font-style: italic; }
+
+  .msg { display: flex; gap: var(--space-2); align-items: flex-start; }
+  .msg.mine { justify-content: flex-end; }
+  .bubble { max-width: var(--width-bubble-max); padding: var(--space-2) var(--space-3); border-radius: var(--radius-lg); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .bubble.other { background: var(--color-surface); color: var(--color-text); }
+  .bubble.mine { background: var(--color-primary); color: #FFFFFF; }
+  .bubble.pending .msg-time { font-style: italic; }
+  .bubble.failed { background: var(--color-error-bg); color: var(--color-text); border: 1px solid var(--color-error); }
+  .sender { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-text-secondary); }
+  .msg-time { font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: var(--space-1); }
+  .bubble.mine .msg-time { color: #FFFFFF; }
+  .fail-line { font-size: var(--font-size-sm); color: var(--color-error); display: flex; gap: var(--space-2); align-items: center; margin-top: var(--space-1); }
+  .system { text-align: center; font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: var(--space-2) 0; }
+  .day { text-align: center; font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: var(--space-2) 0; }
+
+  .offline { background: var(--color-warning-bg); color: var(--color-warning-text); font-size: var(--font-size-sm); padding: var(--space-2) var(--space-3); text-align: center; }
+  .toast { background: var(--color-text); color: #FFFFFF; border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); display: inline-flex; gap: var(--space-3); align-items: center; }
+  .alert-error { background: var(--color-error-bg); color: var(--color-error); border: 1px solid var(--color-error); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); }
+  .alert-success { color: var(--color-success); border: 1px solid var(--color-success); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); background: var(--color-bg); }
+  .skeleton { background: linear-gradient(90deg, var(--color-surface), var(--color-border), var(--color-surface)); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); height: 12px; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .chipsel { display: inline-flex; gap: var(--space-1); align-items: center; background: var(--color-selected); border-radius: var(--radius-full); padding: 0 var(--space-2); font-size: var(--font-size-sm); min-height: 32px; }
+  .role { font-size: var(--font-size-xs); border: 1px solid var(--color-primary); color: var(--color-primary); border-radius: var(--radius-full); padding: 0 var(--space-2); }
+
+  /* ===== App layout ===== */
+  .browser { overflow-x: auto; border: 1px solid var(--color-text-muted); border-radius: var(--radius-md); overflow: hidden; background: var(--color-bg); }
+  .browser-tab { background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: var(--space-1) var(--space-3); font-size: var(--font-size-sm); display: flex; gap: var(--space-2); }
+  .browser-tab .tab { background: var(--color-bg); border: 1px solid var(--color-border); border-bottom: 0; border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: 0 var(--space-3); }
+  .app { min-width: 720px; display: grid; grid-template-columns: var(--width-sidebar) 1fr var(--width-sidebar); height: 620px; }
+  .sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; min-height: 0; }
+  .side-head { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
+  .brand { display: flex; align-items: center; gap: var(--space-2); }
+  .brand strong { flex: 1; font-size: var(--font-size-lg); }
+  .list { overflow: auto; padding: 0 var(--space-2) var(--space-2); }
+  .chat { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .chat-head { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-border); min-height: 64px; }
+  .chat-head .title { flex: 1; min-width: 0; }
+  .chat-head .title strong { font-size: var(--font-size-lg); display: block; }
+  .messages { flex: 1; overflow: auto; padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
+  .composer { border-top: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); display: flex; gap: var(--space-2); align-items: flex-end; }
+  .composer textarea { flex: 1; font: inherit; font-size: var(--font-size-md); min-height: var(--size-touch); max-height: 144px; resize: none; padding: var(--space-2); border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); }
+  .info { border-left: 1px solid var(--color-border); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow: auto; }
+  .member { display: flex; gap: var(--space-2); align-items: center; min-height: var(--size-touch); }
+  .member .n { flex: 1; min-width: 0; }
+
+  /* mobile frame */
+  .phones { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+  .phone { width: 390px; max-width: 100%; height: 760px; border: 8px solid var(--color-text); border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; background: var(--color-bg); flex: none; }
+  .phone .status { background: var(--color-surface); font-size: var(--font-size-xs); text-align: center; padding: var(--space-1); color: var(--color-text-secondary); }
+  .phone .sidebar { border-right: 0; flex: 1; }
+  .back { font-size: var(--font-size-lg); min-width: var(--size-touch); min-height: var(--size-touch); display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--color-primary); cursor: pointer; }
+
+  .modal-backdrop { background: rgba(17,24,39,.45); padding: var(--space-5); border-radius: var(--radius-md); display: flex; justify-content: center; }
+  .modal { background: var(--color-bg); border-radius: var(--radius-md); padding: var(--space-4); width: 440px; max-width: 100%; display: flex; flex-direction: column; gap: var(--space-3); }
+  .modal h3 { margin: 0; font-size: var(--font-size-lg); }
+  .actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+
+  .auth { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr)); gap: var(--space-4); }
+  .auth .card { display: flex; flex-direction: column; gap: var(--space-3); }
+  .auth h3 { font-size: var(--font-size-xl); margin: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 1100px) { .app { grid-template-columns: 280px 1fr; } .app .info { display: none; } }
+</style>
+</head>
+<body>
+<div class="mockup-banner" role="note">MẪU THIẾT KẾ – không phải ảnh sản phẩm đang chạy, không dùng để báo cáo nghiệm thu. Dữ liệu là dữ liệu giả lập. Bản nháp dựng trên wireframe CHƯA DUYỆT (docs/10-ui-ux.md mục 13).</div>
+<main>
+  <h1>UI design – Ứng dụng chat nội bộ (MVP)</h1>
+  <p class="lead">Dùng đúng design token ở <code>docs/10-ui-ux.md</code> mục 8. Mã màn hình SC-xx như trong wireframe. Rê chuột, bấm Tab trên các nút và ô nhập để xem trạng thái hover/focus thật.</p>
+
+  <!-- ================= 1. TOKENS ================= -->
+  <h2 id="tokens">1. Design token</h2>
+  <h3>Màu sắc (tỉ lệ tương phản ghi ở 10-ui-ux.md mục 8.1)</h3>
+  <div class="grid g4">
+    <div class="swatch"><div class="chip" style="background:var(--color-primary);color:#fff">Aa</div><div class="info"><b>--color-primary</b><br>#1D4ED8</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-primary-hover);color:#fff">Aa</div><div class="info"><b>--color-primary-hover</b><br>#1E40AF</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-focus);color:#fff">Aa</div><div class="info"><b>--color-focus</b><br>#2563EB</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-bg);color:var(--color-text);border-bottom:1px solid var(--color-border)">Aa</div><div class="info"><b>--color-bg</b><br>#FFFFFF</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-surface)">Aa</div><div class="info"><b>--color-surface</b><br>#F3F4F6</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-selected)">Aa</div><div class="info"><b>--color-selected</b><br>#DBEAFE</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-text);color:#fff">Aa</div><div class="info"><b>--color-text</b><br>#111827</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-text-secondary);color:#fff">Aa</div><div class="info"><b>--color-text-secondary</b><br>#4B5563</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-text-muted);color:#fff">Aa</div><div class="info"><b>--color-text-muted</b><br>#6B7280</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-border)">Aa</div><div class="info"><b>--color-border</b><br>#E5E7EB</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-badge);color:#fff">12</div><div class="info"><b>--color-badge</b><br>#C81E1E</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-error);color:#fff">Aa</div><div class="info"><b>--color-error</b><br>#B91C1C</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-error-bg);color:var(--color-error)">Aa</div><div class="info"><b>--color-error-bg</b><br>#FEF2F2</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-success);color:#fff">Aa</div><div class="info"><b>--color-success</b><br>#15803D</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-warning-bg);color:var(--color-warning-text)">Aa</div><div class="info"><b>--color-warning-bg / -text</b><br>#FEF3C7 / #92400E</div></div>
+    <div class="swatch"><div class="chip" style="background:var(--color-disabled-bg);color:var(--color-disabled-text)">Aa</div><div class="info"><b>--color-disabled-bg / -text</b><br>#E5E7EB / #6B7280</div></div>
+  </div>
+  <h3>Avatar (chọn theo mã người dùng % 6)</h3>
+  <div class="row">
+    <span class="avatar a1">A</span><span class="avatar a2">B</span><span class="avatar a3">C</span><span class="avatar a4">D</span><span class="avatar a5">Ẩ</span><span class="avatar a6">Ư</span>
+    <span class="caption">#1D4ED8 · #0F766E · #7C3AED · #B45309 · #BE185D · #4D7C0F – "Nguyễn Văn Ẩn" → <b>Ẩ</b> (chữ cái đầu của từ cuối, giữ dấu)</span>
+  </div>
+  <h3>Chữ (phông hệ thống, line-height 1.5)</h3>
+  <div class="card stack">
+    <div style="font-size:var(--font-size-xl);font-weight:600">24 px – Tiêu đề: Đăng nhập</div>
+    <div style="font-size:var(--font-size-lg);font-weight:600">20 px – Phòng Kế hoạch · Ẩ Ỗ Ữ Ặ Ộ</div>
+    <div style="font-size:var(--font-size-md)">16 px – Nội dung tin: Chào bạn, hôm nay họp lúc 14h nhé! Ừ, được. Nghiêng ngả, khuỷu tay, thuở ấy.</div>
+    <div style="font-size:var(--font-size-sm);color:var(--color-text-secondary)">14 px – Trích tin cuối, tin hệ thống, chữ gợi ý</div>
+    <div style="font-size:var(--font-size-xs);color:var(--color-text-secondary)">12 px – 14:05 · Hôm qua · 12/11/2026</div>
+  </div>
+  <h3>Khoảng cách (lưới 8 px) và bo góc</h3>
+  <div class="row card">
+    <span style="width:4px;height:24px;background:var(--color-primary)"></span><span class="caption">4</span>
+    <span style="width:8px;height:24px;background:var(--color-primary)"></span><span class="caption">8</span>
+    <span style="width:16px;height:24px;background:var(--color-primary)"></span><span class="caption">16</span>
+    <span style="width:24px;height:24px;background:var(--color-primary)"></span><span class="caption">24</span>
+    <span style="width:32px;height:24px;background:var(--color-primary)"></span><span class="caption">32</span>
+    <span style="width:48px;height:24px;background:var(--color-primary)"></span><span class="caption">48</span>
+    <span style="width:48px;height:32px;border:2px solid var(--color-text-muted);border-radius:var(--radius-sm)"></span><span class="caption">4</span>
+    <span style="width:48px;height:32px;border:2px solid var(--color-text-muted);border-radius:var(--radius-md)"></span><span class="caption">8</span>
+    <span style="width:48px;height:32px;border:2px solid var(--color-text-muted);border-radius:var(--radius-lg)"></span><span class="caption">16</span>
+    <span style="width:32px;height:32px;border:2px solid var(--color-text-muted);border-radius:var(--radius-full)"></span><span class="caption">999</span>
+  </div>
+
+  <!-- ================= 2. COMPONENTS ================= -->
+  <h2 id="components">2. Thành phần và trạng thái</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(400px,100%),1fr))">
+    <div class="card stack">
+      <h3 style="margin-top:0">Nút</h3>
+      <div class="row"><button class="btn btn-primary">Đăng nhập</button><button class="btn btn-primary is-hover">Hover</button><button class="btn btn-primary is-focus">Focus</button></div>
+      <div class="row"><button class="btn btn-primary" disabled>Bị khóa</button><button class="btn btn-primary" aria-busy="true"><span class="spinner" aria-hidden="true"></span>Đang xử lý…</button></div>
+      <div class="row"><button class="btn btn-secondary">Hủy</button><button class="btn btn-secondary is-hover">Hover</button><button class="btn btn-danger">Rời nhóm</button><button class="btn btn-ghost">Thử lại</button></div>
+    </div>
+    <div class="card stack">
+      <h3 style="margin-top:0">Ô nhập</h3>
+      <div class="field"><label for="d1">Mặc định</label><input id="d1" placeholder="vd: an.nguyen"></div>
+      <div class="field"><label for="d2">Focus</label><input id="d2" class="is-focus" value="an.nguyen"></div>
+      <div class="field"><label for="d3">Lỗi</label><input id="d3" value="nhanvien01" aria-invalid="true" aria-describedby="d3e"><span id="d3e" class="error-text">Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.</span></div>
+      <div class="field"><label for="d4">Bị khóa (chỉ xem)</label><input id="d4" value="dang.an" disabled></div>
+    </div>
+    <div class="card stack">
+      <h3 style="margin-top:0">Badge, thông báo</h3>
+      <div class="row"><span class="badge" aria-label="3 tin chưa đọc">3</span><span class="badge" aria-label="12 tin chưa đọc">12</span><span class="badge" aria-label="Hơn 99 tin chưa đọc">99+</span><span class="caption">Ẩn khi bằng 0</span></div>
+      <div class="offline" role="status">Mất kết nối. Đang thử kết nối lại…</div>
+      <div class="alert-error" role="alert">Tên đăng nhập hoặc mật khẩu không đúng.</div>
+      <div class="alert-success" role="status">Đăng ký thành công. Vui lòng đăng nhập.</div>
+      <div><span class="toast" role="status">Đã lưu tên hiển thị. <button class="btn btn-ghost" style="color:#fff;min-height:auto" aria-label="Đóng thông báo">✕</button></span></div>
+    </div>
+    <div class="card stack">
+      <h3 style="margin-top:0">Dòng hội thoại</h3>
+      <div style="background:var(--color-surface);padding:var(--space-2);border-radius:var(--radius-md)">
+        <a class="conv" href="#components"><span class="avatar a2">B</span><span class="body"><span class="name">Mặc định – Trần Thị Bình</span><span class="preview">Bạn: Mình gửi file trước 15h nhé</span></span><span class="side"><span class="time">14:05</span></span></a>
+        <a class="conv is-hover" href="#components"><span class="avatar a3">C</span><span class="body"><span class="name">Hover – Lê Cường</span><span class="preview">Ok anh</span></span><span class="side"><span class="time">11:20</span></span></a>
+        <a class="conv is-selected" href="#components"><span class="avatar a1">P</span><span class="body"><span class="name">Đang mở – Phòng Kế hoạch</span><span class="preview">Lê Cường: Họp lúc 9h sáng mai</span></span><span class="side"><span class="time">13:40</span></span></a>
+        <a class="conv is-unread" href="#components"><span class="avatar a4">D</span><span class="body"><span class="name">Chưa đọc – Phạm Dũng</span><span class="preview">Anh xem giúp em báo cáo tuần</span></span><span class="side"><span class="time">Hôm qua</span><span class="badge" aria-label="2 tin chưa đọc">2</span></span></a>
+      </div>
+    </div>
+    <div class="card stack">
+      <h3 style="margin-top:0">Tin nhắn</h3>
+      <div class="msg"><span class="avatar sm a3">C</span><div><div class="sender">Lê Cường</div><div class="bubble other">Tin người khác trong nhóm<div class="msg-time">08:41</div></div></div></div>
+      <div class="msg mine"><div class="bubble mine">Tin của mình<div class="msg-time">09:06</div></div></div>
+      <div class="msg mine"><div class="bubble mine pending">Tin đang chờ xác nhận<div class="msg-time">đang gửi…</div></div></div>
+      <div class="msg mine"><div class="bubble failed">⚠ Mình sẽ gửi thêm phụ lục sau<div class="fail-line">Gửi không thành công. <button class="btn btn-secondary" style="min-height:32px">Gửi lại</button></div></div></div>
+      <div class="system">Nguyễn Văn An đã thêm Phạm Dũng vào nhóm · 09:02</div>
+    </div>
+    <div class="card stack">
+      <h3 style="margin-top:0">Đang tải</h3>
+      <div class="row" style="flex-wrap:nowrap"><span class="avatar" style="background:var(--color-border)"></span><div style="flex:1" class="stack"><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:40%"></div></div></div>
+      <div class="row" style="flex-wrap:nowrap"><span class="avatar" style="background:var(--color-border)"></span><div style="flex:1" class="stack"><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:50%"></div></div></div>
+      <p class="caption">Hiệu ứng tắt khi người dùng chọn "giảm chuyển động".</p>
+    </div>
+  </div>
+
+  <!-- ================= 3. DESKTOP ================= -->
+  <h2 id="desktop">3. SC-03 + SC-04c + SC-06 · Máy tính ≥ 1024 px (3 cột)</h2>
+  <div class="browser">
+    <div class="browser-tab"><span class="tab">(5) Chat nội bộ</span><span class="caption">← tổng chưa đọc trên tiêu đề tab (TB-01)</span></div>
+    <div class="app">
+      <aside class="sidebar" aria-label="Danh sách hội thoại">
+        <div class="side-head">
+          <div class="brand"><strong>Chat nội bộ</strong><span class="badge" aria-label="5 tin chưa đọc">5</span><button class="avatar sm a1" style="border:0;cursor:pointer" aria-label="Hồ sơ của tôi: Nguyễn Văn An">A</button></div>
+          <div class="row" style="flex-wrap:nowrap">
+            <div class="field" style="flex:1"><label class="sr-only" for="search">Tìm đồng nghiệp</label><input id="search" placeholder="Tìm đồng nghiệp…"></div>
+            <button class="btn btn-primary">+ Tạo nhóm</button>
+          </div>
+        </div>
+        <nav class="list">
+          <a class="conv is-selected" href="#desktop" aria-current="true"><span class="avatar a1">P</span><span class="body"><span class="name">Phòng Kế hoạch</span><span class="preview">Bạn: Mình sẽ gửi tài liệu trước buổi họp</span></span><span class="side"><span class="time">09:06</span></span></a>
+          <a class="conv is-unread" href="#desktop"><span class="avatar a4">D</span><span class="body"><span class="name">Phạm Dũng</span><span class="preview">Anh xem giúp em báo cáo tuần này nhé</span></span><span class="side"><span class="time">08:55</span><span class="badge" aria-label="3 tin chưa đọc">3</span></span></a>
+          <a class="conv is-unread" href="#desktop"><span class="avatar a6">N</span><span class="body"><span class="name">Nhóm Đổi Mới 2026</span><span class="preview">Hoàng Thị Ngọc: Ý tưởng này ổn đấy</span></span><span class="side"><span class="time">Hôm qua</span><span class="badge" aria-label="2 tin chưa đọc">2</span></span></a>
+          <a class="conv" href="#desktop"><span class="avatar a2">B</span><span class="body"><span class="name">Trần Thị Bình</span><span class="preview">Ừ, được.</span></span><span class="side"><span class="time">Hôm qua</span></span></a>
+          <a class="conv" href="#desktop"><span class="avatar a5">Ẩ</span><span class="body"><span class="name">Đặng Thị Ẩn</span><span class="preview">Cảm ơn chị nhiều ạ</span></span><span class="side"><span class="time">12/11/2026</span></span></a>
+        </nav>
+      </aside>
+
+      <section class="chat" aria-label="Hội thoại Phòng Kế hoạch">
+        <header class="chat-head">
+          <span class="avatar a1">P</span>
+          <div class="title"><strong>Phòng Kế hoạch</strong><span class="caption">4 thành viên</span></div>
+          <button class="btn btn-secondary">Thông tin nhóm</button>
+        </header>
+        <div class="messages" role="log" aria-live="polite">
+          <div class="system italic">Đã hiển thị toàn bộ lịch sử.</div>
+          <div class="day">Hôm nay</div>
+          <div class="system">Nguyễn Văn An đã tạo nhóm "Phòng Kế hoạch" · 08:30</div>
+          <div class="msg"><span class="avatar sm a3">C</span><div><div class="sender">Lê Cường</div><div class="bubble other">Họp lúc 9h sáng mai nhé mọi người.
+Phòng họp tầng 3.<div class="msg-time">08:41</div></div></div></div>
+          <div class="system">Nguyễn Văn An đã thêm Phạm Dũng vào nhóm · 09:02</div>
+          <div class="msg"><span class="avatar sm a2">B</span><div><div class="sender">Trần Thị Bình</div><div class="bubble other">Đã nhận, cảm ơn anh. Em sẽ chuẩn bị số liệu quý IV.<div class="msg-time">09:05</div></div></div></div>
+          <div class="msg mine"><div class="bubble mine">Mình sẽ gửi tài liệu trước buổi họp<div class="msg-time">09:06</div></div></div>
+          <div class="system">Nguyễn Văn An đã xóa Đặng Thị Ẩn khỏi nhóm · 09:10</div>
+          <div class="msg mine"><div class="bubble failed">⚠ Nhờ mọi người đọc trước phụ lục 2<div class="fail-line">Gửi không thành công. <button class="btn btn-secondary" style="min-height:32px">Gửi lại</button></div></div></div>
+        </div>
+        <form class="composer" onsubmit="return false">
+          <label class="sr-only" for="compose">Nhập tin nhắn</label>
+          <textarea id="compose" rows="1" placeholder="Nhập tin nhắn…"></textarea>
+          <button class="btn btn-primary" type="submit" aria-label="Gửi tin nhắn">Gửi</button>
+        </form>
+      </section>
+
+      <aside class="info" aria-label="Thông tin nhóm">
+        <div class="row" style="flex-wrap:nowrap"><strong style="flex:1;font-size:var(--font-size-lg)">Thông tin nhóm</strong><button class="btn btn-ghost" aria-label="Đóng thông tin nhóm">✕</button></div>
+        <div class="row" style="flex-wrap:nowrap"><strong style="flex:1">Phòng Kế hoạch</strong><button class="btn btn-ghost" aria-label="Đổi tên nhóm">✎ Sửa</button></div>
+        <div class="caption">Thành viên (4)</div>
+        <div class="member"><span class="avatar sm a1">A</span><span class="n">Nguyễn Văn An (bạn)</span><span class="role">Trưởng nhóm</span></div>
+        <div class="member"><span class="avatar sm a2">B</span><span class="n">Trần Thị Bình</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Trần Thị Bình khỏi nhóm">Xóa</button></div>
+        <div class="member"><span class="avatar sm a3">C</span><span class="n">Lê Cường</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Lê Cường khỏi nhóm">Xóa</button></div>
+        <div class="member"><span class="avatar sm a4">D</span><span class="n">Phạm Dũng</span><button class="btn btn-ghost" style="color:var(--color-error)" aria-label="Xóa Phạm Dũng khỏi nhóm">Xóa</button></div>
+        <button class="btn btn-secondary">+ Thêm thành viên</button>
+        <button class="btn btn-danger">Rời nhóm</button>
+      </aside>
+    </div>
+  </div>
+  <p class="caption">Người đang đăng nhập là trưởng nhóm nên thấy "✎ Sửa", "Xóa", "+ Thêm thành viên". Thành viên thường chỉ thấy danh sách và "Rời nhóm" (wireframe SC-06).</p>
+
+  <!-- ================= 4. MOBILE ================= -->
+  <h2 id="mobile">4. Điện thoại – khung 390 px (SC-03 → SC-04)</h2>
+  <div class="phones">
+    <div class="phone" aria-label="Khung điện thoại – trang chính">
+      <div class="status">SC-03 · Trang chính</div>
+      <aside class="sidebar">
+        <div class="side-head">
+          <div class="brand"><strong>Chat nội bộ</strong><span class="badge" aria-label="5 tin chưa đọc">5</span><span class="avatar sm a1">A</span></div>
+          <div class="row" style="flex-wrap:nowrap"><div class="field" style="flex:1"><label class="sr-only" for="m-search">Tìm đồng nghiệp</label><input id="m-search" placeholder="Tìm đồng nghiệp…"></div><button class="btn btn-primary" aria-label="Tạo nhóm">+ Nhóm</button></div>
+        </div>
+        <div class="offline" role="status">Mất kết nối. Đang thử kết nối lại…</div>
+        <nav class="list">
+          <a class="conv is-unread" href="#mobile"><span class="avatar a4">D</span><span class="body"><span class="name">Phạm Dũng</span><span class="preview">Anh xem giúp em báo cáo tuần này nhé</span></span><span class="side"><span class="time">08:55</span><span class="badge">3</span></span></a>
+          <a class="conv is-unread" href="#mobile"><span class="avatar a6">N</span><span class="body"><span class="name">Nhóm Đổi Mới 2026</span><span class="preview">Hoàng Thị Ngọc: Ý tưởng này ổn đấy</span></span><span class="side"><span class="time">Hôm qua</span><span class="badge">2</span></span></a>
+          <a class="conv" href="#mobile"><span class="avatar a1">P</span><span class="body"><span class="name">Phòng Kế hoạch</span><span class="preview">Bạn: Mình sẽ gửi tài liệu trước buổi họp</span></span><span class="side"><span class="time">09:06</span></span></a>
+          <a class="conv" href="#mobile"><span class="avatar a2">B</span><span class="body"><span class="name">Trần Thị Bình</span><span class="preview">Ừ, được.</span></span><span class="side"><span class="time">Hôm qua</span></span></a>
+        </nav>
+      </aside>
+    </div>
+    <div class="phone" aria-label="Khung điện thoại – hội thoại 1-1">
+      <div class="status">SC-04 · Hội thoại 1-1</div>
+      <section class="chat" style="flex:1">
+        <header class="chat-head"><button class="back" aria-label="Quay lại danh sách">←</button><span class="avatar sm a4">D</span><div class="title"><strong>Phạm Dũng</strong></div></header>
+        <div class="messages" role="log" aria-live="polite">
+          <div class="day">Hôm nay</div>
+          <div class="msg"><div class="bubble other">Anh ơi, báo cáo tuần em để trong thư mục chung rồi ạ.<div class="msg-time">08:52</div></div></div>
+          <div class="msg"><div class="bubble other">Anh xem giúp em báo cáo tuần này nhé<div class="msg-time">08:55</div></div></div>
+          <div class="msg mine"><div class="bubble mine">Ừ, trưa nay anh xem.
+Có gì anh góp ý sau.<div class="msg-time">09:20</div></div></div>
+        </div>
+        <form class="composer" onsubmit="return false"><label class="sr-only" for="m-compose">Nhập tin nhắn</label><textarea id="m-compose" rows="1" placeholder="Nhập tin nhắn…"></textarea><button class="btn btn-primary" type="submit">Gửi</button></form>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= 5. FORMS & DIALOGS ================= -->
+  <h2 id="forms">5. SC-01 Đăng ký, SC-02 Đăng nhập, SC-05 Tạo nhóm</h2>
+  <div class="auth">
+    <form class="card" onsubmit="return false" aria-labelledby="reg-title">
+      <h3 id="reg-title">Tạo tài khoản</h3>
+      <div class="field"><label for="r-user">Tên đăng nhập</label><input id="r-user" placeholder="vd: an.nguyen" aria-describedby="r-user-h"><span id="r-user-h" class="hint">3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới</span></div>
+      <div class="field"><label for="r-name">Tên hiển thị</label><input id="r-name" value="Đặng Thị Ẩn"></div>
+      <div class="field"><label for="r-pass">Mật khẩu</label><input id="r-pass" type="password" value="matkhau" aria-invalid="true" aria-describedby="r-pass-c r-pass-e">
+        <span id="r-pass-c"><span class="check-ok">✓ Ít nhất 8 ký tự</span> · <span class="check-ok">✓ Có chữ cái</span> · <span class="check-no">○ Có chữ số</span></span>
+        <span id="r-pass-e" class="error-text">Mật khẩu phải có cả chữ cái và chữ số.</span></div>
+      <div class="field"><label for="r-pass2">Nhập lại mật khẩu</label><input id="r-pass2" type="password"></div>
+      <div class="field"><label for="r-code">Mã đăng ký tổ chức</label><input id="r-code"></div>
+      <button class="btn btn-primary" type="submit">Đăng ký</button>
+      <a href="#forms" style="color:var(--color-primary)">Đã có tài khoản? Đăng nhập</a>
+    </form>
+    <form class="card" onsubmit="return false" aria-labelledby="login-title">
+      <div class="alert-success" role="status">Đăng ký thành công. Vui lòng đăng nhập.</div>
+      <h3 id="login-title">Đăng nhập</h3>
+      <div class="field"><label for="l-user">Tên đăng nhập</label><input id="l-user" value="dang.an"></div>
+      <div class="field"><label for="l-pass">Mật khẩu</label><input id="l-pass" type="password"></div>
+      <div class="alert-error" role="alert">Tên đăng nhập hoặc mật khẩu không đúng.</div>
+      <button class="btn btn-primary" type="submit">Đăng nhập</button>
+      <a href="#forms" style="color:var(--color-primary)">Chưa có tài khoản? Đăng ký</a>
+    </form>
+  </div>
+  <h3>SC-05 Tạo nhóm (hộp thoại)</h3>
+  <div class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="g-title">
+      <h3 id="g-title">Tạo nhóm</h3>
+      <div class="field"><label for="g-name">Tên nhóm</label><input id="g-name" value="Nhóm Đổi Mới 2026"></div>
+      <div class="field"><label for="g-add">Thêm thành viên</label><input id="g-add" placeholder="Tìm đồng nghiệp…"></div>
+      <div class="row"><span class="chipsel">Trần Thị Bình <button class="btn btn-ghost" style="min-height:auto;padding:0" aria-label="Bỏ chọn Trần Thị Bình">✕</button></span></div>
+      <span class="caption">Đã chọn: 1 người</span>
+      <span class="error-text">Hãy chọn ít nhất 2 thành viên.</span>
+      <div class="actions"><button class="btn btn-secondary">Hủy</button><button class="btn btn-primary" disabled>Tạo nhóm</button></div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

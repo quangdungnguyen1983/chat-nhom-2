@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireframe – Ứng dụng chat nội bộ (MVP) – Bản nháp chờ duyệt</title>
+<style>
+  :root { --ink:#222; --line:#888; --soft:#e6e6e6; --softer:#f4f4f4; --mid:#bdbdbd; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif; color:var(--ink); background:#fafafa; line-height:1.5; }
+  h1 { font-size:24px; margin:0 0 8px; }
+  .intro { max-width:960px; border:1px dashed var(--line); background:#fff; padding:16px; margin-bottom:24px; }
+  .intro p { margin:4px 0; }
+  nav.toc { max-width:960px; background:#fff; border:1px solid var(--mid); padding:8px 16px; margin-bottom:32px; columns:3; font-size:14px; }
+  nav.toc a { color:var(--ink); display:block; }
+  section.frame { background:#fff; border:2px solid var(--ink); margin:0 0 40px; max-width:1240px; }
+  section.frame > header { background:var(--ink); color:#fff; padding:8px 16px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  section.frame > header h2 { margin:0; font-size:18px; }
+  section.frame > header span { font-size:14px; }
+  .canvas { padding:16px; overflow-x:auto; }
+  .notes { border-top:1px solid var(--mid); padding:8px 16px 16px; font-size:14px; }
+  .notes ol { margin:4px 0; padding-left:0; list-style:none; }
+  .notes li { margin:2px 0; }
+  .c { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--ink); color:#fff; font-size:12px; font-weight:700; margin-right:6px; vertical-align:middle; flex:none; }
+  .box { border:1px solid var(--line); background:#fff; padding:8px; position:relative; }
+  .grey { background:var(--softer); }
+  .row { display:flex; gap:8px; align-items:center; }
+  .col { display:flex; flex-direction:column; gap:8px; }
+  .grow { flex:1; min-width:0; }
+  .lbl { font-size:13px; color:#444; }
+  .inp { border:1px solid var(--line); height:36px; padding:6px 8px; color:#777; font-size:14px; background:#fff; }
+  .inp.err { border:2px solid var(--ink); }
+  .errtxt { font-size:12px; font-weight:700; }
+  .errtxt::before { content:"⚠ "; }
+  .btn { border:1px solid var(--ink); padding:6px 12px; font-size:14px; background:var(--soft); display:inline-block; text-align:center; }
+  .btn.primary { background:var(--ink); color:#fff; }
+  .btn.disabled { background:var(--soft); color:#999; border-color:var(--mid); }
+  .link { text-decoration:underline; font-size:14px; }
+  .av { width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:var(--soft); display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex:none; }
+  .av.sm { width:28px; height:28px; font-size:12px; }
+  .badge { min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:var(--ink); color:#fff; font-size:12px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+  .item { display:flex; gap:8px; align-items:center; padding:8px; border-bottom:1px solid var(--soft); }
+  .item.sel { background:var(--soft); }
+  .item .t { font-size:14px; }
+  .item .p { font-size:13px; color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .item .time { font-size:12px; color:#666; }
+  .b { font-weight:700; }
+  .bubble { max-width:70%; border:1px solid var(--line); padding:6px 10px; font-size:14px; border-radius:12px; background:#fff; }
+  .bubble.me { margin-left:auto; background:var(--soft); }
+  .bubble.fail { border:2px dashed var(--ink); }
+  .meta { font-size:11px; color:#666; }
+  .sys { text-align:center; font-size:12px; color:#555; font-style:italic; margin:4px 0; }
+  .banner { border:1px dashed var(--ink); background:var(--softer); padding:6px 8px; font-size:13px; text-align:center; }
+  .skel { height:14px; background:var(--soft); margin:6px 0; }
+  .modal { border:2px solid var(--ink); background:#fff; width:440px; max-width:100%; margin:0 auto; padding:16px; }
+  .overlay { background:repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 6px,#fafafa 6px,#fafafa 12px); padding:24px; }
+  .chip { border:1px solid var(--line); border-radius:12px; padding:2px 8px; font-size:13px; display:inline-flex; gap:6px; }
+  .desk { display:grid; grid-template-columns:280px 1fr 260px; height:520px; border:1px solid var(--line); min-width:960px; }
+  .desk2 { display:grid; grid-template-columns:280px 1fr; height:460px; border:1px solid var(--line); min-width:760px; }
+  .pane { border-right:1px solid var(--line); display:flex; flex-direction:column; min-height:0; }
+  .pane:last-child { border-right:0; }
+  .pane-h { border-bottom:1px solid var(--line); padding:8px; }
+  .scroll { flex:1; overflow:visible; padding:8px; display:flex; flex-direction:column; gap:6px; }
+  .composer { border-top:1px solid var(--line); padding:8px; }
+  .phone { width:390px; border:2px solid var(--ink); border-radius:16px; height:640px; display:flex; flex-direction:column; overflow:hidden; flex:none; background:#fff; }
+  .phone .notch { height:20px; background:var(--soft); font-size:11px; text-align:center; }
+  .phones { display:flex; gap:24px; flex-wrap:wrap; }
+  .tab { font-size:12px; border:1px solid var(--line); border-bottom:0; display:inline-block; padding:4px 12px; background:var(--soft); }
+  .formpage { width:400px; max-width:100%; margin:0 auto; border:1px solid var(--line); padding:24px; }
+  .check { font-size:13px; }
+  .tag { position:absolute; top:-11px; left:-11px; }
+  .rel { position:relative; }
+</style>
+</head>
+<body>
+
+<h1>Wireframe – Ứng dụng chat nội bộ (MVP)</h1>
+<div class="intro">
+  <p><strong>Trạng thái: BẢN NHÁP – CHỜ DUYỆT</strong> theo <code>docs/10-ui-ux.md</code> mục 13. Chưa duyệt thì chưa viết mã giao diện.</p>
+  <p>Mục đích: duyệt <strong>bố cục và luồng</strong>, chưa duyệt màu sắc. Chỉ dùng trắng – đen – xám.</p>
+  <p>Mã SC-xx trùng số với SCR-xx của <code>03-frs.md</code>. Ký hiệu <span class="c">1</span> là chú thích, giải thích ở cuối mỗi khung. Câu M-xx lấy nguyên văn từ <code>03-frs.md</code> mục 5.</p>
+  <p>Đây là <strong>bản vẽ thiết kế</strong>, không phải ảnh sản phẩm đang chạy; không dùng để báo cáo nghiệm thu. Tên người và tin nhắn là dữ liệu giả lập.</p>
+</div>
+
+<nav class="toc" aria-label="Mục lục">
+  <a href="#sc01">SC-01 Đăng ký</a><a href="#sc01b">SC-01b Đăng ký – lỗi</a><a href="#sc02">SC-02 Đăng nhập</a><a href="#sc02b">SC-02b Đăng nhập – lỗi</a>
+  <a href="#sc03a">SC-03a + SC-04a Trang chính (máy tính)</a><a href="#sc03b">SC-03b Rỗng</a><a href="#sc03c">SC-03c Đang tải</a><a href="#sc03d">SC-03d Lỗi tải</a><a href="#sc03e">SC-03e Tìm người</a>
+  <a href="#sc04b">SC-04b Gửi lỗi / mất kết nối</a><a href="#sc04c">SC-04c Nhóm + SC-06</a><a href="#sc04d">SC-04d Tin dài</a><a href="#sc04e">SC-04e Tin mới khi đọc tin cũ</a><a href="#sc04f">SC-04f Bị từ chối / bị xóa</a>
+  <a href="#sc05">SC-05 Tạo nhóm</a><a href="#sc06m">SC-06 Thành viên thường xem</a><a href="#sc06a">SC-06a Thêm thành viên</a><a href="#sc06b">SC-06b Rời nhóm</a>
+  <a href="#sc07">SC-07 Hồ sơ</a><a href="#sc08">SC-08 Đổi mật khẩu</a><a href="#tablet">Máy tính bảng 2 cột</a><a href="#mobile">Điện thoại 390 px</a>
+</nav>
+
+<!-- SC-01 -->
+<section class="frame" id="sc01">
+  <header><h2>SC-01 · Đăng ký (SC-01a: đang nhập)</h2><span>TK-01, TK-02 · UC-01 · US-01, US-02</span></header>
+  <div class="canvas">
+    <div class="formpage col">
+      <div class="b" style="font-size:20px">Tạo tài khoản</div>
+      <div class="rel"><span class="c tag">1</span><div class="lbl">Tên đăng nhập</div><div class="inp">vd: an.nguyen</div><div class="lbl">3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới</div></div>
+      <div><div class="lbl">Tên hiển thị</div><div class="inp">vd: Nguyễn Văn An</div></div>
+      <div class="rel"><span class="c tag">2</span><div class="lbl">Mật khẩu</div><div class="row"><div class="inp grow">••••••••</div><div class="btn">👁 Hiện</div></div>
+        <div class="check">✓ Ít nhất 8 ký tự &nbsp; ✓ Có chữ cái &nbsp; ☐ Có chữ số</div></div>
+      <div><div class="lbl">Nhập lại mật khẩu</div><div class="inp">••••••••</div></div>
+      <div class="rel"><span class="c tag">3</span><div class="lbl">Mã đăng ký tổ chức</div><div class="inp"></div></div>
+      <div class="btn primary rel"><span class="c tag">4</span>Đăng ký</div>
+      <div class="link" style="text-align:center">Đã có tài khoản? Đăng nhập</div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Chữ hoa tự đổi sang chữ thường khi lưu (QĐ-07, GF-01). Gợi ý định dạng luôn hiện.</li>
+    <li><span class="c">2</span>Danh sách kiểm tra mật khẩu đổi ✓ ngay khi gõ (TK-02). Có nút hiện/ẩn mật khẩu.</li>
+    <li><span class="c">3</span>Mã do tổ chức cấp (QĐ-05, GĐ-16). Không gợi ý mã đúng.</li>
+    <li><span class="c">4</span>Thành công → sang SC-02, hiện M-40, điền sẵn tên đăng nhập. Đang gửi → nút "Đang xử lý…" và khóa.</li>
+  </ol></div>
+</section>
+
+<!-- SC-01b -->
+<section class="frame" id="sc01b">
+  <header><h2>SC-01b · Đăng ký – lỗi</h2><span>TK-01, TK-02 · M-01, M-05, M-07</span></header>
+  <div class="canvas">
+    <div class="formpage col">
+      <div class="b" style="font-size:20px">Tạo tài khoản</div>
+      <div class="rel"><span class="c tag">1</span><div class="lbl">Tên đăng nhập</div><div class="inp err">nhanvien01</div><div class="errtxt">Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.</div></div>
+      <div><div class="lbl">Tên hiển thị</div><div class="inp">Đặng Thị Ẩn</div></div>
+      <div><div class="lbl">Mật khẩu</div><div class="inp err">••••••••</div><div class="errtxt">Mật khẩu phải có cả chữ cái và chữ số.</div></div>
+      <div><div class="lbl">Nhập lại mật khẩu</div><div class="inp">••••••••</div></div>
+      <div><div class="lbl">Mã đăng ký tổ chức</div><div class="inp err">••••</div><div class="errtxt">Mã đăng ký tổ chức không đúng. Vui lòng liên hệ đầu mối của tổ chức để nhận mã.</div></div>
+      <div class="btn primary rel"><span class="c tag">2</span>Đăng ký</div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Lỗi hiện ngay dưới ô, kèm biểu tượng ⚠ và viền đậm (không chỉ dựa vào màu). Focus chuyển tới ô lỗi đầu tiên.</li>
+    <li><span class="c">2</span>Nội dung đã nhập được giữ lại; người dùng chỉ sửa ô sai.</li>
+  </ol></div>
+</section>
+
+<!-- SC-02 -->
+<section class="frame" id="sc02">
+  <header><h2>SC-02 · Đăng nhập (SC-02a)</h2><span>TK-03 · UC-02 · US-03</span></header>
+  <div class="canvas">
+    <div class="formpage col">
+      <div class="banner rel"><span class="c tag">1</span>Đăng ký thành công. Vui lòng đăng nhập.</div>
+      <div class="b" style="font-size:20px">Đăng nhập</div>
+      <div><div class="lbl">Tên đăng nhập</div><div class="inp" style="color:#222">nhanvien01</div></div>
+      <div><div class="lbl">Mật khẩu</div><div class="row"><div class="inp grow">••••••••</div><div class="btn">👁 Hiện</div></div></div>
+      <div class="btn primary rel"><span class="c tag">2</span>Đăng nhập</div>
+      <div class="link" style="text-align:center">Chưa có tài khoản? Đăng ký</div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>M-40 chỉ hiện khi vừa đăng ký xong; tên đăng nhập được điền sẵn.</li>
+    <li><span class="c">2</span>Enter trong ô mật khẩu cũng đăng nhập. Thành công → SC-03.</li>
+  </ol></div>
+</section>
+
+<!-- SC-02b -->
+<section class="frame" id="sc02b">
+  <header><h2>SC-02b · Đăng nhập – lỗi / hết phiên</h2><span>TK-03 · M-09, M-31</span></header>
+  <div class="canvas">
+    <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:center">
+      <div class="formpage col" style="margin:0">
+        <div class="b">Đăng nhập</div>
+        <div class="inp">nhanvien01</div><div class="inp">••••••••</div>
+        <div class="errtxt rel"><span class="c tag">1</span>Tên đăng nhập hoặc mật khẩu không đúng.</div>
+        <div class="btn primary">Đăng nhập</div>
+      </div>
+      <div class="formpage col" style="margin:0">
+        <div class="banner rel"><span class="c tag">2</span>Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</div>
+        <div class="b">Đăng nhập</div>
+        <div class="inp">Tên đăng nhập</div><div class="inp">Mật khẩu</div>
+        <div class="btn primary">Đăng nhập</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Cùng một câu cho sai tên và sai mật khẩu (TK-03 R5).</li>
+    <li><span class="c">2</span>Khi phiên hết hạn, bị hủy hoặc đăng xuất ở nơi khác (đổi mật khẩu), ứng dụng đưa về đây với M-31.</li>
+  </ol></div>
+</section>
+
+<!-- SC-03a desktop -->
+<section class="frame" id="sc03a">
+  <header><h2>SC-03a + SC-04a · Trang chính trên máy tính ≥ 1024 px – có tin chưa đọc, hội thoại 1-1 đang mở</h2><span>CH-06, TB-01, CH-01, CH-02, CH-03 · UC-07…UC-11</span></header>
+  <div class="canvas">
+    <div class="tab rel"><span class="c tag">1</span>(5) Chat nội bộ</div>
+    <div class="desk">
+      <div class="pane grey">
+        <div class="pane-h col">
+          <div class="row"><span class="b grow">Chat nội bộ</span><span class="c">2</span><span class="badge">5</span><span class="c">3</span><span class="av sm">A</span></div>
+          <div class="row"><div class="inp grow rel"><span class="c tag">4</span>Tìm đồng nghiệp…</div><div class="btn rel"><span class="c tag">5</span>+ Tạo nhóm</div></div>
+        </div>
+        <div class="scroll" style="padding:0">
+          <div class="item sel"><span class="av">B</span><div class="grow"><div class="t">Trần Thị Bình</div><div class="p">Bạn: Mình gửi file trước 15h nhé</div></div><div class="col" style="align-items:flex-end"><span class="time">14:05</span></div></div>
+          <div class="item"><span class="c">6</span><span class="av">P</span><div class="grow"><div class="t b">Phòng Kế hoạch</div><div class="p b">Lê Cường: Họp lúc 9h sáng mai</div></div><div class="col" style="align-items:flex-end"><span class="time">13:40</span><span class="badge">3</span></div></div>
+          <div class="item"><span class="av">D</span><div class="grow"><div class="t b">Phạm Dũng</div><div class="p b">Anh xem giúp em báo cáo tuần</div></div><div class="col" style="align-items:flex-end"><span class="time">Hôm qua</span><span class="badge">2</span></div></div>
+          <div class="item"><span class="av">Ẩ</span><div class="grow"><div class="t">Đặng Thị Ẩn</div><div class="p"><i>Đặng Thị Ẩn đã rời nhóm</i></div></div><div class="col" style="align-items:flex-end"><span class="time">12/11/2026</span></div></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="pane-h row"><span class="av sm">B</span><span class="b">Trần Thị Bình</span></div>
+        <div class="scroll">
+          <div class="sys rel"><span class="c tag">7</span>Đang tải tin cũ hơn… / Đã hiển thị toàn bộ lịch sử.</div>
+          <div class="sys">Hôm nay</div>
+          <div class="bubble">Chào bạn, hôm nay họp lúc 14h nhé!<div class="meta">13:58</div></div>
+          <div class="bubble me">Ừ, được.<br>Mình gửi file trước 15h nhé<div class="meta">14:05</div></div>
+        </div>
+        <div class="composer row rel"><span class="c tag">8</span><div class="inp grow" style="height:44px">Nhập tin nhắn…</div><div class="btn primary">Gửi</div></div>
+      </div>
+      <div class="pane">
+        <div class="pane-h b rel"><span class="c tag">9</span>(Cột 3 – chỉ hiện khi mở "Thông tin nhóm")</div>
+        <div class="scroll"><div class="lbl">Với hội thoại 1-1 cột này ẩn; cột giữa giãn ra.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Tiêu đề tab có tổng số chưa đọc "(5) Chat nội bộ"; bằng 0 thì chỉ còn "Chat nội bộ" (TB-01, GĐ-15).</li>
+    <li><span class="c">2</span>Badge tổng = tổng badge các dòng; > 99 hiện "99+".</li>
+    <li><span class="c">3</span>Avatar chữ cái của mình → mở SC-07 Hồ sơ.</li>
+    <li><span class="c">4</span>Ô tìm: gõ ≥ 1 ký tự → chuyển sang SC-03e.</li>
+    <li><span class="c">5</span>Mở SC-05 Tạo nhóm.</li>
+    <li><span class="c">6</span>Dòng chưa đọc: tên + trích tin in đậm + badge số (không chỉ dựa vào màu). Sắp theo tin mới nhất (CH-06). Nhóm có "Tên người gửi:"; tin của mình có "Bạn:"; tin hệ thống chữ nghiêng.</li>
+    <li><span class="c">7</span>Mở hội thoại tải 50 tin mới nhất; cuộn lên đầu tải 50 tin cũ hơn; hết thì M-21 (CH-03). Mở hội thoại thì badge của nó về 0 (TB-01).</li>
+    <li><span class="c">8</span>Enter gửi, Shift+Enter xuống dòng; nút "Gửi" khóa khi ô trống (CH-02).</li>
+    <li><span class="c">9</span>Cột 3 dành cho SC-06 (xem SC-04c).</li>
+  </ol></div>
+</section>
+
+<!-- SC-03b/c/d -->
+<section class="frame" id="sc03b">
+  <header><h2>SC-03b · Rỗng &nbsp;|&nbsp; <span id="sc03c">SC-03c · Đang tải</span> &nbsp;|&nbsp; <span id="sc03d">SC-03d · Lỗi tải</span></h2><span>CH-06 · M-23, M-24</span></header>
+  <div class="canvas">
+    <div class="row" style="gap:24px; align-items:stretch; flex-wrap:wrap">
+      <div class="box grey" style="width:300px; height:300px">
+        <div class="lbl b">SC-03b</div><div class="inp">Tìm đồng nghiệp…</div>
+        <div class="sys rel" style="margin-top:48px"><span class="c tag">1</span>↑<br>Bạn chưa có cuộc trò chuyện nào. Hãy tìm đồng nghiệp ở ô phía trên để bắt đầu.</div>
+      </div>
+      <div class="box grey" style="width:300px; height:300px">
+        <div class="lbl b">SC-03c</div><div class="inp">Tìm đồng nghiệp…</div>
+        <div class="rel"><span class="c tag">2</span>
+          <div class="row" style="margin-top:12px"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
+          <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
+          <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
+        </div>
+      </div>
+      <div class="box grey" style="width:300px; height:300px">
+        <div class="lbl b">SC-03d</div><div class="inp">Tìm đồng nghiệp…</div>
+        <div class="sys rel" style="margin-top:48px"><span class="c tag">3</span>Không tải được danh sách hội thoại.</div>
+        <div style="text-align:center"><span class="btn">Thử lại</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>M-23, có mũi tên chỉ ô tìm. Hội thoại 1-1 chưa có tin không hiện ở đây (GF-09).</li>
+    <li><span class="c">2</span>Khung xám thay cho dữ liệu khi đang tải; tắt hiệu ứng nếu người dùng chọn giảm chuyển động.</li>
+    <li><span class="c">3</span>M-24 kèm nút "Thử lại".</li>
+  </ol></div>
+</section>
+
+<!-- SC-03e -->
+<section class="frame" id="sc03e">
+  <header><h2>SC-03e · Tìm đồng nghiệp</h2><span>TK-06, CH-01 · UC-06, UC-07 · M-14</span></header>
+  <div class="canvas">
+    <div class="row" style="gap:24px; align-items:flex-start; flex-wrap:wrap">
+      <div class="box grey" style="width:300px">
+        <div class="inp rel" style="color:#222"><span class="c tag">1</span>đặng</div>
+        <div class="item"><span class="av">Ẩ</span><div class="grow"><div class="t">Đặng Thị Ẩn</div><div class="p">dang.an</div></div></div>
+        <div class="item"><span class="c">2</span><span class="av">H</span><div class="grow"><div class="t">Đặng Văn Hùng</div><div class="p">hung.dang</div></div></div>
+      </div>
+      <div class="box grey" style="width:300px">
+        <div class="inp" style="color:#222">xyz</div>
+        <div class="sys rel" style="margin:24px 0"><span class="c tag">3</span>Không tìm thấy người dùng phù hợp.</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Tự tìm sau khi ngừng gõ ~0,3 giây (GF-07). Không phân biệt hoa thường; có phân biệt dấu (GĐ-10). Esc hoặc xóa ô → về danh sách hội thoại.</li>
+    <li><span class="c">2</span>Mỗi kết quả: avatar, tên hiển thị, tên đăng nhập; tối đa 20; không có chính mình. Chọn → mở SC-04 (hội thoại cũ nếu đã có – CH-01).</li>
+    <li><span class="c">3</span>M-14 – thông tin, không phải lỗi.</li>
+  </ol></div>
+</section>
+
+<!-- SC-04b -->
+<section class="frame" id="sc04b">
+  <header><h2>SC-04b · Gửi lỗi và mất kết nối</h2><span>CH-02, NFR-13 (khuyến khích) · M-20, M-33</span></header>
+  <div class="canvas">
+    <div class="box" style="max-width:640px; margin:0 auto; padding:0">
+      <div class="pane-h row"><span class="av sm">B</span><span class="b">Trần Thị Bình</span></div>
+      <div class="banner rel"><span class="c tag">1</span>Mất kết nối. Đang thử kết nối lại…</div>
+      <div class="scroll" style="height:220px">
+        <div class="bubble">Bạn gửi lại giúp mình bảng số liệu nhé<div class="meta">15:10</div></div>
+        <div class="bubble me" style="opacity:.6">Đây ạ, bản cập nhật mới nhất<div class="meta">đang gửi…</div></div>
+        <div class="bubble me fail rel"><span class="c tag">2</span>⚠ Mình sẽ gửi thêm phụ lục sau<div class="meta">Gửi không thành công. <span class="btn" style="padding:0 6px">Gửi lại</span></div></div>
+      </div>
+      <div class="composer row"><div class="inp grow">Nhập tin nhắn…</div><div class="btn primary">Gửi</div></div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>M-33 khi kết nối realtime bị ngắt; tự ẩn khi nối lại, rồi tải tin bị lỡ (07 mục 7.8).</li>
+    <li><span class="c">2</span>Quá 10 giây không có xác nhận → tin lỗi: ⚠ + M-20 + nút "Gửi lại" (GF-13). Bấm "Gửi lại" gửi đúng tin đó, không sinh tin trùng. Không có nhãn "đã nhận / đã xem" (CH-04 – NOT MVP).</li>
+  </ol></div>
+</section>
+
+<!-- SC-04c group + SC-06 owner -->
+<section class="frame" id="sc04c">
+  <header><h2>SC-04c + SC-06 · Hội thoại nhóm và Thông tin nhóm (trưởng nhóm xem)</h2><span>NH-02, NH-03, NH-04 · UC-08, UC-13…UC-16</span></header>
+  <div class="canvas">
+    <div class="desk">
+      <div class="pane grey"><div class="pane-h b">Danh sách hội thoại (như SC-03a)</div><div class="scroll"><div class="item sel"><span class="av">P</span><div class="grow"><div class="t">Phòng Kế hoạch</div><div class="p">Lê Cường: Họp lúc 9h sáng mai</div></div></div></div></div>
+      <div class="pane">
+        <div class="pane-h row rel"><span class="c tag">1</span><span class="av sm">P</span><div class="grow"><div class="b">Phòng Kế hoạch</div><div class="lbl">4 thành viên</div></div><span class="btn">Thông tin nhóm</span></div>
+        <div class="scroll">
+          <div class="sys rel"><span class="c tag">2</span>Nguyễn Văn An đã tạo nhóm "Phòng Kế hoạch" · 08:30</div>
+          <div class="row" style="align-items:flex-start"><span class="av sm rel"><span class="c tag">3</span>C</span><div><div class="lbl b">Lê Cường</div><div class="bubble" style="max-width:100%">Họp lúc 9h sáng mai nhé mọi người<div class="meta">08:41</div></div></div></div>
+          <div class="sys">Nguyễn Văn An đã thêm Phạm Dũng vào nhóm · 09:02</div>
+          <div class="row" style="align-items:flex-start"><span class="av sm">B</span><div><div class="lbl b">Trần Thị Bình</div><div class="bubble" style="max-width:100%">Đã nhận, cảm ơn anh<div class="meta">09:05</div></div></div></div>
+          <div class="bubble me">Mình sẽ gửi tài liệu trước buổi họp<div class="meta">09:06</div></div>
+          <div class="sys">Nguyễn Văn An đã xóa Đặng Thị Ẩn khỏi nhóm · 09:10</div>
+        </div>
+        <div class="composer row"><div class="inp grow">Nhập tin nhắn…</div><div class="btn primary">Gửi</div></div>
+      </div>
+      <div class="pane">
+        <div class="pane-h row rel"><span class="c tag">4</span><span class="b grow">Thông tin nhóm</span><span>✕</span></div>
+        <div class="scroll">
+          <div class="row"><span class="b grow">Phòng Kế hoạch</span><span class="btn rel"><span class="c tag">5</span>✎ Sửa</span></div>
+          <div class="lbl">Thành viên (4)</div>
+          <div class="item"><span class="av sm">A</span><div class="grow t">Nguyễn Văn An (bạn)</div><span class="chip">Trưởng nhóm</span></div>
+          <div class="item"><span class="av sm">B</span><div class="grow t">Trần Thị Bình</div><span class="btn rel"><span class="c tag">6</span>Xóa</span></div>
+          <div class="item"><span class="av sm">C</span><div class="grow t">Lê Cường</div><span class="btn">Xóa</span></div>
+          <div class="item"><span class="av sm">D</span><div class="grow t">Phạm Dũng</div><span class="btn">Xóa</span></div>
+          <div class="btn rel"><span class="c tag">7</span>+ Thêm thành viên</div>
+          <div class="btn rel"><span class="c tag">8</span>Rời nhóm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Đầu khung nhóm: tên nhóm, số thành viên hiện tại, nút "Thông tin nhóm" (mở cột 3).</li>
+    <li><span class="c">2</span>Tin hệ thống: căn giữa, chữ nhỏ, nghiêng, không avatar, có giờ; dùng tên hiển thị lúc xảy ra sự kiện (NH-04, GS-32).</li>
+    <li><span class="c">3</span>Mỗi tin của người khác có tên + avatar (NH-02, GF-16). Tin của mình căn phải, không cần tên (GX-07).</li>
+    <li><span class="c">4</span>SC-06 ở cột 3 trên máy tính; trên điện thoại là màn hình riêng (GX-05). ✕ đóng cột.</li>
+    <li><span class="c">5</span>Sửa tên nhóm – chỉ trưởng nhóm thấy (NH-03).</li>
+    <li><span class="c">6</span>"Xóa" – chỉ trưởng nhóm thấy, không có ở dòng của chính mình; luôn hỏi xác nhận M-43.</li>
+    <li><span class="c">7</span>Mở SC-06a.</li>
+    <li><span class="c">8</span>Mở SC-06b; mọi thành viên đều thấy.</li>
+  </ol></div>
+</section>
+
+<!-- SC-04d / e -->
+<section class="frame" id="sc04d">
+  <header><h2>SC-04d · Tin dài &nbsp;|&nbsp; <span id="sc04e">SC-04e · Có tin mới khi đang đọc tin cũ</span></h2><span>CH-02, CH-03 · M-17, M-22</span></header>
+  <div class="canvas">
+    <div class="row" style="gap:24px; flex-wrap:wrap; align-items:flex-start">
+      <div class="box" style="width:520px; padding:0">
+        <div class="composer col">
+          <div class="inp" style="height:88px; color:#222">Kính gửi anh chị, em xin gửi báo cáo tổng hợp… (rất dài)</div>
+          <div class="row"><span class="errtxt grow rel"><span class="c tag">1</span>Tin nhắn vượt quá 5.000 ký tự (hiện có 5.032 ký tự).</span><span class="b">5.032 / 5.000</span><span class="btn disabled">Gửi</span></div>
+        </div>
+      </div>
+      <div class="box" style="width:420px; height:240px; padding:0; display:flex; flex-direction:column">
+        <div class="sys rel"><span class="c tag">2</span>Không tải được tin nhắn cũ. <span class="btn" style="padding:0 6px">Thử lại</span></div>
+        <div class="scroll"><div class="bubble">… tin cũ đang đọc …</div><div class="bubble me">… tin cũ …</div></div>
+        <div style="text-align:center; padding:8px"><span class="btn rel"><span class="c tag">3</span>Có tin nhắn mới ↓</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Bộ đếm hiện khi &gt; 4.500 ký tự (GF-11); &gt; 5.000: chữ đậm/đỏ, M-17, nút "Gửi" khóa. Đếm theo ký tự sau chuẩn hóa NFC (09 mục 4.1).</li>
+    <li><span class="c">2</span>Lỗi tải 50 tin cũ: M-22 + "Thử lại"; tin đang hiện vẫn giữ nguyên.</li>
+    <li><span class="c">3</span>Đang cuộn lên đọc tin cũ thì không tự cuộn xuống; hiện nút này (GF-15).</li>
+  </ol></div>
+</section>
+
+<!-- SC-04f -->
+<section class="frame" id="sc04f">
+  <header><h2>SC-04f · Bị từ chối / bị xóa khỏi nhóm</h2><span>NFR-04, NH-03 · UC-17 · M-30, M-32</span></header>
+  <div class="canvas">
+    <div class="row" style="gap:24px; flex-wrap:wrap; justify-content:center">
+      <div class="modal col"><div class="b rel"><span class="c tag">1</span>Không mở được hội thoại</div><div>Không tìm thấy hội thoại hoặc bạn không có quyền truy cập.</div><div class="btn primary">Về danh sách</div></div>
+      <div class="modal col"><div class="b rel"><span class="c tag">2</span>Thông báo</div><div>Bạn không còn là thành viên của nhóm này.</div><div class="btn primary">Về danh sách</div></div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>M-30 – cùng một câu cho "không tồn tại" và "không có quyền"; không hiện tin nào (AT-06).</li>
+    <li><span class="c">2</span>M-32 khi đang mở nhóm mà bị xóa; nhóm biến mất khỏi danh sách (QĐ-04).</li>
+  </ol></div>
+</section>
+
+<!-- SC-05 -->
+<section class="frame" id="sc05">
+  <header><h2>SC-05 · Tạo nhóm (SC-05a: chưa đủ người)</h2><span>NH-01 · UC-12 · US-16 · M-25, M-26, M-27</span></header>
+  <div class="canvas overlay">
+    <div class="row" style="gap:24px; flex-wrap:wrap; align-items:flex-start">
+      <div class="modal col">
+        <div class="b">Tạo nhóm</div>
+        <div><div class="lbl">Tên nhóm</div><div class="inp rel" style="color:#222"><span class="c tag">1</span>Phòng Kế hoạch</div></div>
+        <div><div class="lbl">Thêm thành viên</div><div class="inp rel"><span class="c tag">2</span>Tìm đồng nghiệp…</div></div>
+        <div class="row" style="flex-wrap:wrap"><span class="chip">Trần Thị Bình ✕</span><span class="chip">Lê Cường ✕</span></div>
+        <div class="lbl rel"><span class="c tag">3</span>Đã chọn: 2 người</div>
+        <div class="row" style="justify-content:flex-end"><span class="btn">Hủy</span><span class="btn primary rel"><span class="c tag">4</span>Tạo nhóm</span></div>
+      </div>
+      <div class="modal col">
+        <div class="b">Tạo nhóm – SC-05a</div>
+        <div class="inp" style="color:#222">Nhóm Đổi Mới 2026</div>
+        <div class="row"><span class="chip">Trần Thị Bình ✕</span></div>
+        <div class="lbl">Đã chọn: 1 người</div>
+        <div class="errtxt">Hãy chọn ít nhất 2 thành viên.</div>
+        <div class="row" style="justify-content:flex-end"><span class="btn">Hủy</span><span class="btn disabled">Tạo nhóm</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>1–100 ký tự, cho phép tiếng Việt (GS-28); lỗi M-25.</li>
+    <li><span class="c">2</span>Ô tìm như SC-03e; không có chính mình; chọn rồi thành thẻ có ✕.</li>
+    <li><span class="c">3</span>Đếm người đã chọn, không tính người tạo (NH-01: từ 2 người trở lên).</li>
+    <li><span class="c">4</span>Chỉ bật khi tên hợp lệ và ≥ 2 người. Thành công → mở nhóm ở SC-04c với tin "đã tạo nhóm". Hộp thoại: focus vào ô đầu tiên, Esc đóng.</li>
+  </ol></div>
+</section>
+
+<!-- SC-06 member view -->
+<section class="frame" id="sc06m">
+  <header><h2>SC-06 · Thông tin nhóm – thành viên thường xem</h2><span>NH-03 · UC-16</span></header>
+  <div class="canvas">
+    <div class="box" style="width:300px; margin:0 auto">
+      <div class="row"><span class="b grow">Thông tin nhóm</span><span>✕</span></div>
+      <div class="b rel"><span class="c tag">1</span>Phòng Kế hoạch</div>
+      <div class="lbl">Thành viên (4)</div>
+      <div class="item"><span class="av sm">A</span><div class="grow t">Nguyễn Văn An</div><span class="chip">Trưởng nhóm</span></div>
+      <div class="item"><span class="av sm">B</span><div class="grow t">Trần Thị Bình (bạn)</div></div>
+      <div class="item"><span class="av sm">C</span><div class="grow t">Lê Cường</div></div>
+      <div class="item"><span class="av sm">D</span><div class="grow t">Phạm Dũng</div></div>
+      <div class="btn rel" style="display:block; margin-top:8px"><span class="c tag">2</span>Rời nhóm</div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Không có nút sửa tên, "Xóa", "Thêm thành viên" – các nút này không hiện (máy chủ vẫn kiểm tra quyền – NH-03).</li>
+    <li><span class="c">2</span>Rời nhóm → SC-06b (bản thành viên thường: chỉ câu xác nhận M-44).</li>
+  </ol></div>
+</section>
+
+<!-- SC-06a -->
+<section class="frame" id="sc06a">
+  <header><h2>SC-06a · Thêm thành viên</h2><span>NH-03, NH-04 · UC-13 · US-18 · M-36</span></header>
+  <div class="canvas overlay">
+    <div class="modal col">
+      <div class="b">Thêm thành viên</div>
+      <div class="inp rel"><span class="c tag">1</span>Tìm đồng nghiệp…</div>
+      <div class="row"><span class="chip">Phạm Dũng ✕</span></div>
+      <div class="row rel"><span class="c tag">2</span><span class="box" style="width:20px; height:20px; padding:0"></span><span>Cho xem tin nhắn trước đó</span></div>
+      <div class="row" style="justify-content:flex-end"><span class="btn">Hủy</span><span class="btn primary rel"><span class="c tag">3</span>Thêm</span></div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Kết quả tìm đã loại người đang trong nhóm (GF-08). Chọn được nhiều người.</li>
+    <li><span class="c">2</span>Mặc định <strong>không</strong> đánh dấu (QĐ-08, GS-35); áp dụng cho cả lần thêm (GF-17).</li>
+    <li><span class="c">3</span>Mỗi người được thêm sinh một tin hệ thống "… đã thêm … vào nhóm" (NH-04). Lỗi M-36 nếu có người đã ở trong nhóm.</li>
+  </ol></div>
+</section>
+
+<!-- SC-06b -->
+<section class="frame" id="sc06b">
+  <header><h2>SC-06b · Rời nhóm (trưởng nhóm)</h2><span>NH-03, NH-04 · UC-16 · US-21 · M-44, M-37, M-28</span></header>
+  <div class="canvas overlay">
+    <div class="row" style="gap:24px; flex-wrap:wrap; align-items:flex-start">
+      <div class="modal col">
+        <div class="b">Rời nhóm</div>
+        <div class="rel"><span class="c tag">1</span>Rời nhóm "Phòng Kế hoạch"? Bạn sẽ không xem được lịch sử nhóm nữa.</div>
+        <div class="lbl rel"><span class="c tag">2</span>Chọn trưởng nhóm mới</div>
+        <div class="item"><span>◉</span><span class="av sm">B</span><span class="t">Trần Thị Bình</span></div>
+        <div class="item"><span>○</span><span class="av sm">C</span><span class="t">Lê Cường</span></div>
+        <div class="row" style="justify-content:flex-end"><span class="btn">Hủy</span><span class="btn primary rel"><span class="c tag">3</span>Rời nhóm</span></div>
+      </div>
+      <div class="modal col">
+        <div class="b">Rời nhóm – chỉ còn một mình</div>
+        <div class="errtxt rel"><span class="c tag">4</span>Bạn là thành viên duy nhất của nhóm nên chưa thể rời nhóm.</div>
+        <div class="row" style="justify-content:flex-end"><span class="btn">Đóng</span><span class="btn disabled">Rời nhóm</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>M-44. Thành viên thường chỉ thấy câu này và hai nút.</li>
+    <li><span class="c">2</span>Chỉ trưởng nhóm thấy; bắt buộc chọn (QĐ-03). Chưa chọn → nút "Rời nhóm" khóa, gợi ý M-37.</li>
+    <li><span class="c">3</span>Thành công → về SC-03; nhóm biến mất khỏi danh sách; nhóm có 2 tin hệ thống "chuyển quyền" rồi "đã rời nhóm" (GĐ-19).</li>
+    <li><span class="c">4</span>M-28 (GĐ-18).</li>
+  </ol></div>
+</section>
+
+<!-- SC-07 -->
+<section class="frame" id="sc07">
+  <header><h2>SC-07 · Hồ sơ cá nhân</h2><span>TK-05, TK-03 · UC-05, UC-03 · US-06, US-04 · M-03, M-42</span></header>
+  <div class="canvas">
+    <div class="formpage col">
+      <div class="row"><span class="av rel" style="width:64px; height:64px; font-size:24px"><span class="c tag">1</span>Ẩ</span><div><div class="b">Đặng Thị Ẩn</div><div class="lbl">dang.an</div></div></div>
+      <div><div class="lbl">Tên đăng nhập</div><div class="inp rel" style="background:#eee"><span class="c tag">2</span>dang.an</div></div>
+      <div><div class="lbl">Tên hiển thị</div><div class="inp" style="color:#222">Đặng Thị Ẩn</div></div>
+      <div class="btn primary rel"><span class="c tag">3</span>Lưu</div>
+      <div class="btn">Đổi mật khẩu</div>
+      <div class="btn rel"><span class="c tag">4</span>Đăng xuất</div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Avatar = chữ cái đầu của từ cuối tên hiển thị, in hoa, giữ dấu (GS-11). Không có tải ảnh (TK-05).</li>
+    <li><span class="c">2</span>Tên đăng nhập chỉ xem (GS-10).</li>
+    <li><span class="c">3</span>Chỉ bật khi tên đã đổi; thành công M-42; lỗi M-03.</li>
+    <li><span class="c">4</span>Đăng xuất không cần xác nhận (GF-05) → SC-02.</li>
+  </ol></div>
+</section>
+
+<!-- SC-08 -->
+<section class="frame" id="sc08">
+  <header><h2>SC-08 · Đổi mật khẩu</h2><span>TK-04, TK-02 · UC-04 · US-05 · M-04, M-06…M-11, M-41</span></header>
+  <div class="canvas overlay">
+    <div class="modal col">
+      <div class="b">Đổi mật khẩu</div>
+      <div><div class="lbl">Mật khẩu hiện tại</div><div class="inp err">••••••••</div><div class="errtxt">Mật khẩu hiện tại không đúng.</div></div>
+      <div><div class="lbl">Mật khẩu mới</div><div class="inp">••••••••</div><div class="check rel"><span class="c tag">1</span>✓ Ít nhất 8 ký tự &nbsp; ✓ Có chữ cái &nbsp; ✓ Có chữ số</div></div>
+      <div><div class="lbl">Nhập lại mật khẩu mới</div><div class="inp">••••••••</div></div>
+      <div class="row" style="justify-content:flex-end"><span class="btn">Hủy</span><span class="btn primary rel"><span class="c tag">2</span>Đổi mật khẩu</span></div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Cùng danh sách kiểm tra như SC-01; mật khẩu mới phải khác mật khẩu hiện tại (M-11).</li>
+    <li><span class="c">2</span>Thành công: đóng hộp thoại, M-41; các trình duyệt khác bị đăng xuất (QĐ-09).</li>
+  </ol></div>
+</section>
+
+<!-- Tablet -->
+<section class="frame" id="tablet">
+  <header><h2>Bố cục 768–1023 px · 2 cột</h2><span>NFR-12 · GX-01</span></header>
+  <div class="canvas">
+    <div class="desk2">
+      <div class="pane grey"><div class="pane-h b">SC-03 Danh sách (280 px)</div><div class="scroll"><div class="item sel"><span class="av">P</span><div class="grow t">Phòng Kế hoạch</div></div><div class="item"><span class="av">B</span><div class="grow t">Trần Thị Bình</div></div></div></div>
+      <div class="pane rel"><div class="pane-h row"><span class="b grow">SC-04 Phòng Kế hoạch</span><span class="btn">Thông tin nhóm</span></div>
+        <div class="scroll" style="position:relative"><div class="bubble">…</div>
+          <div class="box" style="position:absolute; right:0; top:0; bottom:0; width:260px; border-left:2px solid #222"><span class="c tag">1</span><div class="b">SC-06 trượt phủ lên</div></div></div></div>
+    </div>
+  </div>
+  <div class="notes"><ol><li><span class="c">1</span>Ở chiều rộng này không đủ chỗ cột 3; SC-06 là bảng trượt phủ lên cột hội thoại, có nút ✕.</li></ol></div>
+</section>
+
+<!-- Mobile -->
+<section class="frame" id="mobile">
+  <header><h2>Điện thoại &lt; 768 px (khung 390 px) · SC-03 → SC-04 → SC-06</h2><span>NFR-12 · GX-01, GX-05</span></header>
+  <div class="canvas">
+    <div class="phones">
+      <div class="phone">
+        <div class="notch">SC-03 Trang chính</div>
+        <div class="pane-h col"><div class="row"><span class="b grow">Chat nội bộ</span><span class="badge">5</span><span class="av sm">A</span></div><div class="row"><div class="inp grow">Tìm đồng nghiệp…</div><div class="btn rel"><span class="c tag">1</span>+ Nhóm</div></div></div>
+        <div class="scroll" style="padding:0">
+          <div class="item"><span class="av">P</span><div class="grow"><div class="t b">Phòng Kế hoạch</div><div class="p b">Lê Cường: Họp lúc 9h sáng mai</div></div><span class="badge">3</span></div>
+          <div class="item"><span class="av">D</span><div class="grow"><div class="t b">Phạm Dũng</div><div class="p b">Anh xem giúp em báo cáo tuần</div></div><span class="badge">2</span></div>
+          <div class="item"><span class="av">B</span><div class="grow"><div class="t">Trần Thị Bình</div><div class="p">Bạn: Mình gửi file trước 15h nhé</div></div></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="notch">SC-04 Hội thoại</div>
+        <div class="pane-h row"><span class="c">2</span><span>←</span><span class="av sm">P</span><div class="grow"><div class="b">Phòng Kế hoạch</div><div class="lbl">4 thành viên</div></div><span class="btn">ⓘ</span></div>
+        <div class="scroll">
+          <div class="sys">Nguyễn Văn An đã thêm Phạm Dũng vào nhóm</div>
+          <div class="row" style="align-items:flex-start"><span class="av sm">C</span><div><div class="lbl b">Lê Cường</div><div class="bubble" style="max-width:100%">Họp lúc 9h sáng mai nhé</div></div></div>
+          <div class="bubble me">Mình sẽ có mặt</div>
+        </div>
+        <div class="composer row"><span class="c">3</span><div class="inp grow" style="height:44px">Nhập tin nhắn…</div><div class="btn primary">Gửi</div></div>
+      </div>
+      <div class="phone">
+        <div class="notch">SC-06 Thông tin nhóm</div>
+        <div class="pane-h row"><span>←</span><span class="b grow">Thông tin nhóm</span></div>
+        <div class="scroll">
+          <div class="b">Phòng Kế hoạch</div>
+          <div class="item"><span class="av sm">A</span><div class="grow t">Nguyễn Văn An</div><span class="chip">Trưởng nhóm</span></div>
+          <div class="item"><span class="av sm">B</span><div class="grow t">Trần Thị Bình</div></div>
+          <div class="btn" style="margin-top:auto">Rời nhóm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes"><ol>
+    <li><span class="c">1</span>Mỗi lúc một màn hình; vùng bấm tối thiểu 44 × 44 px. Hộp thoại (SC-05, SC-06a, SC-06b, SC-08) phủ toàn màn hình.</li>
+    <li><span class="c">2</span>"← Quay lại" về SC-03. ⓘ mở SC-06.</li>
+    <li><span class="c">3</span>Trên điện thoại phím Enter xuống dòng, gửi bằng nút "Gửi" (GF-10). Ô soạn bám đáy, không bị bàn phím ảo che.</li>
+  </ol></div>
+</section>
+
+</body>
+</html>
