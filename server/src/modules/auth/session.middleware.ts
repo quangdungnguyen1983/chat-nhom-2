@@ -1,7 +1,7 @@
 // requireAuth cho REST (cửa G1) và kiểm tra Origin cho yêu cầu thay đổi dữ liệu (GH-03).
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../../common/errors.js";
-import { env } from "../../config/env.js";
+import { env, isAllowedOrigin } from "../../config/env.js";
 import { resolveSession } from "./session.service.js";
 
 export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
@@ -16,10 +16,12 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
 
 const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-/** Chống giả mạo yêu cầu từ trang khác: POST/PUT/PATCH/DELETE phải có Origin đúng APP_ORIGIN. */
+/**
+ * Chống giả mạo yêu cầu từ trang khác: POST/PUT/PATCH/DELETE phải có Origin đúng APP_ORIGIN
+ * (hoặc tên miền của chính bản deploy trên Vercel – xem allowedOrigins).
+ */
 export function checkOrigin(req: Request, _res: Response, next: NextFunction) {
   if (!UNSAFE.has(req.method)) return next();
-  const origin = req.get("origin");
-  if (origin !== env().APP_ORIGIN) return next(new AppError("FORBIDDEN_ORIGIN"));
+  if (!isAllowedOrigin(req.get("origin"))) return next(new AppError("FORBIDDEN_ORIGIN"));
   next();
 }

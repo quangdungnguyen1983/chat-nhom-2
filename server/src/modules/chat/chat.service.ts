@@ -154,7 +154,7 @@ export async function sendMessage(me: number, input: SendInput): Promise<{ messa
       const msg = await msgRepo.createText(tx, input.conversationId, me, content, input.clientMessageId);
       await convRepo.setLastMessage(tx, input.conversationId, msg.id, msg.createdAt);
       return { message: toMessageDto(msg), duplicate: false };
-    });
+    }, { lockConversationId: input.conversationId }); // GE-10: ghi lần lượt trong một hội thoại
   } catch (err) {
     if (!isUniqueViolation(err)) throw err;
     const prev = await msgRepo.findBySenderClientId(me, input.clientMessageId);

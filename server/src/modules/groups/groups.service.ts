@@ -68,7 +68,7 @@ export async function renameGroup(me: number, conversationId: number, rawName: s
     await groups.rename(tx, conversationId, name);
     const names = await namesOf(tx, [me]);
     return [await addSystem(tx, conversationId, { type: "group_renamed", actor: names.get(me)!, newName: name }, me, null)];
-  });
+  }, { lockConversationId: conversationId }); // khóa dòng hội thoại (PostgreSQL)
   if (msgs.length) {
     await broadcastMessages(conversationId, msgs);
     realtime.emitMemberChanged(conversationId, "renamed", null, (await detailFor(me, conversationId)).memberCount);
@@ -100,7 +100,7 @@ export async function addMembers(me: number, conversationId: number, userIds: nu
       await groups.upsertCursor(tx, conversationId, u, out[out.length - 1].id);
     }
     return out;
-  });
+  }, { lockConversationId: conversationId }); // khóa dòng hội thoại (PostgreSQL)
   realtime.joinConversation(conversationId, userIds); // vào phòng SAU khi ghi CSDL, TRƯỚC khi phát
   await broadcastMessages(conversationId, msgs);
   const count = (await detailFor(me, conversationId)).memberCount;
@@ -118,7 +118,7 @@ export async function removeMember(me: number, conversationId: number, targetId:
     await groups.markLeft(tx, conversationId, targetId, "removed");
     const names = await namesOf(tx, [me, targetId]);
     return addSystem(tx, conversationId, { type: "member_removed", actor: names.get(me)!, target: names.get(targetId)! }, me, targetId);
-  });
+  }, { lockConversationId: conversationId }); // khóa dòng hội thoại (PostgreSQL)
   // Rời phòng TRƯỚC khi phát → người bị xóa không nhận HT-03 về chính mình (FRS-14 quy tắc 4).
   realtime.leaveConversation(conversationId, [targetId]);
   realtime.emitConversationRemoved(targetId, conversationId, "removed");
@@ -148,7 +148,7 @@ export async function leaveGroup(me: number, conversationId: number, newOwnerId?
     const n = await namesOf(tx, [me]);
     out.push(await addSystem(tx, conversationId, { type: "member_left", target: n.get(me)! }, me, me));
     return { msgs: out, transferredTo };
-  });
+  }, { lockConversationId: conversationId }); // khóa dòng hội thoại (PostgreSQL)
   realtime.leaveConversation(conversationId, [me]);
   realtime.emitConversationRemoved(me, conversationId, "left");
   await broadcastMessages(conversationId, msgs);
