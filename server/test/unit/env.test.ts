@@ -30,7 +30,19 @@ describe("config/env", () => {
     expect(dbProvider(loadEnv(base))).toBe("sqlite");
     expect(dbProvider(loadEnv({ ...base, DATABASE_URL: "postgresql://u:p@h/db" }))).toBe("postgresql");
   });
-  it("dùng KV_URL làm REDIS_URL khi kho Redis chỉ cấp KV_URL", () => {
-    expect(loadEnv({ ...base, KV_URL: "rediss://x" }).REDIS_URL).toBe("rediss://x");
+  it("đọc được biến Neon có tiền tố và báo Prisma khi đi qua pooler", () => {
+    const { DATABASE_URL: _omit, ...rest } = base;
+    const e = loadEnv({
+      ...rest,
+      DATABASE_URL_DATABASE_URL: "postgresql://u:p@ep-x-pooler.ap-southeast-1.aws.neon.tech/db?sslmode=require",
+      DATABASE_URL_UNPOOLED: "postgresql://u:p@ep-x.ap-southeast-1.aws.neon.tech/db?sslmode=require",
+    });
+    expect(dbProvider(e)).toBe("postgresql");
+    expect(new URL(e.DATABASE_URL).searchParams.get("pgbouncer")).toBe("true");
+    expect(e.DATABASE_URL_UNPOOLED).toContain("ep-x.ap-southeast-1");
+  });
+  it("SQLite local giữ nguyên DATABASE_URL", () => {
+    expect(loadEnv(base).DATABASE_URL).toBe("file:x.db");
+    expect(loadEnv(base).DATABASE_URL_UNPOOLED).toBeUndefined();
   });
 });

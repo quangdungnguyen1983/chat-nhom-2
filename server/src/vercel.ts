@@ -4,13 +4,13 @@
 import http from "node:http";
 import { env } from "./config/env.js";
 import { createApp } from "./app.js";
-import { initDatabase } from "./storage/prisma.js";
-import { attachRealtime, useRedisAdapter } from "./realtime-server.js";
+import { initDatabase, isPostgres } from "./storage/prisma.js";
+import { attachRealtime, usePostgresAdapter } from "./realtime-server.js";
 
 const e = env(); // dừng ngay nếu thiếu biến bắt buộc
 await initDatabase();
 const server = http.createServer(createApp());
 const io = attachRealtime(server);
-if (e.REDIS_URL) await useRedisAdapter(io, e.REDIS_URL);
+if (isPostgres() && e.DATABASE_URL_UNPOOLED) await usePostgresAdapter(io, e.DATABASE_URL_UNPOOLED);
 
 export default server;

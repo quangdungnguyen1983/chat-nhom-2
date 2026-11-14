@@ -1,8 +1,8 @@
 // Gắn Socket.IO vào HTTP server. CHỈ transport WebSocket – không long-polling (ADR-03, GH-04).
 import type http from "node:http";
 import { Server } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
-import { Redis } from "ioredis";
+import { createAdapter } from "@socket.io/postgres-adapter";
+import pg from "pg";
 import { log } from "./common/logger.js";
 import { socketAuth, type SocketData } from "./modules/auth/socket-auth.js";
 import { registerChatHandlers } from "./modules/chat/chat.socket.js";
@@ -46,24 +46,17 @@ export function attachRealtime(httpServer: http.Server): Server {
 }
 
 /**
- * Nhiều bản máy chủ (Vercel Function có thể chạy nhiều instance): dùng Redis để phát sự kiện và
- * vào/rời phòng (socketsJoin, socketsLeave, disconnectSockets) trên MỌI instance (OQ-28).
- * Không có REDIS_URL → giữ adapter trong bộ nhớ như bản chạy một tiến trình (ADR-03).
+ * Nhiều bản máy chủ (Vercel Function có thể chạy nhiều instance): dùng LISTEN/NOTIFY của chính
+ * PostgreSQL (Neon) để phát sự kiện và vào/rời phòng (socketsJoin, socketsLeave, disconnectSockets)
+ * trên MỌI instance (OQ-28). Không cần thêm dịch vụ Redis.
+ * Phải dùng kết nối TRỰC TIẾP: pooler (PgBouncer chế độ transaction) không giữ được LISTEN.
+ * Tin lớn hơn ngưỡng NOTIFY được đặt tạm ở bảng socket_io_attachments (tạo bằng migration).
  */
-export async function useRedisAdapter(io: Server, url: string): Promise<void> {
-  const pub = new Redis(url, { maxRetriesPerRequest: null });
-  const sub = pub.duplicate();
-  // Không in URL (có mật khẩu); chỉ ghi tên lỗi.
-  for (const c of [pub, sub]) c.on("error", (err: Error) => log("error", `Redis: ${err.name}`));
-  await Promise.all([waitReady(pub), waitReady(sub)]);
-  io.adapter(createAdapter(pub, sub));
-  log("info", "Socket.IO dùng Redis adapter");
-}
-
-function waitReady(c: Redis): Promise<void> {
-  if (c.status === "ready") return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    c.once("ready", () => resolve());
-    c.once("end", () => reject(new Error("REDIS_UNAVAILABLE")));
-  });
+export async function usePostgresAdapter(io: Server, directUrl: string): Promise<void> {
+  const pool = new pg.Pool({ connectionString: directUrl, max: 3 });
+  // Không in chuỗi kết nối (có mật khẩu); chỉ ghi tên lỗi.
+  pool.on("error", (err: Error) => log("error", `Postgres adapter: ${err.name}`));
+  await pool.query("SELECT 1"); // dừng sớm nếu không kết nối được
+  io.adapter(createAdapter(pool, { tableName: "socket_io_attachments" }));
+  log("info", "Socket.IO dùng Postgres adapter");
 }

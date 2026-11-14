@@ -1,6 +1,7 @@
 // Đọc và kiểm tra biến môi trường (09-detailed-design.md mục 11).
 // Thiếu biến bắt buộc thì dừng khởi động, không chạy với giá trị đoán.
 import { z } from "zod";
+import { resolveDatabaseEnv } from "./db-url.js";
 
 const boolStr = z.enum(["true", "false"]).transform((v) => v === "true");
 
@@ -15,8 +16,9 @@ const schema = z.object({
   COOKIE_SECURE: boolStr,
   COOKIE_NAME: z.string().regex(/^[A-Za-z0-9_-]+$/).default("sid"),
   LOG_LEVEL: z.enum(["silent", "error", "info", "debug"]).default("info"),
-  // Redis cho Socket.IO khi chạy nhiều bản máy chủ (Vercel Function) – OQ-28. Không có thì phòng chỉ nằm trong bộ nhớ.
-  REDIS_URL: z.string().min(1).optional(),
+  // PostgreSQL: kết nối trực tiếp (không qua pooler) – cho LISTEN/NOTIFY của Socket.IO khi chạy
+  // nhiều bản máy chủ (Vercel) – OQ-28. Không có (SQLite local) thì phòng chỉ nằm trong bộ nhớ.
+  DATABASE_URL_UNPOOLED: z.string().min(1).optional(),
   // Biến hệ thống do Vercel tự đặt (không cần khai báo): tên miền của bản deploy, nhánh và bản chính thức.
   VERCEL: z.string().optional(),
   VERCEL_URL: z.string().optional(),
@@ -32,9 +34,8 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const input: NodeJS.ProcessEnv = { ...source };
   // Trên Vercel không đặt NODE_ENV thủ công (đặt sẽ làm bước cài bỏ qua devDependencies khi build).
   if (!input.NODE_ENV && input.VERCEL) input.NODE_ENV = "production";
-  // Kho Redis/Upstash trên Vercel Marketplace có thể chỉ cấp KV_URL.
-  if (!input.REDIS_URL && input.KV_URL) input.REDIS_URL = input.KV_URL;
-  if (!input.REDIS_URL) delete input.REDIS_URL; // "REDIS_URL=" để trống = không dùng Redis
+  // Kho Neon trên Vercel có thể đặt tên biến kèm tiền tố – xem db-url.ts.
+  Object.assign(input, resolveDatabaseEnv(input));
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     // Chỉ in TÊN biến lỗi, không in giá trị (có thể là bí mật).

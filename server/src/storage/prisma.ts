@@ -5,7 +5,10 @@ import { dbProvider, env } from "../config/env.js";
 let client: PrismaClient | null = null;
 
 export function prisma(): PrismaClient {
-  if (!client) client = new PrismaClient({ log: [] }); // không log câu truy vấn (có thể chứa dữ liệu người dùng)
+  // PostgreSQL: dùng chuỗi kết nối đã chuẩn hóa ở config/env.ts (tên biến của Neon có thể có tiền tố).
+  // SQLite giữ cách đọc DATABASE_URL cũ (đường dẫn tương đối tính theo thư mục prisma/).
+  // Không log câu truy vấn (có thể chứa dữ liệu người dùng).
+  if (!client) client = new PrismaClient({ log: [], ...(isPostgres() ? { datasourceUrl: env().DATABASE_URL } : {}) });
   return client;
 }
 

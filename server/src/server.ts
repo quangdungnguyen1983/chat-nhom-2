@@ -2,16 +2,16 @@
 import http from "node:http";
 import { env } from "./config/env.js";
 import { createApp } from "./app.js";
-import { closeDatabase, initDatabase } from "./storage/prisma.js";
+import { closeDatabase, initDatabase, isPostgres } from "./storage/prisma.js";
 import { log } from "./common/logger.js";
-import { attachRealtime, useRedisAdapter } from "./realtime-server.js";
+import { attachRealtime, usePostgresAdapter } from "./realtime-server.js";
 
 async function main() {
   const e = env(); // dừng ngay nếu thiếu biến bắt buộc
   await initDatabase();
   const server = http.createServer(createApp());
   const io = attachRealtime(server);
-  if (e.REDIS_URL) await useRedisAdapter(io, e.REDIS_URL);
+  if (isPostgres() && e.DATABASE_URL_UNPOOLED) await usePostgresAdapter(io, e.DATABASE_URL_UNPOOLED);
   server.listen(e.PORT, () => log("info", `Máy chủ chạy tại cổng ${e.PORT} (${e.NODE_ENV})`));
 
   const shutdown = () => {

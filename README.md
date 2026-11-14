@@ -152,13 +152,14 @@ web/
 - Người ngoài nhận **403** (theo yêu cầu review slice 2); `09` GT-08 đề xuất 404. Cả hai trường hợp (không phải thành viên / không tồn tại) cho phản hồi giống hệt nhau.
 - Nhóm: không phải thành viên → 403 `CONVERSATION_FORBIDDEN` (như slice 2); là thành viên nhưng không phải trưởng nhóm → 403 `NOT_GROUP_OWNER` (M-29).
 - Thêm nhiều người trong một lần: cả lần dùng chung một mốc xem (tin HT-02 đầu tiên của lần đó), để không ai thấy tin trước lúc được thêm.
-- Socket.IO chạy một tiến trình (ADR-03); khi có `REDIS_URL` thì dùng Redis adapter để chạy nhiều tiến trình (OQ-28) – xem mục 8.
+- Socket.IO chạy một tiến trình (ADR-03); bản Vercel chạy nhiều instance qua Postgres adapter (OQ-28) – xem mục 8.
 - Không có giới hạn số lần đăng nhập sai (PDF không yêu cầu – FRS-03 "Ngoài MVP").
 
 ## 8. Triển khai lên Vercel
 
 > Bản Vercel **đổi hai quyết định thiết kế còn Draft**: CSDL PostgreSQL (Neon) thay SQLite (ADR-01) và
-> Socket.IO nhiều instance qua Redis (ADR-03, OQ-28). Cần Product Owner duyệt và cập nhật `08-high-level-design.md`.
+> Socket.IO nhiều instance qua LISTEN/NOTIFY của PostgreSQL – `@socket.io/postgres-adapter` (ADR-03, OQ-28).
+> Chỉ cần MỘT kho miễn phí (Neon), không cần Redis. Cần Product Owner duyệt và cập nhật `08-high-level-design.md`.
 > Local và kiểm thử **vẫn dùng SQLite** như cũ.
 
 Thành phần:
@@ -170,15 +171,14 @@ Thành phần:
 | `server/src/vercel.ts` | Tạo Express + Socket.IO, **không** gọi `listen` |
 | `server/prisma/postgres/` | Lược đồ + migration PostgreSQL (cùng model với bản SQLite) |
 
-Lệnh build trên Vercel (`npm run build:vercel`): sinh Prisma Client cho PostgreSQL → `prisma migrate deploy`
-→ biên dịch server → build giao diện.
+Lệnh build trên Vercel (`npm run build:vercel`): sinh Prisma Client cho PostgreSQL → biên dịch server
+→ `prisma migrate deploy` (qua `server/scripts/migrate-postgres.mjs`) → build giao diện.
 
 Biến môi trường trên Vercel (Project → Settings → Environment Variables):
 
 | Biến | Nguồn |
 |---|---|
-| `DATABASE_URL`, `DATABASE_URL_UNPOOLED` | Tự có khi kết nối Neon từ Vercel Marketplace |
-| `REDIS_URL` (hoặc `KV_URL`) | Tự có khi kết nối Upstash Redis từ Vercel Marketplace |
+| Chuỗi kết nối Neon | Tự có khi kết nối Neon từ Vercel Marketplace. Máy chủ nhận cả khi có tiền tố (`DATABASE_URL_DATABASE_URL`, `DATABASE_URL_POSTGRES_PRISMA_URL`, `DATABASE_URL_UNPOOLED`…) – danh sách ở `server/src/config/db-url.ts` |
 | `REGISTRATION_CODE` | Tự đặt (≥ 8 ký tự), kiểu **Sensitive**; không ghi vào repo |
 | `APP_ORIGIN` | Địa chỉ chính thức, ví dụ `https://<tên-dự-án>.vercel.app` |
 | `COOKIE_SECURE` | `true` |
@@ -192,5 +192,7 @@ Giới hạn cần biết:
 
 - Kết nối WebSocket bị đóng khi Function chạy tới thời gian tối đa (300 giây trong `vercel.json`).
   Trình duyệt tự nối lại và tải các tin bị lỡ (`after`), nên có thể thấy thông báo mất kết nối thoáng qua.
+- Postgres adapter giữ một kết nối trực tiếp tới Neon khi Function đang chạy (có người đang kết nối),
+  nên Neon không "ngủ" trong lúc đó – tính vào giờ chạy miễn phí của Neon.
 - Thứ tự tin trong một hội thoại (GE-10) trên PostgreSQL được giữ bằng khóa dòng `conversations`
   (`SELECT … FOR UPDATE`) trong giao dịch ghi.
