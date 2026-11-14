@@ -1,0 +1,39 @@
+// Phiên: token ngẫu nhiên, chỉ lưu SHA-256 trong bảng sessions (ADR-02).
+// Đăng xuất / đổi mật khẩu ghi revoked_at → token cũ không dùng lại được dù còn hạn (TK-03 R3).
+import { createHash, randomBytes } from "node:crypto";
+import * as sessions from "../../storage/sessions.repo.js";
+import { AppError } from "../../common/errors.js";
+
+export type AuthContext = {
+  sessionId: number;
+  userId: number;
+  expiresAt: Date;
+  user: { id: number; username: string; displayName: string };
+};
+
+export const hashToken = (token: string): string => createHash("sha256").update(token).digest("hex");
+
+export async function createSession(userId: number, ttlHours: number, now = new Date()) {
+  const token = randomBytes(32).toString("base64url");
+  const expiresAt = new Date(now.getTime() + ttlHours * 3600_000);
+  const row = await sessions.createSession(userId, hashToken(token), expiresAt);
+  return { token, sessionId: row.id, expiresAt };
+}
+
+/** Cửa G1: trả AuthContext hoặc ném UNAUTHENTICATED. */
+export async function resolveSession(token: string | undefined, now = new Date()): Promise<AuthContext> {
+  if (!token || typeof token !== "string" || token.length > 200) throw new AppError("UNAUTHENTICATED");
+  const row = await sessions.findActiveByTokenHash(hashToken(token), now);
+  if (!row) throw new AppError("UNAUTHENTICATED");
+  return {
+    sessionId: row.id,
+    userId: row.userId,
+    expiresAt: row.expiresAt,
+    user: { id: row.user.id, username: row.user.username, displayName: row.user.displayName },
+  };
+}
+
+export async function revoke(sessionId: number, reason: sessions.RevokedReason, now = new Date()): Promise<void> {
+  await sessions.revokeSession(sessionId, reason, now);
+  // Slice sau (realtime): phát session:revoked và ngắt socket của phiên tại đây (TK-03 R4).
+}
