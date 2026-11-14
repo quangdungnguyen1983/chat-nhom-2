@@ -12,7 +12,7 @@ const schema = z.object({
   APP_ORIGIN: z.url(),
   DATABASE_URL: z.string().min(1),
   REGISTRATION_CODE: z.string().trim().min(8, "REGISTRATION_CODE phải có ít nhất 8 ký tự"),
-  SESSION_TTL_HOURS: z.coerce.number().positive(),
+  SESSION_TTL_HOURS: z.coerce.number().positive().default(8), // QĐ-04: mặc định 8 giờ
   COOKIE_SECURE: boolStr,
   COOKIE_NAME: z.string().regex(/^[A-Za-z0-9_-]+$/).default("sid"),
   LOG_LEVEL: z.enum(["silent", "error", "info", "debug"]).default("info"),
