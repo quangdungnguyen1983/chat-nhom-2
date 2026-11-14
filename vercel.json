@@ -11,8 +11,8 @@
     }
   },
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/socket.io/:path*", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/socket.io/(.*)", "destination": "/api/index" },
     { "source": "/((?!api/|socket\\.io/).*)", "destination": "/index.html" }
   ]
 }
