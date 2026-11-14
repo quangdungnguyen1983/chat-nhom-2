@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Dự án | Ứng dụng chat nội bộ (MVP) – Nhóm: *[chưa xác định]* |
-| Tệp | `docs/04-use-cases.md` |
+| Tệp | `04-use-cases.md` |
 | Phiên bản | 1.1 – Draft |
 | Ngày | 2026-11-13 |
 | Người soạn | Nhóm BA / QA (bản nháp có trợ lý AI hỗ trợ soạn thảo) |
 | Trạng thái | Draft – chờ Product Owner rà soát mục 7 |
-| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `docs/01-brd.md` v1.1; (3) `docs/02-srs.md` v1.1. `docs/03-frs.md` **chưa có trên repository** nên không được dẫn chiếu |
+| Căn cứ | (1) PDF "Xây dựng ứng dụng chat nội bộ (MVP)" – nguồn duy nhất của yêu cầu nghiệp vụ; (2) `01-brd.md` v1.1; (3) `02-srs.md` v1.1. `03-frs.md` **chưa có trên repository** nên không được dẫn chiếu |
 
 **Lịch sử thay đổi**
 
