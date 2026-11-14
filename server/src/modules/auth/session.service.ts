@@ -3,6 +3,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import * as sessions from "../../storage/sessions.repo.js";
 import { AppError } from "../../common/errors.js";
+import { disconnectSession } from "../notifications/realtime.js";
 
 export type AuthContext = {
   sessionId: number;
@@ -35,5 +36,5 @@ export async function resolveSession(token: string | undefined, now = new Date()
 
 export async function revoke(sessionId: number, reason: sessions.RevokedReason, now = new Date()): Promise<void> {
   await sessions.revokeSession(sessionId, reason, now);
-  // Slice sau (realtime): phát session:revoked và ngắt socket của phiên tại đây (TK-03 R4).
+  disconnectSession(sessionId, reason); // TK-03 R4: đóng kết nối realtime của phiên
 }

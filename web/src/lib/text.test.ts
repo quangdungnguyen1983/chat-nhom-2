@@ -27,3 +27,16 @@ describe("lib/text (giống server)", () => {
     expect(avatarColorVar(7)).toBe("var(--avatar-2)");
   });
 });
+
+describe("lib/text – nội dung tin (giống server)", async () => {
+  const { normalizeContent, hasVisibleChar, tooLongMessage, badgeText } = await import("./text");
+  it("\\r\\n → \\n, giữ dòng trống, không trim", () => {
+    expect(normalizeContent(" a\r\n\r\nb ")).toBe(" a\n\nb ");
+    expect(hasVisibleChar(" \n\t ")).toBe(false);
+  });
+  it("câu M-17 có số định dạng tiếng Việt; badge 99+", () => {
+    expect(tooLongMessage(5001)).toBe("Tin nhắn vượt quá 5.000 ký tự (hiện có 5.001 ký tự).");
+    expect(badgeText(99)).toBe("99");
+    expect(badgeText(100)).toBe("99+");
+  });
+});

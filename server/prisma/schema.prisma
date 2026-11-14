@@ -1,5 +1,6 @@
-// Vertical Slice 1: chỉ bảng users và sessions (09-detailed-design.md mục 3.2).
-// Các bảng hội thoại / tin nhắn sẽ được thêm ở slice sau bằng migration mới.
+// Lược đồ theo 09-detailed-design.md mục 3.2.
+// Slice 1: users, sessions. Slice 2 (chat 1-1): conversations, conversation_members, messages, message_read_cursors.
+// Các cột cho nhóm (role, left_at, event_*…) có sẵn theo thiết kế nhưng slice 2 chỉ dùng hội thoại 'direct'.
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,7 +18,15 @@ model User {
   displayNameSearch String    @map("display_name_search")
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
-  sessions          Session[]
+  sessions             Session[]
+  memberships          ConversationMember[] @relation("MemberUser")
+  addedMembers         ConversationMember[] @relation("MemberAddedBy")
+  createdConversations Conversation[]       @relation("ConversationCreatedBy")
+  directLow            Conversation[]       @relation("DirectLow")
+  directHigh           Conversation[]       @relation("DirectHigh")
+  sentMessages         Message[]            @relation("MessageSender")
+  eventActorOf         Message[]            @relation("EventActor")
+  eventTargetOf        Message[]            @relation("EventTarget")
 
   @@map("users")
 }
@@ -34,4 +43,80 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+model Conversation {
+  id               Int                  @id @default(autoincrement())
+  type             String
+  name             String?
+  directUserLowId  Int?                 @map("direct_user_low_id")
+  directUserHighId Int?                 @map("direct_user_high_id")
+  createdById      Int                  @map("created_by")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  lastMessageId    Int?                 @unique @map("last_message_id")
+  lastMessageAt    DateTime?            @map("last_message_at")
+  directLow        User?                @relation("DirectLow", fields: [directUserLowId], references: [id])
+  directHigh       User?                @relation("DirectHigh", fields: [directUserHighId], references: [id])
+  createdBy        User                 @relation("ConversationCreatedBy", fields: [createdById], references: [id])
+  lastMessage      Message?             @relation("LastMessage", fields: [lastMessageId], references: [id])
+  members          ConversationMember[]
+  messages         Message[]            @relation("ConversationMessages")
+
+  @@unique([directUserLowId, directUserHighId])
+  @@map("conversations")
+}
+
+model ConversationMember {
+  conversationId       Int                @map("conversation_id")
+  userId               Int                @map("user_id")
+  role                 String             @default("member")
+  joinedAt             DateTime           @default(now()) @map("joined_at")
+  visibleFromMessageId Int                @default(0) @map("visible_from_message_id")
+  addedById            Int?               @map("added_by")
+  leftAt               DateTime?          @map("left_at")
+  leftReason           String?            @map("left_reason")
+  conversation         Conversation       @relation(fields: [conversationId], references: [id])
+  user                 User               @relation("MemberUser", fields: [userId], references: [id])
+  addedBy              User?              @relation("MemberAddedBy", fields: [addedById], references: [id])
+  readCursor           MessageReadCursor?
+  authoredMessages     Message[]          @relation("MessageAuthorMembership")
+
+  @@id([conversationId, userId])
+  @@index([userId])
+  @@map("conversation_members")
+}
+
+model Message {
+  id                 Int                 @id @default(autoincrement())
+  conversationId     Int                 @map("conversation_id")
+  senderId           Int?                @map("sender_id")
+  type               String
+  content            String
+  clientMsgId        String?             @map("client_msg_id")
+  eventType          String?             @map("event_type")
+  eventActorId       Int?                @map("event_actor_id")
+  eventTargetId      Int?                @map("event_target_id")
+  eventData          String?             @map("event_data")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  conversation       Conversation        @relation("ConversationMessages", fields: [conversationId], references: [id])
+  sender             User?               @relation("MessageSender", fields: [senderId], references: [id])
+  authorMembership   ConversationMember? @relation("MessageAuthorMembership", fields: [conversationId, senderId], references: [conversationId, userId])
+  eventActor         User?               @relation("EventActor", fields: [eventActorId], references: [id])
+  eventTarget        User?               @relation("EventTarget", fields: [eventTargetId], references: [id])
+  lastOfConversation Conversation?       @relation("LastMessage")
+
+  @@unique([senderId, clientMsgId])
+  @@index([conversationId, id])
+  @@map("messages")
+}
+
+model MessageReadCursor {
+  conversationId    Int                @map("conversation_id")
+  userId            Int                @map("user_id")
+  lastReadMessageId Int                @default(0) @map("last_read_message_id")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  member            ConversationMember @relation(fields: [conversationId, userId], references: [conversationId, userId], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@map("message_read_cursors")
 }

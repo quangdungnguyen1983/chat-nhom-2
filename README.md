@@ -1,12 +1,15 @@
-# Chat nội bộ (MVP) – Vertical Slice 1: Tài khoản
+# Chat nội bộ (MVP)
 
-Mã nguồn **Vertical Slice 1**: đăng ký (TK-01, TK-02), đăng nhập / đăng xuất (TK-03), đổi mật khẩu (TK-04), hồ sơ (TK-05), tìm người dùng (TK-06).
+- **Slice 1 – Tài khoản**: đăng ký (TK-01, TK-02), đăng nhập / đăng xuất (TK-03), đổi mật khẩu (TK-04), hồ sơ (TK-05), tìm người dùng (TK-06).
+- **Slice 2 – Chat realtime 1-1**: mở hội thoại 1-1 không trùng (CH-01), gửi/nhận qua WebSocket (CH-02), lịch sử 50 tin/trang (CH-03), danh sách hội thoại mới nhất trước (CH-06), số chưa đọc (TB-01).
+
 Thiết kế theo `08-high-level-design.md`, `09-detailed-design.md`, `10-ui-ux.md` (đều đang **Draft**, ADR chờ duyệt – xem "Lưu ý" cuối trang).
 
 | Phần | Công nghệ (theo HLD mục 2) |
 |---|---|
 | Giao diện | React 19 + TypeScript + Vite (`web/`) |
 | Máy chủ | Node.js + Express 5 + TypeScript (`server/`) |
+| Realtime | Socket.IO 4, **chỉ transport WebSocket** (`transports: ["websocket"]` ở cả hai phía, máy chủ từ chối long-polling) – ADR-03 |
 | CSDL | SQLite qua Prisma 6 (ADR-01) – file thật trên đĩa, không mất khi khởi động lại |
 | Mật khẩu | argon2id (`@node-rs/argon2`) – theo 09 mục 4.3 / GT-01 |
 | Phiên | Token ngẫu nhiên 256 bit, chỉ lưu SHA-256 trong bảng `sessions`, gửi bằng cookie `HttpOnly; SameSite=Lax` (ADR-02). Đăng xuất / đổi mật khẩu ghi `revoked_at` → token cũ bị từ chối ngay |
@@ -91,6 +94,22 @@ Xem `.env.example` và `09-detailed-design.md` mục 11. Máy chủ **dừng kh�
 | U1 | GET | `/api/me` | Phiên | TK-05, TK-03 |
 | U2 | PUT | `/api/me` | Phiên | TK-05 |
 | U3 | GET | `/api/users?q=` | Phiên | TK-06 |
+| C1 | POST | `/api/conversations/direct` `{userId}` | Phiên | CH-01 (201 vừa tạo / 200 đã có) |
+| C2 | GET | `/api/conversations` | Phiên | CH-06, TB-01 |
+| C3 | GET | `/api/conversations/:id` | Thành viên | CH-01 |
+| C4 | GET | `/api/conversations/:id/messages?before=&after=&limit=` | Thành viên | CH-03 (tối đa 50) |
+| C5 | POST | `/api/conversations/:id/read` | Thành viên | TB-01 |
+
+**Socket.IO** (cùng địa chỉ, cookie phiên + `Origin` kiểm tra khi bắt tay):
+
+| Sự kiện | Chiều | Ghi chú |
+|---|---|---|
+| `message:send` `{conversationId, content, clientMessageId}` + ack | client → server | Không nhận `senderId` (có là bị từ chối). Lưu CSDL **xong** mới ack và phát. Gửi lại cùng `clientMessageId` → `duplicate: true` |
+| `message:new` | server → phòng `conv:<id>` | Chỉ socket của thành viên hiện tại ở trong phòng; không có sự kiện nào cho client tự vào phòng |
+| `conversation:updated`, `unread:update` | server → phòng `user:<id>` | Dòng danh sách + số chưa đọc tính riêng cho từng người |
+| `session:revoked` | server → phòng `session:<id>` | Đăng xuất / đổi mật khẩu / hết hạn → báo rồi ngắt socket |
+
+**Người ngoài hội thoại** (và hội thoại không tồn tại) nhận **cùng một** phản hồi: REST `403 CONVERSATION_FORBIDDEN` + M-30; socket: ack `{ok:false, error.code: "CONVERSATION_FORBIDDEN"}`, không lưu, không phát.
 
 Lỗi trả dạng `{"error": {"code", "message", "fields?"}}`, câu `message` lấy nguyên văn M-xx từ `03-frs.md` mục 5. Mọi POST/PUT phải có header `Origin` đúng `APP_ORIGIN` (chống CSRF, GH-03), nếu không → 403.
 
@@ -107,16 +126,21 @@ server/
   src/storage/          – CHỈ nơi này import Prisma (08 mục 4.3)
   src/modules/auth/     – register, login, logout, đổi mật khẩu, phiên, requireAuth, kiểm tra Origin
   src/modules/users/    – /api/me, /api/users
+  src/modules/chat/     – membership.ts (cửa kiểm tra thành viên DUY NHẤT), chat.service, routes C1–C4, chat.socket (message:send)
+  src/modules/notifications/ – realtime.ts (nơi DUY NHẤT gọi io), read.routes (C5), unread.service
+  src/realtime-server.ts – gắn Socket.IO (chỉ WebSocket) vào HTTP server
   test/unit, test/integration, test/db
 web/
   src/api/              – gọi REST (credentials: same-origin)
   src/lib/text.ts       – kiểm tra dữ liệu GIỐNG HỆT server
-  src/pages/            – SC-01 Đăng ký, SC-02 Đăng nhập, SC-03 (tìm người), SC-07 Hồ sơ, SC-08 Đổi mật khẩu
+  src/realtime/socket.ts – io({ transports: ["websocket"] })
+  src/pages/            – SC-01 Đăng ký, SC-02 Đăng nhập, SC-03 Trang chính, SC-04 Hội thoại (ChatPanel), SC-07 Hồ sơ, SC-08 Đổi mật khẩu
 ```
 
-## 7. Lưu ý / chưa làm trong slice này
+## 7. Lưu ý / chưa làm
 
 - **Tài liệu thiết kế còn Draft**: ADR-01 (SQLite), ADR-02 (cookie HttpOnly), OQ-31 (cột `display_name_search`), OQ-36 (argon2id thay bcrypt) **chưa được Product Owner duyệt**. Mã đi theo đề xuất trong tài liệu.
-- Chưa có realtime (Socket.IO): phần "đóng kết nối realtime khi phiên bị hủy" (TK-03 R4) và sự kiện `session:revoked` sẽ làm ở slice chat.
-- Trang chính chỉ có ô tìm người; danh sách hội thoại, mở chat 1-1, tạo nhóm thuộc slice sau. Tham số `excludeConversationId` của U3 được nhận nhưng chưa có tác dụng.
+- Người ngoài nhận **403** (theo yêu cầu review slice 2); `09` GT-08 đề xuất 404. Cả hai trường hợp (không phải thành viên / không tồn tại) cho phản hồi giống hệt nhau.
+- Chưa có nhóm (NH-01…NH-04): lược đồ đã có cột cho nhóm nhưng chỉ hội thoại `direct` được dùng. Tham số `excludeConversationId` của U3 chưa có tác dụng.
+- Socket.IO chạy một tiến trình (ADR-03); chạy nhiều tiến trình cần adapter (OQ-28).
 - Không có giới hạn số lần đăng nhập sai (PDF không yêu cầu – FRS-03 "Ngoài MVP").

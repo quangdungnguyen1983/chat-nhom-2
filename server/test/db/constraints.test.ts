@@ -48,3 +48,44 @@ describe("ràng buộc CSDL", () => {
     await expect(prisma().session.create({ data: { ...base, tokenHash: "t4", expiresAt: new Date(Date.now() - 3600_000) } })).rejects.toThrow();
   });
 });
+
+describe("ràng buộc CSDL – bảng chat (slice 2)", () => {
+  const mkUser = async (username: string) => {
+    await insertUser(username);
+    return (await prisma().user.findUniqueOrThrow({ where: { username } })).id;
+  };
+
+  it("UK cặp 1-1 và CHECK low < high, hình dạng direct", async () => {
+    const x = await mkUser("db.x"), y = await mkUser("db.y");
+    const [lo, hi] = [Math.min(x, y), Math.max(x, y)];
+    await prisma().conversation.create({ data: { type: "direct", directUserLowId: lo, directUserHighId: hi, createdById: lo } });
+    await expect(prisma().conversation.create({ data: { type: "direct", directUserLowId: lo, directUserHighId: hi, createdById: hi } })).rejects.toThrow();
+    await expect(prisma().conversation.create({ data: { type: "direct", directUserLowId: hi, directUserHighId: lo, createdById: hi } })).rejects.toThrow();
+    await expect(prisma().conversation.create({ data: { type: "direct", directUserLowId: lo, directUserHighId: hi, name: "x", createdById: lo } })).rejects.toThrow();
+    await expect(prisma().conversation.create({ data: { type: "khac", createdById: lo } })).rejects.toThrow();
+  });
+
+  it("khóa ngoại kép: tác giả tin phải là thành viên hội thoại; CHECK tin trắng, > 5000, tin hệ thống", async () => {
+    const x = await mkUser("db.m1"), y = await mkUser("db.m2"), z = await mkUser("db.m3");
+    const [lo, hi] = [Math.min(x, y), Math.max(x, y)];
+    const conv = await prisma().conversation.create({ data: { type: "direct", directUserLowId: lo, directUserHighId: hi, createdById: lo } });
+    for (const uid of [lo, hi]) await prisma().conversationMember.create({ data: { conversationId: conv.id, userId: uid } });
+    const msg = (senderId: number | null, content: string, extra: object = {}) =>
+      prisma().message.create({ data: { conversationId: conv.id, senderId, type: "text", content, ...extra } });
+
+    await expect(msg(x, "hợp lệ\n\ncó dấu")).resolves.toBeTruthy();
+    await expect(msg(z, "người ngoài")).rejects.toThrow();                 // z không phải thành viên
+    await expect(msg(x, " \n\t\r ")).rejects.toThrow();                     // chỉ khoảng trắng
+    await expect(msg(x, "Ẩ".repeat(5000))).resolves.toBeTruthy();          // đúng 5000 ký tự
+    await expect(msg(x, "Ẩ".repeat(5001))).rejects.toThrow();               // 5001
+    await expect(msg(null, "không tác giả")).rejects.toThrow();
+    await expect(prisma().message.create({ data: { conversationId: conv.id, type: "system", content: "x", eventType: "khac" } })).rejects.toThrow();
+  });
+
+  it("UK (sender_id, client_msg_id) chống tin trùng", async () => {
+    const m = await prisma().message.findFirstOrThrow({ where: { type: "text" } });
+    const cid = "11111111-1111-4111-8111-111111111111";
+    await prisma().message.create({ data: { conversationId: m.conversationId, senderId: m.senderId, type: "text", content: "a", clientMsgId: cid } });
+    await expect(prisma().message.create({ data: { conversationId: m.conversationId, senderId: m.senderId, type: "text", content: "b", clientMsgId: cid } })).rejects.toThrow();
+  });
+});

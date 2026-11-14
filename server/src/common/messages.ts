@@ -12,9 +12,15 @@ export const M = {
   M10: "Mật khẩu hiện tại không đúng.",
   M11: "Mật khẩu mới phải khác mật khẩu hiện tại.",
   M14: "Không tìm thấy người dùng phù hợp.",
+  M15: "Bạn không thể tự nhắn tin cho chính mình.",
+  M16: "Người dùng này không tồn tại.",
+  M17: "Tin nhắn vượt quá 5.000 ký tự (hiện có {n} ký tự).",
+  M30: "Không tìm thấy hội thoại hoặc bạn không có quyền truy cập.",
   M31: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
   M34: "Không kết nối được máy chủ. Vui lòng thử lại.",
   M35: "Vui lòng nhập đủ tên đăng nhập và mật khẩu.",
   // Câu chung cho VALIDATION_ERROR – [ĐX] theo 09 mục 5.
   VALIDATION: "Dữ liệu không hợp lệ.",
+  // [ĐX] 09 mục 5 / CR-04 – chờ cấp mã M-xx (OQ-38).
+  MESSAGE_EMPTY: "Tin nhắn không được để trống.",
 } as const;

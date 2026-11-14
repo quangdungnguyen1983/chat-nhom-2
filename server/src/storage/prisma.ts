@@ -31,7 +31,13 @@ export function isUniqueViolation(err: unknown): boolean {
 
 export type Tx = Prisma.TransactionClient;
 
-/** Giao dịch ghi (09 mục 10.1 – bản rút gọn cho slice 1). */
+// Khóa ghi trong tiến trình (09 mục 10.1): các giao dịch ghi xếp hàng, tránh SQLite báo "đang bận"
+// và bảo đảm hai yêu cầu mở 1-1 đồng thời không cùng tạo hội thoại (CH-01 R4).
+let writeQueue: Promise<unknown> = Promise.resolve();
+
+/** Giao dịch ghi (09 mục 10.1). */
 export function withWriteTx<T>(fn: (tx: Tx) => Promise<T>): Promise<T> {
-  return prisma().$transaction(fn);
+  const run = writeQueue.then(() => prisma().$transaction(fn));
+  writeQueue = run.catch(() => undefined);
+  return run;
 }
