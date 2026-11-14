@@ -150,5 +150,57 @@ h2 { font-size: var(--font-size-lg); margin: 0 0 var(--space-3); }
 .checkbox input { width: 20px; height: 20px; }
 select { width: 100%; min-height: var(--size-touch); font: inherit; border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); padding: 0 var(--space-2); background: var(--color-bg); }
 @media (max-width: 767px) { .group-info { width: 100%; } .info-btn { padding: 0 var(--space-2); } }
-/* ≥ 1024 px: Thông tin nhóm là cột thứ 3 (10-ui-ux.md mục 7) – không che khung chat. 768–1023: bảng trượt phủ lên. */
-@media (min-width: 1024px) { .app-shell.has-info .content { margin-right: 320px; } }
+
+/* ===== Khớp ui-design.html (bố cục SC-03/SC-04/SC-06) ===== */
+.app-shell { grid-template-columns: var(--width-sidebar) 1fr; grid-template-rows: 1fr; height: 100vh; min-height: 0; }
+.sidebar { display: flex; flex-direction: column; padding: 0; min-height: 0; overflow: hidden; }
+.side-head { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
+.brand { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-md); }
+.brand strong { flex: 1; font-size: var(--font-size-lg); }
+.brand .badge { margin-left: 0; }
+.list { flex: 1; overflow-y: auto; padding: 0 var(--space-2) var(--space-2); }
+.btn-primary.create-btn { width: auto; flex-shrink: 0; white-space: nowrap; }
+.btn-ghost { background: transparent; border: 0; color: var(--color-primary); padding: 0 var(--space-2); min-height: var(--size-touch); font: inherit; cursor: pointer; }
+.btn-ghost:hover { text-decoration: underline; }
+.italic { font-style: italic; }
+.conv-row.unread .preview { font-weight: var(--font-weight-bold); color: var(--color-text); }
+.empty-hint { text-align: center; margin-top: var(--space-5); }
+.skeleton-row { display: flex; gap: var(--space-2); align-items: center; min-height: 72px; padding: var(--space-2); }
+.skeleton-avatar { width: 40px; height: 40px; background: var(--color-border); }
+.skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: var(--space-2); }
+.skeleton { display: block; height: 12px; border-radius: var(--radius-sm); background: linear-gradient(90deg, var(--color-surface), var(--color-border), var(--color-surface)); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.skeleton.short { width: 60%; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+.content { padding: 0; position: relative; }
+.content > .placeholder { padding: var(--space-4); }
+.chat { position: relative; }
+.chat-head { padding: var(--space-2) var(--space-3); min-height: 64px; }
+.chat-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.chat-title h2 { margin: 0; font-size: var(--font-size-lg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-log { padding: var(--space-3); }
+.composer { padding: var(--space-2) var(--space-3); }
+.day-sep { text-align: center; font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: var(--space-2) 0; }
+.new-below { position: absolute; left: 50%; transform: translateX(-50%); bottom: 96px; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.role { font-size: var(--font-size-xs); border: 1px solid var(--color-primary); color: var(--color-primary); border-radius: var(--radius-full); padding: 0 var(--space-2); white-space: nowrap; }
+.group-info .user-row { gap: var(--space-2); }
+.toast { position: fixed; left: 50%; bottom: var(--space-4); transform: translateX(-50%); z-index: 20; background: var(--color-text); color: #fff; border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); font-size: var(--font-size-sm); display: flex; gap: var(--space-2); align-items: center; max-width: calc(100% - 32px); }
+.toast .btn-ghost { color: #fff; }
+
+/* ≥ 1024 px: 3 cột – Thông tin nhóm là cột lưới thật, không che khung chat (10-ui-ux mục 7, GX-05) */
+@media (min-width: 1024px) {
+  .app-shell.has-info { grid-template-columns: var(--width-sidebar) 1fr var(--width-sidebar); }
+  .app-shell.has-info .group-info { position: static; width: auto; height: 100vh; box-shadow: none; }
+}
+/* 768–1023 px: 2 cột, Thông tin nhóm là bảng trượt phủ lên (đã có ở .group-info: position fixed) */
+@media (max-width: 1023px) { .app-shell { grid-template-columns: 280px 1fr; } }
+/* < 768 px: 1 cột, mỗi lúc một màn hình */
+@media (max-width: 767px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .app-shell .content { display: none; }
+  .app-shell.has-active .sidebar { display: none; }
+  .app-shell.has-active .content { display: flex; }
+  .chat-head .back { display: inline-flex; }
+  .new-below { bottom: 112px; }
+}
+.me-link { text-decoration: none; }

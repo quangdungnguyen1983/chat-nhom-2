@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wireframe – Ứng dụng chat nội bộ (MVP) – Bản nháp chờ duyệt</title>
+<title>Wireframe – Ứng dụng chat nội bộ (MVP)</title>
 <style>
   :root { --ink:#222; --line:#888; --soft:#e6e6e6; --softer:#f4f4f4; --mid:#bdbdbd; }
   * { box-sizing: border-box; }
@@ -49,13 +49,13 @@
   .bubble.me { margin-left:auto; background:var(--soft); }
   .bubble.fail { border:2px dashed var(--ink); }
   .meta { font-size:11px; color:#666; }
-  .sys { text-align:center; font-size:12px; color:#555; font-style:italic; margin:4px 0; }
+  .sys { text-align:center; font-size:12px; color:#555; margin:4px 0; }
   .banner { border:1px dashed var(--ink); background:var(--softer); padding:6px 8px; font-size:13px; text-align:center; }
   .skel { height:14px; background:var(--soft); margin:6px 0; }
   .modal { border:2px solid var(--ink); background:#fff; width:440px; max-width:100%; margin:0 auto; padding:16px; }
   .overlay { background:repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 6px,#fafafa 6px,#fafafa 12px); padding:24px; }
   .chip { border:1px solid var(--line); border-radius:12px; padding:2px 8px; font-size:13px; display:inline-flex; gap:6px; }
-  .desk { display:grid; grid-template-columns:280px 1fr 260px; height:520px; border:1px solid var(--line); min-width:960px; }
+  .desk { display:grid; grid-template-columns:320px 1fr 320px; height:520px; border:1px solid var(--line); min-width:1000px; }
   .desk2 { display:grid; grid-template-columns:280px 1fr; height:460px; border:1px solid var(--line); min-width:760px; }
   .pane { border-right:1px solid var(--line); display:flex; flex-direction:column; min-height:0; }
   .pane:last-child { border-right:0; }
@@ -76,9 +76,9 @@
 
 <h1>Wireframe – Ứng dụng chat nội bộ (MVP)</h1>
 <div class="intro">
-  <p><strong>Trạng thái: BẢN NHÁP – CHỜ DUYỆT</strong> theo <code>docs/10-ui-ux.md</code> mục 13. Chưa duyệt thì chưa viết mã giao diện.</p>
+  <p><strong>Trạng thái: BẢN NHÁP – chờ Product Owner ký duyệt</strong> theo <code>10-ui-ux.md</code> mục 13. Giao diện slice 1–3 (PR #1–#3) đã được dựng theo bản này; mọi thay đổi bố cục sau khi duyệt phải cập nhật cả file này lẫn mã.</p>
   <p>Mục đích: duyệt <strong>bố cục và luồng</strong>, chưa duyệt màu sắc. Chỉ dùng trắng – đen – xám.</p>
-  <p>Mã SC-xx trùng số với SCR-xx của <code>03-frs.md</code>. Ký hiệu <span class="c">1</span> là chú thích, giải thích ở cuối mỗi khung. Câu M-xx lấy nguyên văn từ <code>03-frs.md</code> mục 5.</p>
+  <p>Mã SC-xx trùng số với SCR-xx của <code>03-frs.md</code>. Kích thước cột theo token <code>10-ui-ux.md</code> mục 8.3 (danh sách 320 px, Thông tin nhóm 320 px). Ký hiệu <span class="c">1</span> là chú thích, giải thích ở cuối mỗi khung. Câu M-xx lấy nguyên văn từ <code>03-frs.md</code> mục 5.</p>
   <p>Đây là <strong>bản vẽ thiết kế</strong>, không phải ảnh sản phẩm đang chạy; không dùng để báo cáo nghiệm thu. Tên người và tin nhắn là dữ liệu giả lập.</p>
 </div>
 
@@ -193,7 +193,7 @@
           <div class="item sel"><span class="av">B</span><div class="grow"><div class="t">Trần Thị Bình</div><div class="p">Bạn: Mình gửi file trước 15h nhé</div></div><div class="col" style="align-items:flex-end"><span class="time">14:05</span></div></div>
           <div class="item"><span class="c">6</span><span class="av">P</span><div class="grow"><div class="t b">Phòng Kế hoạch</div><div class="p b">Lê Cường: Họp lúc 9h sáng mai</div></div><div class="col" style="align-items:flex-end"><span class="time">13:40</span><span class="badge">3</span></div></div>
           <div class="item"><span class="av">D</span><div class="grow"><div class="t b">Phạm Dũng</div><div class="p b">Anh xem giúp em báo cáo tuần</div></div><div class="col" style="align-items:flex-end"><span class="time">Hôm qua</span><span class="badge">2</span></div></div>
-          <div class="item"><span class="av">Ẩ</span><div class="grow"><div class="t">Đặng Thị Ẩn</div><div class="p"><i>Đặng Thị Ẩn đã rời nhóm</i></div></div><div class="col" style="align-items:flex-end"><span class="time">12/11/2026</span></div></div>
+          <div class="item"><span class="av">N</span><div class="grow"><div class="t">Nhóm Đổi Mới 2026</div><div class="p"><i>Đặng Thị Ẩn đã rời nhóm</i></div></div><div class="col" style="align-items:flex-end"><span class="time">12/11/2026</span></div></div>
         </div>
       </div>
       <div class="pane">
@@ -240,6 +240,8 @@
           <div class="row" style="margin-top:12px"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
           <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
           <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
+          <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
+          <div class="row"><span class="av"></span><div class="grow"><div class="skel"></div><div class="skel" style="width:60%"></div></div></div>
         </div>
       </div>
       <div class="box grey" style="width:300px; height:300px">
@@ -251,7 +253,7 @@
   </div>
   <div class="notes"><ol>
     <li><span class="c">1</span>M-23, có mũi tên chỉ ô tìm. Hội thoại 1-1 chưa có tin không hiện ở đây (GF-09).</li>
-    <li><span class="c">2</span>Khung xám thay cho dữ liệu khi đang tải; tắt hiệu ứng nếu người dùng chọn giảm chuyển động.</li>
+    <li><span class="c">2</span>5 dòng khung xám thay cho dữ liệu khi đang tải; tắt hiệu ứng nếu người dùng chọn giảm chuyển động.</li>
     <li><span class="c">3</span>M-24 kèm nút "Thử lại".</li>
   </ol></div>
 </section>
@@ -263,8 +265,8 @@
     <div class="row" style="gap:24px; align-items:flex-start; flex-wrap:wrap">
       <div class="box grey" style="width:300px">
         <div class="inp rel" style="color:#222"><span class="c tag">1</span>đặng</div>
-        <div class="item"><span class="av">Ẩ</span><div class="grow"><div class="t">Đặng Thị Ẩn</div><div class="p">dang.an</div></div></div>
-        <div class="item"><span class="c">2</span><span class="av">H</span><div class="grow"><div class="t">Đặng Văn Hùng</div><div class="p">hung.dang</div></div></div>
+        <div class="item"><span class="av">Ẩ</span><div class="grow"><div class="t">Đặng Thị Ẩn</div><div class="p">@dang.an</div></div></div>
+        <div class="item"><span class="c">2</span><span class="av">H</span><div class="grow"><div class="t">Đặng Văn Hùng</div><div class="p">@hung.dang</div></div></div>
       </div>
       <div class="box grey" style="width:300px">
         <div class="inp" style="color:#222">xyz</div>
@@ -274,7 +276,7 @@
   </div>
   <div class="notes"><ol>
     <li><span class="c">1</span>Tự tìm sau khi ngừng gõ ~0,3 giây (GF-07). Không phân biệt hoa thường; có phân biệt dấu (GĐ-10). Esc hoặc xóa ô → về danh sách hội thoại.</li>
-    <li><span class="c">2</span>Mỗi kết quả: avatar, tên hiển thị, tên đăng nhập; tối đa 20; không có chính mình. Chọn → mở SC-04 (hội thoại cũ nếu đã có – CH-01).</li>
+    <li><span class="c">2</span>Mỗi kết quả: avatar, tên hiển thị, "@tên đăng nhập" (phân biệt người trùng tên); tối đa 20; không có chính mình. Chọn → mở SC-04 (hội thoại cũ nếu đã có – CH-01).</li>
     <li><span class="c">3</span>M-14 – thông tin, không phải lỗi.</li>
   </ol></div>
 </section>
@@ -288,7 +290,7 @@
       <div class="banner rel"><span class="c tag">1</span>Mất kết nối. Đang thử kết nối lại…</div>
       <div class="scroll" style="height:220px">
         <div class="bubble">Bạn gửi lại giúp mình bảng số liệu nhé<div class="meta">15:10</div></div>
-        <div class="bubble me" style="opacity:.6">Đây ạ, bản cập nhật mới nhất<div class="meta">đang gửi…</div></div>
+        <div class="bubble me">Đây ạ, bản cập nhật mới nhất<div class="meta"><i>đang gửi…</i></div></div>
         <div class="bubble me fail rel"><span class="c tag">2</span>⚠ Mình sẽ gửi thêm phụ lục sau<div class="meta">Gửi không thành công. <span class="btn" style="padding:0 6px">Gửi lại</span></div></div>
       </div>
       <div class="composer row"><div class="inp grow">Nhập tin nhắn…</div><div class="btn primary">Gửi</div></div>
@@ -296,7 +298,7 @@
   </div>
   <div class="notes"><ol>
     <li><span class="c">1</span>M-33 khi kết nối realtime bị ngắt; tự ẩn khi nối lại, rồi tải tin bị lỡ (07 mục 7.8).</li>
-    <li><span class="c">2</span>Quá 10 giây không có xác nhận → tin lỗi: ⚠ + M-20 + nút "Gửi lại" (GF-13). Bấm "Gửi lại" gửi đúng tin đó, không sinh tin trùng. Không có nhãn "đã nhận / đã xem" (CH-04 – NOT MVP).</li>
+    <li><span class="c">2</span>Quá 10 giây không có xác nhận → tin lỗi: ⚠ + M-20 + nút "Gửi lại" (GF-13). Bấm "Gửi lại" gửi đúng tin đó, không sinh tin trùng. Tin đang chờ giữ nguyên màu (không làm mờ), nhãn nghiêng "đang gửi…" thay giờ. Không có nhãn "đã nhận / đã xem" (CH-04 – NOT MVP).</li>
   </ol></div>
 </section>
 
@@ -335,7 +337,7 @@
   </div>
   <div class="notes"><ol>
     <li><span class="c">1</span>Đầu khung nhóm: tên nhóm, số thành viên hiện tại, nút "Thông tin nhóm" (mở cột 3).</li>
-    <li><span class="c">2</span>Tin hệ thống: căn giữa, chữ nhỏ, nghiêng, không avatar, có giờ; dùng tên hiển thị lúc xảy ra sự kiện (NH-04, GS-32).</li>
+    <li><span class="c">2</span>Tin hệ thống: căn giữa, chữ nhỏ màu xám, không avatar, có giờ (FRS-14); dùng tên hiển thị lúc xảy ra sự kiện (NH-04, GS-32). Chữ nghiêng chỉ dùng cho trích tin hệ thống ở danh sách hội thoại (GS-25).</li>
     <li><span class="c">3</span>Mỗi tin của người khác có tên + avatar (NH-02, GF-16). Tin của mình căn phải, không cần tên (GX-07).</li>
     <li><span class="c">4</span>SC-06 ở cột 3 trên máy tính; trên điện thoại là màn hình riêng (GX-05). ✕ đóng cột.</li>
     <li><span class="c">5</span>Sửa tên nhóm – chỉ trưởng nhóm thấy (NH-03).</li>
@@ -381,7 +383,7 @@
   </div>
   <div class="notes"><ol>
     <li><span class="c">1</span>M-30 – cùng một câu cho "không tồn tại" và "không có quyền"; không hiện tin nào (AT-06).</li>
-    <li><span class="c">2</span>M-32 khi đang mở nhóm mà bị xóa; nhóm biến mất khỏi danh sách (QĐ-04).</li>
+    <li><span class="c">2</span>M-32 khi đang mở nhóm mà bị xóa (sự kiện realtime <code>conversation:removed</code>); nhóm biến mất khỏi danh sách ngay (QĐ-04). "Về danh sách" → SC-03.</li>
   </ol></div>
 </section>
 
@@ -489,7 +491,7 @@
   <header><h2>SC-07 · Hồ sơ cá nhân</h2><span>TK-05, TK-03 · UC-05, UC-03 · US-06, US-04 · M-03, M-42</span></header>
   <div class="canvas">
     <div class="formpage col">
-      <div class="row"><span class="av rel" style="width:64px; height:64px; font-size:24px"><span class="c tag">1</span>Ẩ</span><div><div class="b">Đặng Thị Ẩn</div><div class="lbl">dang.an</div></div></div>
+      <div class="row"><span class="av rel" style="width:64px; height:64px; font-size:24px"><span class="c tag">1</span>Ẩ</span><div><div class="b">Đặng Thị Ẩn</div><div class="lbl">@dang.an</div></div></div>
       <div><div class="lbl">Tên đăng nhập</div><div class="inp rel" style="background:#eee"><span class="c tag">2</span>dang.an</div></div>
       <div><div class="lbl">Tên hiển thị</div><div class="inp" style="color:#222">Đặng Thị Ẩn</div></div>
       <div class="btn primary rel"><span class="c tag">3</span>Lưu</div>
@@ -544,7 +546,7 @@
     <div class="phones">
       <div class="phone">
         <div class="notch">SC-03 Trang chính</div>
-        <div class="pane-h col"><div class="row"><span class="b grow">Chat nội bộ</span><span class="badge">5</span><span class="av sm">A</span></div><div class="row"><div class="inp grow">Tìm đồng nghiệp…</div><div class="btn rel"><span class="c tag">1</span>+ Nhóm</div></div></div>
+        <div class="pane-h col"><div class="row"><span class="b grow">Chat nội bộ</span><span class="badge">5</span><span class="av sm">A</span></div><div class="row"><div class="inp grow">Tìm đồng nghiệp…</div><div class="btn rel"><span class="c tag">1</span>+ Tạo nhóm</div></div></div>
         <div class="scroll" style="padding:0">
           <div class="item"><span class="av">P</span><div class="grow"><div class="t b">Phòng Kế hoạch</div><div class="p b">Lê Cường: Họp lúc 9h sáng mai</div></div><span class="badge">3</span></div>
           <div class="item"><span class="av">D</span><div class="grow"><div class="t b">Phạm Dũng</div><div class="p b">Anh xem giúp em báo cáo tuần</div></div><span class="badge">2</span></div>

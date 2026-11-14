@@ -56,7 +56,7 @@ export function GroupInfoPanel({ conversationId, meId, refreshKey, onClose, onLe
       ) : (
         <p className="group-name">
           <strong>{detail.name}</strong>
-          {isOwner && <button type="button" className="link-btn" onClick={() => { setName(detail.name ?? ""); setEditing(true); }}>Sửa tên</button>}
+          {isOwner && <button type="button" className="btn btn-ghost" aria-label="Sửa tên nhóm" onClick={() => { setName(detail.name ?? ""); setEditing(true); }}>✎ Sửa</button>}
         </p>
       )}
       <h3>Thành viên ({detail.memberCount})</h3>
@@ -66,16 +66,17 @@ export function GroupInfoPanel({ conversationId, meId, refreshKey, onClose, onLe
             <Avatar user={m.user} size={32} />
             <span className="user-text">
               <span className="name">{m.user.displayName}{m.user.id === meId ? " (bạn)" : ""}</span>
-              <span className="sub">@{m.user.username}{m.role === "owner" ? " · Trưởng nhóm" : ""}</span>
+              <span className="sub">@{m.user.username}</span>
             </span>
+            {m.role === "owner" && <span className="role">Trưởng nhóm</span>}
             {isOwner && m.user.id !== meId && (
-              <button type="button" className="btn btn-danger small" onClick={() => setDialog({ remove: m.user })}>Xóa</button>
+              <button type="button" className="btn btn-danger small" aria-label={`Xóa ${m.user.displayName} khỏi nhóm`} onClick={() => setDialog({ remove: m.user })}>Xóa</button>
             )}
           </li>
         ))}
       </ul>
       <div className="actions">
-        {isOwner && <button type="button" className="btn btn-secondary" onClick={() => setDialog("add")}>Thêm thành viên</button>}
+        {isOwner && <button type="button" className="btn btn-secondary" aria-label="Thêm thành viên" onClick={() => setDialog("add")}>+ Thêm thành viên</button>}
         <button type="button" className="btn btn-danger" onClick={() => setDialog("leave")}>Rời nhóm</button>
       </div>
 

@@ -33,7 +33,7 @@ describe("G1 – NH-01 tạo nhóm", () => {
     const res = await createGroup("a", "Phòng Kế hoạch", ["b", "c"]);
     expect(res.status).toBe(201);
     const g = res.body.conversation;
-    expect(g).toMatchObject({ type: "group", title: "Phòng Kế hoạch", name: "Phòng Kế hoạch", memberCount: 3, myRole: "owner", otherUser: null, unreadCount: 0 });
+    expect(g).toMatchObject({ type: "group", title: "Phòng Kế hoạch", name: "Phòng Kế hoạch", avatarInitial: "P", memberCount: 3, myRole: "owner", otherUser: null, unreadCount: 0 });
     expect(Object.fromEntries(g.members.map((m: any) => [m.user.username, m.role]))).toEqual({ "grp.a": "owner", "grp.b": "member", "grp.c": "member" });
     const msgs = await history("b", g.id);
     expect(msgs).toHaveLength(1);
