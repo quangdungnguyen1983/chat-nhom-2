@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "db:migrate": "prisma migrate deploy",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/prisma-generate.mjs",
     "build:vercel": "prisma generate --schema prisma/postgres/schema.prisma && tsc -p tsconfig.build.json && node scripts/migrate-postgres.mjs"
   },
   "dependencies": {
