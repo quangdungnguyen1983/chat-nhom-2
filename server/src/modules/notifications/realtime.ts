@@ -41,3 +41,19 @@ export function disconnectSession(sessionId: number, reason: RevokeReason): void
   io.to(rooms.session(sessionId)).emit("session:revoked", { reason });
   io.in(rooms.session(sessionId)).disconnectSockets(true);
 }
+
+/** Rời phòng hội thoại – gọi TRƯỚC khi phát tin hệ thống xóa / rời (09 mục 10.8, QĐ-04). */
+export function leaveConversation(conversationId: number, userIds: number[]): void {
+  if (!io) return;
+  for (const u of userIds) io.in(rooms.user(u)).socketsLeave(rooms.conv(conversationId));
+}
+
+export function emitConversationRemoved(userId: number, conversationId: number, reason: "removed" | "left"): void {
+  io?.to(rooms.user(userId)).emit("conversation:removed", { conversationId, reason });
+}
+
+export type MemberChange = "added" | "removed" | "left" | "owner_transferred" | "renamed";
+
+export function emitMemberChanged(conversationId: number, change: MemberChange, userId: number | null, memberCount: number): void {
+  io?.to(rooms.conv(conversationId)).emit("member:changed", { conversationId, change, userId, memberCount });
+}

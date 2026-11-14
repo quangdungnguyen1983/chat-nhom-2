@@ -5,4 +5,5 @@ export const getMe = () => api<{ user: UserDto; session: { expiresAt: string } }
 
 export const updateMe = (displayName: string) => api<{ user: UserDto }>("PUT", "/api/me", { displayName });
 
-export const searchUsers = (q: string) => api<{ users: UserDto[] }>("GET", `/api/users?q=${encodeURIComponent(q)}`);
+export const searchUsers = (q: string, excludeConversationId?: number) =>
+  api<{ users: UserDto[] }>("GET", `/api/users?q=${encodeURIComponent(q)}${excludeConversationId ? `&excludeConversationId=${excludeConversationId}` : ""}`);

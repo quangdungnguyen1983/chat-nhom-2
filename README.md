@@ -2,6 +2,7 @@
 
 - **Slice 1 – Tài khoản**: đăng ký (TK-01, TK-02), đăng nhập / đăng xuất (TK-03), đổi mật khẩu (TK-04), hồ sơ (TK-05), tìm người dùng (TK-06).
 - **Slice 2 – Chat realtime 1-1**: mở hội thoại 1-1 không trùng (CH-01), gửi/nhận qua WebSocket (CH-02), lịch sử 50 tin/trang (CH-03), danh sách hội thoại mới nhất trước (CH-06), số chưa đọc (TB-01).
+- **Slice 3 – Nhóm**: tạo nhóm ≥ 2 người được chọn, người tạo là trưởng nhóm (NH-01); nhắn tin nhóm realtime kèm tên + avatar người gửi (NH-02); trưởng nhóm thêm / xóa / đổi tên, thành viên tự rời, trưởng nhóm rời phải chuyển quyền (NH-03); tin hệ thống HT-01…HT-06 trong dòng chat (NH-04).
 
 Thiết kế theo `08-high-level-design.md`, `09-detailed-design.md`, `10-ui-ux.md` (đều đang **Draft**, ADR chờ duyệt – xem "Lưu ý" cuối trang).
 
@@ -99,6 +100,11 @@ Xem `.env.example` và `09-detailed-design.md` mục 11. Máy chủ **dừng kh�
 | C3 | GET | `/api/conversations/:id` | Thành viên | CH-01 |
 | C4 | GET | `/api/conversations/:id/messages?before=&after=&limit=` | Thành viên | CH-03 (tối đa 50) |
 | C5 | POST | `/api/conversations/:id/read` | Thành viên | TB-01 |
+| G1 | POST | `/api/conversations/group` `{name, memberIds}` | Phiên | NH-01, NH-04 |
+| G2 | PATCH | `/api/conversations/:id` `{name}` | Trưởng nhóm | NH-03, NH-04 |
+| G3 | POST | `/api/conversations/:id/members` `{userIds, showHistory?}` | Trưởng nhóm | NH-03, NH-04 |
+| G4 | DELETE | `/api/conversations/:id/members/:userId` | Trưởng nhóm | NH-03, NH-04 |
+| G5 | POST | `/api/conversations/:id/leave` `{newOwnerId?}` | Thành viên | NH-03, NH-04 |
 
 **Socket.IO** (cùng địa chỉ, cookie phiên + `Origin` kiểm tra khi bắt tay):
 
@@ -108,6 +114,8 @@ Xem `.env.example` và `09-detailed-design.md` mục 11. Máy chủ **dừng kh�
 | `message:new` | server → phòng `conv:<id>` | Chỉ socket của thành viên hiện tại ở trong phòng; không có sự kiện nào cho client tự vào phòng |
 | `conversation:updated`, `unread:update` | server → phòng `user:<id>` | Dòng danh sách + số chưa đọc tính riêng cho từng người |
 | `session:revoked` | server → phòng `session:<id>` | Đăng xuất / đổi mật khẩu / hết hạn → báo rồi ngắt socket |
+| `member:changed` | server → phòng `conv:<id>` | Nhóm: thêm / xóa / rời / chuyển quyền / đổi tên |
+| `conversation:removed` | server → phòng `user:<id>` | Người bị xóa (`removed` → giao diện hiện M-32) hoặc vừa rời (`left`). Máy chủ cho socket rời phòng **trước** khi phát tin hệ thống |
 
 **Người ngoài hội thoại** (và hội thoại không tồn tại) nhận **cùng một** phản hồi: REST `403 CONVERSATION_FORBIDDEN` + M-30; socket: ack `{ok:false, error.code: "CONVERSATION_FORBIDDEN"}`, không lưu, không phát.
 
@@ -128,6 +136,7 @@ server/
   src/modules/users/    – /api/me, /api/users
   src/modules/chat/     – membership.ts (cửa kiểm tra thành viên DUY NHẤT), chat.service, routes C1–C4, chat.socket (message:send)
   src/modules/notifications/ – realtime.ts (nơi DUY NHẤT gọi io), read.routes (C5), unread.service
+  src/modules/groups/   – groups.service (G1–G5, cửa trưởng nhóm), groups.routes, system-messages (HT-01…HT-06)
   src/realtime-server.ts – gắn Socket.IO (chỉ WebSocket) vào HTTP server
   test/unit, test/integration, test/db
 web/
@@ -141,6 +150,7 @@ web/
 
 - **Tài liệu thiết kế còn Draft**: ADR-01 (SQLite), ADR-02 (cookie HttpOnly), OQ-31 (cột `display_name_search`), OQ-36 (argon2id thay bcrypt) **chưa được Product Owner duyệt**. Mã đi theo đề xuất trong tài liệu.
 - Người ngoài nhận **403** (theo yêu cầu review slice 2); `09` GT-08 đề xuất 404. Cả hai trường hợp (không phải thành viên / không tồn tại) cho phản hồi giống hệt nhau.
-- Chưa có nhóm (NH-01…NH-04): lược đồ đã có cột cho nhóm nhưng chỉ hội thoại `direct` được dùng. Tham số `excludeConversationId` của U3 chưa có tác dụng.
+- Nhóm: không phải thành viên → 403 `CONVERSATION_FORBIDDEN` (như slice 2); là thành viên nhưng không phải trưởng nhóm → 403 `NOT_GROUP_OWNER` (M-29).
+- Thêm nhiều người trong một lần: cả lần dùng chung một mốc xem (tin HT-02 đầu tiên của lần đó), để không ai thấy tin trước lúc được thêm.
 - Socket.IO chạy một tiến trình (ADR-03); chạy nhiều tiến trình cần adapter (OQ-28).
 - Không có giới hạn số lần đăng nhập sai (PDF không yêu cầu – FRS-03 "Ngoài MVP").

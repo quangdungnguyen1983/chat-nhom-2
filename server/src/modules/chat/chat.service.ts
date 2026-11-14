@@ -57,7 +57,7 @@ async function summariesFor(me: number, ids: number[]): Promise<ConversationSumm
   });
 }
 
-async function detailFor(me: number, conversationId: number): Promise<ConversationDetailDto> {
+export async function detailFor(me: number, conversationId: number): Promise<ConversationDetailDto> {
   const [row] = await convRepo.findForView([conversationId]);
   const unread = (await unreadCounts(me, [conversationId])).get(conversationId) ?? 0;
   return {
@@ -162,15 +162,19 @@ export async function sendMessage(me: number, input: SendInput): Promise<{ messa
     saved = { message: toMessageDto(prev), duplicate: true };
   }
 
-  if (!saved.duplicate) await broadcastNewMessage(saved.message);
+  if (!saved.duplicate) await broadcastMessages(saved.message.conversationId, [saved.message]);
   return saved;
 }
 
-async function broadcastNewMessage(message: MessageDto): Promise<void> {
-  realtime.emitNewMessage(message);
-  const memberIds = await members.activeMemberIds(message.conversationId);
+/**
+ * Phát các tin ĐÃ LƯU (theo thứ tự) tới phòng conv:<id>, rồi gửi conversation:updated
+ * tính riêng cho từng thành viên HIỆN TẠI. Dùng chung cho tin thường và tin hệ thống nhóm.
+ */
+export async function broadcastMessages(conversationId: number, messages: MessageDto[]): Promise<void> {
+  for (const m of messages) realtime.emitNewMessage(m);
+  const memberIds = await members.activeMemberIds(conversationId);
   for (const uid of memberIds) {
-    const [summary] = await summariesFor(uid, [message.conversationId]);
-    if (summary) realtime.emitConversationUpdated(uid, summary); // tính RIÊNG cho từng người (unreadCount, isMine)
+    const [summary] = await summariesFor(uid, [conversationId]);
+    if (summary) realtime.emitConversationUpdated(uid, summary); // unreadCount, isMine tính riêng
   }
 }

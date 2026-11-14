@@ -11,8 +11,10 @@ type SendAck = { ok: true; message: MessageDto; duplicate: boolean } | { ok: fal
 
 const time = (iso: string) => new Date(iso).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
 
-export function ChatPanel({ conversation, meId, socket, onBack, onForbidden }: {
+export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onShowInfo }: {
   conversation: ConversationSummaryDto; meId: number; socket: Socket | null; onBack: () => void; onForbidden: () => void;
+  /** Nhóm: mở SC-06 Thông tin nhóm. */
+  onShowInfo?: () => void;
 }) {
   const convId = conversation.id;
   const [items, setItems] = useState<Item[]>([]);
@@ -146,7 +148,13 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden }: {
       <header className="chat-head">
         <button type="button" className="btn btn-secondary back" onClick={onBack} aria-label="Quay lại">←</button>
         {conversation.otherUser && <Avatar user={conversation.otherUser} />}
-        <h2>{conversation.title}</h2>
+        <h2>
+          {conversation.title}
+          {conversation.type === "group" && <span className="sub"> · {conversation.memberCount} thành viên</span>}
+        </h2>
+        {conversation.type === "group" && onShowInfo && (
+          <button type="button" className="btn btn-secondary info-btn" onClick={onShowInfo}>Thông tin nhóm</button>
+        )}
       </header>
       {!connected && <div className="conn-bar" role="status">{M.M33}</div>}
       <div className="chat-log" ref={logRef} role="log" aria-live="polite"
@@ -159,10 +167,21 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden }: {
         {!hasMore && items.length > 0 && <p className="history-end">{M.M21}</p>}
         {loadError && <div role="alert" className="alert alert-error">{loadError}</div>}
         {items.map((m) => {
+          // NH-04: tin hệ thống căn giữa, chữ nhỏ màu xám, không avatar, kèm giờ (FRS-14).
+          if (m.type === "system") {
+            return (
+              <p key={m.id} className="system-msg">
+                <span className="system-text">{m.content}</span> <span className="sub">{time(m.createdAt)}</span>
+              </p>
+            );
+          }
           const mine = m.pending !== undefined || m.sender?.id === meId;
+          const showSender = conversation.type === "group" && !mine && m.sender; // NH-02 R2: tên + avatar cạnh MỖI tin
           return (
             <div key={m.clientMessageId ?? m.id} className={`bubble-row ${mine ? "mine" : "theirs"}`}>
+              {showSender && <Avatar user={m.sender!} size={32} />}
               <div className={`bubble ${m.failed ? "failed" : ""}`}>
+                {showSender && <div className="bubble-sender">{m.sender!.displayName}</div>}
                 <div className="bubble-text">{m.content}</div>
                 <div className="bubble-meta">
                   {m.pending ? <em>đang gửi…</em> : m.failed ? (
