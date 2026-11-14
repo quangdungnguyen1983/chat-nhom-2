@@ -34,11 +34,12 @@ export function updatePasswordHash(id: number, passwordHash: string, tx?: Tx): P
  * Tìm theo tên đăng nhập hoặc display_name_search CHỨA từ khóa (TK-06, GT-09).
  * `pattern` đã được thoát ký tự LIKE và bọc %…% ở tầng service.
  * Cả hai cột và từ khóa đều đã ở chữ thường nên kết quả không phụ thuộc chế độ
- * phân biệt hoa thường của LIKE trong SQLite (chỉ áp dụng A–Z).
+ * phân biệt hoa thường của LIKE (SQLite: chỉ A–Z; PostgreSQL: luôn phân biệt).
+ * Bí danh cột đặt trong ngoặc kép để PostgreSQL giữ nguyên chữ hoa "displayName".
  */
 export function searchUsers(pattern: string, excludeUserId: number, limit: number, excludeConversationId = 0) {
   return prisma().$queryRaw<Array<{ id: number; username: string; displayName: string }>>`
-    SELECT id, username, display_name AS displayName
+    SELECT id, username, display_name AS "displayName"
     FROM users
     WHERE id <> ${excludeUserId}
       AND (username LIKE ${pattern} ESCAPE '\\' OR display_name_search LIKE ${pattern} ESCAPE '\\')

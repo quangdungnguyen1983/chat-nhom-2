@@ -49,7 +49,8 @@ export function createApp() {
 
   // Demo/production: phục vụ giao diện đã đóng gói cùng địa chỉ với API (GH-02).
   const webDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../web/dist");
-  if (env().NODE_ENV === "production" && fs.existsSync(webDist)) {
+  // Trên Vercel, giao diện do CDN phục vụ (vercel.json) nên máy chủ không phục vụ tệp tĩnh.
+  if (env().NODE_ENV === "production" && !env().VERCEL && fs.existsSync(webDist)) {
     app.use(express.static(webDist));
     app.get(/^\/(?!api\/|socket\.io\/).*/, (_req, res) => res.sendFile(path.join(webDist, "index.html")));
   }

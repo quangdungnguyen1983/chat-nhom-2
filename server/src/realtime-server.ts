@@ -1,6 +1,9 @@
 // Gắn Socket.IO vào HTTP server. CHỈ transport WebSocket – không long-polling (ADR-03, GH-04).
 import type http from "node:http";
 import { Server } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { Redis } from "ioredis";
+import { log } from "./common/logger.js";
 import { socketAuth, type SocketData } from "./modules/auth/socket-auth.js";
 import { registerChatHandlers } from "./modules/chat/chat.socket.js";
 import * as realtime from "./modules/notifications/realtime.js";
@@ -40,4 +43,27 @@ export function attachRealtime(httpServer: http.Server): Server {
   });
   realtime.setIo(io);
   return io;
+}
+
+/**
+ * Nhiều bản máy chủ (Vercel Function có thể chạy nhiều instance): dùng Redis để phát sự kiện và
+ * vào/rời phòng (socketsJoin, socketsLeave, disconnectSockets) trên MỌI instance (OQ-28).
+ * Không có REDIS_URL → giữ adapter trong bộ nhớ như bản chạy một tiến trình (ADR-03).
+ */
+export async function useRedisAdapter(io: Server, url: string): Promise<void> {
+  const pub = new Redis(url, { maxRetriesPerRequest: null });
+  const sub = pub.duplicate();
+  // Không in URL (có mật khẩu); chỉ ghi tên lỗi.
+  for (const c of [pub, sub]) c.on("error", (err: Error) => log("error", `Redis: ${err.name}`));
+  await Promise.all([waitReady(pub), waitReady(sub)]);
+  io.adapter(createAdapter(pub, sub));
+  log("info", "Socket.IO dùng Redis adapter");
+}
+
+function waitReady(c: Redis): Promise<void> {
+  if (c.status === "ready") return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    c.once("ready", () => resolve());
+    c.once("end", () => reject(new Error("REDIS_UNAVAILABLE")));
+  });
 }
