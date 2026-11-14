@@ -127,7 +127,7 @@ flowchart LR
 
 | Mã | Tên | Mục đích | Thành phần chính | Mã SRS | Use case | User story |
 |---|---|---|---|---|---|---|
-| SC-01 | Đăng ký | Tạo tài khoản | Ô: tên đăng nhập, tên hiển thị, mật khẩu (có nút hiện/ẩn), nhập lại, mã tổ chức; danh sách kiểm tra mật khẩu; nút "Đăng ký"; liên kết "Đã có tài khoản? Đăng nhập" | TK-01, TK-02 | UC-01 | US-01, US-02 |
+| SC-01 | Đăng ký | Tạo tài khoản | Ô: tên đăng nhập, tên hiển thị, mật khẩu (có nút hiện/ẩn), nhập lại, listbox mã tổ chức (chọn sẵn khi chỉ có một); danh sách kiểm tra mật khẩu; nút "Đăng ký"; liên kết "Đã có tài khoản? Đăng nhập" | TK-01, TK-02 | UC-01 | US-01, US-02 |
 | SC-02 | Đăng nhập | Vào ứng dụng | Ô: tên đăng nhập, mật khẩu; nút "Đăng nhập"; liên kết "Chưa có tài khoản? Đăng ký" | TK-03 | UC-02, UC-03 | US-03, US-04 |
 | SC-03 | Trang chính | Thấy mọi hội thoại, tìm người, tạo nhóm | Đầu trang (tên ứng dụng, badge tổng, avatar của mình); ô "Tìm đồng nghiệp…"; nút "Tạo nhóm"; danh sách hội thoại (avatar, tên, trích tin cuối, thời gian, badge) | CH-06, TB-01, TK-06, CH-01 | UC-06, UC-07, UC-10 | US-07, US-08, US-13, US-14 |
 | SC-04 | Hội thoại | Đọc và gửi tin | Đầu khung (1-1: avatar + tên; nhóm: tên nhóm, số thành viên, nút "Thông tin nhóm"); khung tin (50 tin/lần, tin hệ thống); ô soạn nhiều dòng, bộ đếm ký tự, nút "Gửi" | CH-02, CH-03, NH-02, NH-04, TB-01 | UC-08, UC-09, UC-11 | US-09, US-10, US-11, US-12, US-15, US-17, US-22 |
@@ -308,7 +308,7 @@ Câu thông báo M-xx dùng **nguyên văn** từ `03-frs.md` mục 5; bảng d�
 | Chung | Tên ứng dụng / tiêu đề tab | "Chat nội bộ" · có tin chưa đọc: "(5) Chat nội bộ" `[GĐ-15]` |
 | SC-01 | Tiêu đề / nút / liên kết | "Tạo tài khoản" · "Đăng ký" · "Đã có tài khoản? Đăng nhập" |
 | SC-01 | Nhãn ô | "Tên đăng nhập" · "Tên hiển thị" · "Mật khẩu" · "Nhập lại mật khẩu" · "Mã đăng ký tổ chức" |
-| SC-01 | Placeholder / gợi ý | "vd: an.nguyen" · "vd: Nguyễn Văn An" · gợi ý dưới tên đăng nhập: "3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới" |
+| SC-01 | Placeholder / gợi ý | "vd: an.nguyen" · "vd: Nguyễn Văn An" · gợi ý dưới tên đăng nhập: "3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới" · listbox mã tổ chức: "Đang tải…" / "— Chọn tổ chức —", mỗi mục "Tên tổ chức (mã)" (thay đổi 2026-11-14, xem 03-frs mục 4.1) |
 | SC-01, SC-08 | Danh sách kiểm tra mật khẩu | "Ít nhất 8 ký tự" · "Có chữ cái" · "Có chữ số" |
 | SC-01, SC-02, SC-08 | Nút hiện/ẩn mật khẩu | `aria-label`: "Hiện mật khẩu" / "Ẩn mật khẩu" |
 | SC-02 | Tiêu đề / nút / liên kết | "Đăng nhập" · "Đăng nhập" · "Chưa có tài khoản? Đăng ký" |

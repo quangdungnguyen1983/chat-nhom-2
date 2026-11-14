@@ -452,12 +452,16 @@ Cột "Kiểm tra" áp dụng **cả ở trình duyệt và máy chủ** (NT-01)
 | Tên hiển thị | Ô chữ | ✓ | 1–50 ký tự sau khi bỏ khoảng trắng; cho phép tiếng Việt có dấu `[GS-02]` | M-03 |
 | Mật khẩu | Ô mật khẩu (có nút hiện/ẩn) | ✓ | Theo FRS-02 | M-06, M-07, M-08 |
 | Nhập lại mật khẩu | Ô mật khẩu | ✓ | Giống ô Mật khẩu `[ĐX]` | M-04 |
-| Mã đăng ký tổ chức | Ô chữ | ✓ | Khớp mã cấu hình `[QĐ-06]` | M-05 |
+| Mã đăng ký tổ chức | Listbox một lựa chọn; danh mục lấy từ máy chủ (`GET /api/auth/registration-options`), mỗi mục hiện "Tên tổ chức (mã)"; chỉ có một mục thì chọn sẵn `[YC-2026-11-14]` | ✓ | Khớp mã cấu hình `[QĐ-06]` | M-05 |
 
 | Hành động | Phản hồi khi thành công | Lỗi có thể gặp |
 |---|---|---|
 | Bấm "Đăng ký" | Chuyển sang SCR-02, hiện M-40, điền sẵn tên đăng nhập | M-01…M-08, M-34 |
 | Bấm "Đã có tài khoản? Đăng nhập" | Chuyển sang SCR-02 | – |
+
+> **Thay đổi 2026-11-14 `[YC-2026-11-14]`:** theo yêu cầu của người dùng, ô "Mã đăng ký tổ chức" đổi từ ô chữ sang listbox để người đăng ký không phải nhớ mã.
+> Hệ quả: mã hiện công khai cho bất kỳ ai mở trang đăng ký, nên **không còn chặn được người ngoài tổ chức** như QĐ-05 / GĐ-16 dự định.
+> Cần Product Owner xác nhận chấp nhận rủi ro này (hoặc chọn cách khác, ví dụ link mời tự điền mã).
 
 ### 4.2 SCR-02 – Đăng nhập (FRS-03)
 

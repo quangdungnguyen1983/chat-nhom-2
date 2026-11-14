@@ -3,11 +3,20 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../src/storage/prisma.js";
 import { hashToken } from "../../src/modules/auth/session.service.js";
 import { M } from "../../src/common/messages.js";
-import { ORIGIN, login, makeAgent, register, type Agent } from "../helpers/app.js";
+import { ORIGIN, REG_CODE, login, makeAgent, register, type Agent } from "../helpers/app.js";
 
 let agent: Agent;
 beforeAll(async () => {
   agent = await makeAgent();
+});
+
+describe("A0 GET /api/auth/registration-options – SC-01 listbox", () => {
+  it("trả danh mục gồm tên tổ chức và mã đang cấu hình, không cần đăng nhập, không lưu cache", async () => {
+    const res = await agent.get("/api/auth/registration-options");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ options: [{ label: "Tổ chức", code: REG_CODE }] });
+    expect(res.headers["cache-control"]).toBe("no-store");
+  });
 });
 
 describe("A1 POST /api/auth/register – TK-01, TK-02", () => {
