@@ -1,0 +1,37 @@
+// Vertical Slice 1: chỉ bảng users và sessions (09-detailed-design.md mục 3.2).
+// Các bảng hội thoại / tin nhắn sẽ được thêm ở slice sau bằng migration mới.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  username          String    @unique
+  passwordHash      String    @map("password_hash")
+  displayName       String    @map("display_name")
+  displayNameSearch String    @map("display_name_search")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  sessions          Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @map("user_id")
+  tokenHash     String    @unique @map("token_hash")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  expiresAt     DateTime  @map("expires_at")
+  revokedAt     DateTime? @map("revoked_at")
+  revokedReason String?   @map("revoked_reason")
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
+}
