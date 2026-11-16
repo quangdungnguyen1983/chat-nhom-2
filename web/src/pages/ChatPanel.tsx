@@ -5,6 +5,7 @@ import { ApiError } from "../api/client";
 import { getMessages, getMessagesAfter, markRead, type ConversationSummaryDto, type MessageDto } from "../api/chat";
 import { dayLabel, hhmm, sameDay } from "../lib/datetime";
 import { Avatar } from "../components/Avatar";
+import { EmojiPicker, isEmojiOnly } from "../components/EmojiPicker";
 import { M, MAX_MESSAGE_CHARS, countChars, formatCount, hasVisibleChar, normalizeContent, tooLongMessage } from "../lib/text";
 
 type Item = MessageDto & { pending?: boolean; failed?: boolean };
@@ -166,6 +167,16 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
     void deliver(pending);
   }
 
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  /** Chèn emoji vào đúng vị trí con trỏ rồi trả focus về ô soạn tin. */
+  function insertEmoji(ch: string) {
+    const el = inputRef.current;
+    const start = el?.selectionStart ?? draft.length;
+    const end = el?.selectionEnd ?? draft.length;
+    setDraft(draft.slice(0, start) + ch + draft.slice(end));
+    requestAnimationFrame(() => { el?.focus(); el?.setSelectionRange(start + ch.length, start + ch.length); });
+  }
+
   function onKey(e: KeyboardEvent<HTMLTextAreaElement>) {
     // Máy tính: Enter gửi, Shift+Enter xuống dòng. Điện thoại: Enter xuống dòng (GF-10).
     // KHÔNG gửi khi bộ gõ tiếng Việt đang ghép chữ (GX-04).
@@ -216,7 +227,7 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
             {day}
             <div className={`bubble-row ${mine ? "mine" : "theirs"}`}>
               {showSender && <Avatar user={m.sender!} size={32} />}
-              <div className={`bubble ${m.failed ? "failed" : ""}`}>
+              <div className={`bubble ${m.failed ? "failed" : ""} ${isEmojiOnly(m.content) ? "emoji-only" : ""}`}>
                 {showSender && <div className="bubble-sender">{m.sender!.displayName}</div>}
                 <div className="bubble-text">{m.content}</div>
                 <div className="bubble-meta">
@@ -239,7 +250,8 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
       {newBelow && <button type="button" className="btn btn-secondary new-below" onClick={scrollToBottom}>Có tin nhắn mới ↓</button>}
       <form className="composer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <label htmlFor="composer" className="sr-only">Nhập tin nhắn</label>
-        <textarea id="composer" rows={2} value={draft} placeholder="Nhập tin nhắn…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
+        <EmojiPicker onPick={insertEmoji} />
+        <textarea ref={inputRef} id="composer" rows={2} value={draft} placeholder="Nhập tin nhắn…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
           aria-invalid={tooLong || undefined} aria-describedby="composer-count" />
         <button type="submit" className="btn btn-primary send" disabled={!canSend}>Gửi</button>
         {(n > 4500 || sendError) && (

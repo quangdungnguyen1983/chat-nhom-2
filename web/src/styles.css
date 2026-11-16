@@ -204,3 +204,115 @@ select { width: 100%; min-height: var(--size-touch); font: inherit; border: 1px 
   .new-below { bottom: 112px; }
 }
 .me-link { text-decoration: none; }
+
+/* =====================================================================
+   Giao diện 2026-11-16 – "Ngọc & mực"
+   Thanh bên màu mực đậm, màu nhấn xanh ngọc, khung chat có nền họa tiết
+   lá tre + bong bóng rất nhạt. Mọi cặp chữ/nền giữ tương phản ≥ 4,5:1.
+   ===================================================================== */
+:root {
+  --ink: #14233A; --ink-2: #1C2F4C; --ink-3: #2A4166; --ink-text: #E8EEF5; --ink-muted: #A9B8CB;
+  --jade: #0E7A6D; --jade-dark: #0A5E54; --jade-soft: #D5EEE9; --jade-glow: #7FD4C6;
+  --mist: #E8EFEC; --paper: #FFFFFF;
+  --color-primary: var(--jade); --color-primary-hover: var(--jade-dark); --color-selected: var(--jade-soft);
+  --font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  --radius-bubble: 18px;
+  --chat-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%230E7A6D' stroke-opacity='.10' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M22 38c10-14 26-18 38-14-8 12-24 20-38 14z'/%3E%3Cpath d='M22 38l38-14'/%3E%3Cpath d='M104 18h28a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8h-18l-8 7v-7h-2a8 8 0 0 1-8-8V26a8 8 0 0 1 8-8z'/%3E%3Cpath d='M118 104c-12-6-16-20-12-32 12 6 18 20 12 32z'/%3E%3Cpath d='M118 104l-12-32'/%3E%3Cpath d='M30 112h22a7 7 0 0 1 7 7v9a7 7 0 0 1-7 7H38l-7 6v-6a7 7 0 0 1-8-7v-9a7 7 0 0 1 7-7z'/%3E%3C/g%3E%3Cg fill='%230E7A6D' fill-opacity='.10'%3E%3Ccircle cx='80' cy='70' r='2.5'/%3E%3Ccircle cx='146' cy='136' r='2'/%3E%3Ccircle cx='70' cy='148' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+body { -webkit-font-smoothing: antialiased; }
+
+/* --- Trang đăng nhập / đăng ký: nền mực có họa tiết, thẻ trắng ở giữa --- */
+.auth-page {
+  align-items: center;
+  background: var(--chat-pattern) repeat, radial-gradient(circle at 20% 10%, #22406A 0, var(--ink) 55%);
+  background-size: 200px 200px, auto;
+}
+.auth-page .card { border-radius: 20px; padding: var(--space-5) var(--space-4); box-shadow: 0 24px 48px rgba(6, 15, 30, .35); }
+.auth-page .card h1 { font-size: 26px; font-weight: 700; letter-spacing: -.01em; }
+.auth-page .card h1::before {
+  content: ""; display: block; width: 48px; height: 48px; margin-bottom: var(--space-3); border-radius: 14px;
+  background: var(--jade) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z'/%3E%3C/svg%3E") center / 26px no-repeat;
+}
+.field input, .search, .composer textarea, select { border-radius: 10px; border-color: #B8C2CF; }
+.btn { border-radius: 10px; }
+.btn-primary { box-shadow: 0 1px 0 rgba(255,255,255,.15) inset; }
+
+/* --- Thanh bên màu mực --- */
+.sidebar { background: var(--ink); color: var(--ink-text); border-right: 0; }
+.sidebar :focus-visible { outline-color: var(--jade-glow); }
+.sidebar .brand strong { color: #fff; font-weight: 700; letter-spacing: -.01em; }
+.sidebar .brand strong::before {
+  content: ""; display: inline-block; width: 26px; height: 26px; margin-right: 10px; vertical-align: -6px; border-radius: 8px;
+  background: var(--jade) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z'/%3E%3C/svg%3E") center / 15px no-repeat;
+}
+.sidebar .search { background: var(--ink-2); border: 1px solid var(--ink-3); color: var(--ink-text); }
+.sidebar .search::placeholder { color: var(--ink-muted); }
+.sidebar .search:focus-visible { border: 2px solid var(--jade-glow); }
+.sidebar .sub, .sidebar .empty, .sidebar .placeholder { color: var(--ink-muted); }
+.sidebar .as-button:hover { background: rgba(255,255,255,.06); }
+.sidebar .user-row { border-radius: 12px; position: relative; }
+.sidebar .conv-row.selected { background: rgba(127, 212, 198, .14); }
+.sidebar .conv-row.selected::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: var(--jade-glow); }
+.sidebar .conv-row.unread .name, .sidebar .conv-row.unread .preview { color: #fff; }
+.sidebar .badge { background: #D93036; box-shadow: 0 0 0 2px var(--ink); }
+.sidebar .skeleton-avatar, .sidebar .skeleton { background: var(--ink-2); }
+.sidebar .avatar { box-shadow: 0 0 0 2px rgba(255,255,255,.08); }
+.sidebar .me-link .avatar { box-shadow: 0 0 0 2px var(--jade-glow); }
+.sidebar .link-btn, .sidebar .btn-ghost { color: var(--jade-glow); }
+
+/* --- Vùng nội dung bên phải --- */
+.content { background: var(--mist); }
+.content > .placeholder {
+  margin: auto; max-width: 360px; text-align: center; font-size: var(--font-size-md); color: var(--color-text-secondary);
+  padding-top: 120px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96' fill='none'%3E%3Crect x='8' y='14' width='56' height='40' rx='14' fill='%23D5EEE9'/%3E%3Cpath d='M22 54l-6 12 16-12' fill='%23D5EEE9'/%3E%3Crect x='34' y='38' width='54' height='36' rx='14' fill='%230E7A6D'/%3E%3Cpath d='M74 74l6 10-16-10' fill='%230E7A6D'/%3E%3Ccircle cx='50' cy='56' r='3' fill='white'/%3E%3Ccircle cx='61' cy='56' r='3' fill='white'/%3E%3Ccircle cx='72' cy='56' r='3' fill='white'/%3E%3C/svg%3E") top center / 96px no-repeat;
+}
+
+/* --- Khung chat --- */
+.chat-head { background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #D6E0DC; position: relative; z-index: 1; }
+.chat-title h2 { font-weight: 700; letter-spacing: -.01em; }
+.chat-log { background: var(--chat-pattern) repeat, var(--mist); background-size: 200px 200px, auto; gap: 6px; }
+.day-sep { align-self: center; width: max-content; margin: var(--space-3) 0 var(--space-2); padding: 3px 12px; border-radius: 999px; font-weight: 600; color: var(--color-text-secondary); background: rgba(255,255,255,.88); box-shadow: 0 1px 2px rgba(20,35,58,.08); }
+.system-msg { align-self: center; max-width: 85%; padding: 4px 12px; border-radius: 999px; background: rgba(20,35,58,.06); }
+
+.bubble { border-radius: var(--radius-bubble); box-shadow: 0 1px 1.5px rgba(20,35,58,.12); background: var(--paper); line-height: 1.45; }
+.bubble-row.theirs .bubble { border-bottom-left-radius: 6px; }
+.bubble-row.mine .bubble { background: var(--jade); border-bottom-right-radius: 6px; }
+.bubble-row.mine .bubble.failed { background: var(--color-error-bg); }
+.bubble-meta { font-size: 11px; text-align: right; opacity: 1; color: var(--color-text-secondary); }
+.bubble-row.mine .bubble-meta { color: #DDF2EE; }
+.bubble-row.mine .bubble.failed .bubble-meta { color: var(--color-error); }
+.bubble-sender { color: var(--jade-dark); }
+.bubble.emoji-only { background: transparent; box-shadow: none; padding: 0 var(--space-1); }
+.bubble.emoji-only .bubble-text { font-size: 40px; line-height: 1.15; }
+.bubble-row.mine .bubble.emoji-only .bubble-meta, .bubble.emoji-only .bubble-meta { color: var(--color-text-secondary); }
+.new-below { border-radius: 999px; background: var(--paper); }
+
+/* --- Ô soạn tin + nút emoji --- */
+.composer { grid-template-columns: auto 1fr auto; background: var(--paper); border-top: 1px solid #D6E0DC; padding: var(--space-2) var(--space-3); align-items: end; }
+.composer textarea { border-radius: 22px; padding: 10px 16px; background: #F4F7F6; border: 1px solid transparent; resize: none; }
+.composer textarea:focus-visible { outline: none; border: 2px solid var(--jade); background: #fff; }
+.composer .send { border-radius: 22px; min-width: 72px; }
+.emoji-wrap { position: relative; }
+.emoji-toggle { width: var(--size-touch); height: var(--size-touch); border: 0; border-radius: 50%; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; filter: grayscale(.35); }
+.emoji-toggle:hover, .emoji-toggle[aria-expanded="true"] { background: var(--jade-soft); filter: none; }
+.emoji-toggle:disabled { opacity: .5; cursor: not-allowed; }
+.emoji-panel {
+  position: absolute; bottom: calc(100% + 10px); left: 0; z-index: 10; width: 320px; max-width: calc(100vw - 32px); max-height: 300px; overflow-y: auto;
+  padding: var(--space-2) var(--space-3) var(--space-3); background: var(--paper); border-radius: 16px; border: 1px solid #D6E0DC;
+  box-shadow: 0 16px 40px rgba(20,35,58,.18);
+}
+.emoji-group-name { margin: var(--space-2) 0 var(--space-1); font-size: var(--font-size-xs); font-weight: 600; color: var(--color-text-secondary); }
+.emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 2px; }
+.emoji-grid button { height: 40px; border: 0; border-radius: 10px; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; }
+.emoji-grid button:hover, .emoji-grid button:focus-visible { background: var(--jade-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .emoji-panel { animation: pop .14s ease-out; transform-origin: bottom left; }
+  @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(4px); } }
+}
+
+/* --- Bảng thông tin nhóm, hộp thoại --- */
+.dialog { border-radius: 16px; box-shadow: 0 24px 48px rgba(6,15,30,.3); }
+.overlay { background: rgba(20, 35, 58, .55); }
+.group-info { background: var(--paper); }
+.chip { background: var(--jade-soft); }
+.role { border-color: var(--jade); color: var(--jade-dark); }
