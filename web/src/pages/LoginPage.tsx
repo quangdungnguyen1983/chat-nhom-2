@@ -7,6 +7,7 @@ import { Field } from "../components/Field";
 import { SubmitButton } from "../components/SubmitButton";
 import { useAuth } from "../auth";
 import { M } from "../lib/text";
+import { AuthBrand } from "../components/AuthBrand";
 
 export function LoginPage() {
   const loc = useLocation();
@@ -37,6 +38,7 @@ export function LoginPage() {
   return (
     <main className="auth-page">
       <form className="card" onSubmit={submit} noValidate>
+        <AuthBrand />
         <h1>Đăng nhập</h1>
         {notice && !error && (
           <div role={isSuccess ? "status" : "alert"} className={isSuccess ? "alert alert-success" : "alert alert-error"}>{notice}</div>

@@ -8,6 +8,7 @@ import { PasswordChecklist } from "../components/PasswordChecklist";
 import { SubmitButton } from "../components/SubmitButton";
 import { useAuth } from "../auth";
 import { M, checkDisplayName, checkPassword, checkUsername, normalizeUsername } from "../lib/text";
+import { AuthBrand } from "../components/AuthBrand";
 
 type Form = { username: string; displayName: string; password: string; passwordConfirm: string };
 type Errors = Partial<Record<keyof Form | "_form", string>>;
@@ -56,6 +57,7 @@ export function RegisterPage() {
   return (
     <main className="auth-page">
       <form className="card" onSubmit={submit} noValidate>
+        <AuthBrand />
         <h1>Tạo tài khoản</h1>
         {errors._form && <div role="alert" className="alert alert-error">{errors._form}</div>}
         <Field label="Tên đăng nhập" value={f.username} onChange={set("username")} onBlur={blur("username")} placeholder="vd: an.nguyen"

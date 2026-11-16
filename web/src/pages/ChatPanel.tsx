@@ -6,6 +6,7 @@ import { getMessages, getMessagesAfter, markRead, type ConversationSummaryDto, t
 import { dayLabel, hhmm, sameDay } from "../lib/datetime";
 import { Avatar } from "../components/Avatar";
 import { EmojiPicker, isEmojiOnly } from "../components/EmojiPicker";
+import { ChatBackgroundPicker, useChatBackground } from "../components/ChatBackground";
 import { M, MAX_MESSAGE_CHARS, countChars, formatCount, hasVisibleChar, normalizeContent, tooLongMessage } from "../lib/text";
 
 type Item = MessageDto & { pending?: boolean; failed?: boolean };
@@ -168,6 +169,7 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
   }
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [bg, setBg] = useChatBackground(meId);
   /** Chèn emoji vào đúng vị trí con trỏ rồi trả focus về ô soạn tin. */
   function insertEmoji(ch: string) {
     const el = inputRef.current;
@@ -192,12 +194,13 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
           <h2>{conversation.title}</h2>
           {conversation.type === "group" && <span className="sub">{conversation.memberCount} thành viên</span>}
         </div>
+        <ChatBackgroundPicker value={bg} onChange={setBg} />
         {conversation.type === "group" && onShowInfo && (
           <button type="button" className="btn btn-secondary info-btn" onClick={onShowInfo}>Thông tin nhóm</button>
         )}
       </header>
       {!connected && <div className="conn-bar" role="status">{M.M33}</div>}
-      <div className="chat-log" ref={logRef} role="log" aria-live="polite"
+      <div className="chat-log chat-bg" data-bg={bg} ref={logRef} role="log" aria-live="polite"
         onScroll={(e) => {
           const el = e.currentTarget;
           stickBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
