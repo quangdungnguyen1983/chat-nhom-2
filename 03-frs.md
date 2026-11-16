@@ -83,16 +83,15 @@ Bố cục `[ĐX]`: màn hình rộng hiện SCR-03 và SCR-04 cạnh nhau; màn
 | Mã SRS | TK-01 |
 | Màn hình | SCR-01 (bảng trường nhập ở mục 4.1) |
 | Actor | Khách |
-| Tiền điều kiện | Chưa đăng nhập; người đăng ký đã được tổ chức cấp mã đăng ký `[QĐ-06]` |
+| Tiền điều kiện | Chưa đăng nhập |
 | Hậu điều kiện | Có thêm một tài khoản; mật khẩu chỉ được lưu dạng băm |
 
 **Xử lý phía máy chủ** (theo thứ tự):
 1. Chuẩn hóa dữ liệu: tên đăng nhập chuyển sang chữ thường `[GF-01]`; tên hiển thị chuẩn hóa NFC và bỏ khoảng trắng đầu/cuối.
-2. Kiểm tra **mã đăng ký tổ chức trước tiên**. Sai thì dừng ngay với M-05 và không kiểm tra tiếp, để người ngoài không dò được tên đăng nhập nào đã tồn tại `[ĐX]`.
-3. Kiểm tra định dạng tên đăng nhập (QĐ-07), tên hiển thị (GS-02), mật khẩu (FRS-02).
-4. Kiểm tra tên đăng nhập chưa tồn tại. Nếu hai người đăng ký trùng tên cùng lúc, chỉ một người thành công, người kia nhận M-01.
-5. Băm mật khẩu bằng bcrypt hoặc argon2 `[PDF]` rồi lưu tài khoản.
-6. Trả kết quả thành công. Trình duyệt chuyển sang SCR-02, hiện M-40 và điền sẵn tên đăng nhập `[ĐX]`.
+2. Kiểm tra định dạng tên đăng nhập (QĐ-07), tên hiển thị (GS-02), mật khẩu (FRS-02).
+3. Kiểm tra tên đăng nhập chưa tồn tại. Nếu hai người đăng ký trùng tên cùng lúc, chỉ một người thành công, người kia nhận M-01.
+4. Băm mật khẩu bằng bcrypt hoặc argon2 `[PDF]` rồi lưu tài khoản.
+5. Trả kết quả thành công. Trình duyệt chuyển sang SCR-02, hiện M-40 và điền sẵn tên đăng nhập `[ĐX]`.
 
 **Tiêu chí chấp nhận:** TK-01-AC1…AC4 (SRS).
 
@@ -452,16 +451,11 @@ Cột "Kiểm tra" áp dụng **cả ở trình duyệt và máy chủ** (NT-01)
 | Tên hiển thị | Ô chữ | ✓ | 1–50 ký tự sau khi bỏ khoảng trắng; cho phép tiếng Việt có dấu `[GS-02]` | M-03 |
 | Mật khẩu | Ô mật khẩu (có nút hiện/ẩn) | ✓ | Theo FRS-02 | M-06, M-07, M-08 |
 | Nhập lại mật khẩu | Ô mật khẩu | ✓ | Giống ô Mật khẩu `[ĐX]` | M-04 |
-| Mã đăng ký tổ chức | Listbox một lựa chọn; danh mục lấy từ máy chủ (`GET /api/auth/registration-options`), mỗi mục hiện "Tên tổ chức (mã)"; chỉ có một mục thì chọn sẵn `[YC-2026-11-14]` | ✓ | Khớp mã cấu hình `[QĐ-06]` | M-05 |
 
 | Hành động | Phản hồi khi thành công | Lỗi có thể gặp |
 |---|---|---|
 | Bấm "Đăng ký" | Chuyển sang SCR-02, hiện M-40, điền sẵn tên đăng nhập | M-01…M-08, M-34 |
 | Bấm "Đã có tài khoản? Đăng nhập" | Chuyển sang SCR-02 | – |
-
-> **Thay đổi 2026-11-14 `[YC-2026-11-14]`:** theo yêu cầu của người dùng, ô "Mã đăng ký tổ chức" đổi từ ô chữ sang listbox để người đăng ký không phải nhớ mã.
-> Hệ quả: mã hiện công khai cho bất kỳ ai mở trang đăng ký, nên **không còn chặn được người ngoài tổ chức** như QĐ-05 / GĐ-16 dự định.
-> Cần Product Owner xác nhận chấp nhận rủi ro này (hoặc chọn cách khác, ví dụ link mời tự điền mã).
 
 ### 4.2 SCR-02 – Đăng nhập (FRS-03)
 
@@ -599,7 +593,7 @@ Toàn bộ câu chữ là **đề xuất `[ĐX]`**: PDF chỉ yêu cầu "báo l
 | M-02 | Tên đăng nhập dài 3–30 ký tự, chỉ gồm chữ không dấu (a–z), số (0–9), dấu chấm (.) hoặc gạch dưới (_). | Lỗi | E-TK01-2 |
 | M-03 | Tên hiển thị không được để trống và tối đa 50 ký tự. | Lỗi | E-TK01-4, E-TK05-1 |
 | M-04 | Mật khẩu nhập lại không khớp. | Lỗi | E-TK04-4 |
-| M-05 | Mã đăng ký tổ chức không đúng. Vui lòng liên hệ đầu mối của tổ chức để nhận mã. | Lỗi | E-TK01-5 |
+| M-05 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – | – |
 | M-06 | Mật khẩu phải có ít nhất 8 ký tự. | Lỗi | E-TK02-1 |
 | M-07 | Mật khẩu phải có cả chữ cái và chữ số. | Lỗi | E-TK02-2 |
 | M-08 | Mật khẩu tối đa 64 ký tự. | Lỗi | E-TK02-3 |
@@ -666,7 +660,7 @@ Mốc này áp dụng đồng thời cho **lịch sử** (FRS-09), **trích tin 
 
 | Thao tác | Phiên | Điều kiện cho phép | Khi bị từ chối |
 |---|---|---|---|
-| Đăng ký | Không cần | Mã đăng ký tổ chức đúng | M-05 |
+| Đăng ký | Không cần | Ai cũng đăng ký được | – |
 | Đăng nhập | Không cần | Đúng tên đăng nhập và mật khẩu | M-09 |
 | Đăng xuất | Cần | Phiên của chính mình | M-31 |
 | Xem / sửa hồ sơ | Cần | Chỉ hồ sơ của chính mình | M-31 |

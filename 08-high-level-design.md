@@ -133,7 +133,7 @@ Lựa chọn này **khác** giả định GE-01 của `06-erd.md` (PostgreSQL). 
 ```mermaid
 flowchart TB
     EMP["Người dùng: Nhân viên<br/>dùng trình duyệt Chrome, Edge, Firefox, Safari"]
-    DEP["Người triển khai<br/>đặt cấu hình và mã đăng ký tổ chức"]
+    DEP["Người triển khai<br/>đặt cấu hình"]
 
     subgraph EDGE["Lớp mã hóa đường truyền – chỉ có ở môi trường demo"]
         TLS["Cổng HTTPS/WSS<br/>GitHub Codespaces chuyển tiếp cổng<br/>hoặc reverse proxy có chứng chỉ"]
@@ -151,7 +151,7 @@ flowchart TB
     TLS -- "chuyển tiếp HTTP và WebSocket" --> APP
     APP -- "tệp giao diện đã đóng gói, đi qua cùng cổng" --> SPA
     APP == "đọc và ghi qua Prisma" ==> DB
-    DEP -- "biến môi trường: DATABASE_URL, REGISTRATION_CODE, SESSION_TTL_HOURS" --> APP
+    DEP -- "biến môi trường: DATABASE_URL, SESSION_TTL_HOURS" --> APP
 ```
 
 | Container | Trách nhiệm | Công nghệ | Không làm |
@@ -169,7 +169,7 @@ Trong môi trường demo, máy chủ ứng dụng **vừa phục vụ API vừa
 
 | Module | Trách nhiệm | Mã yêu cầu | Kho dữ liệu (`06-erd.md`) |
 |---|---|---|---|
-| `auth` | Đăng ký (kèm mã tổ chức), đăng nhập, đăng xuất, đổi mật khẩu; cấp và kiểm tra phiên (cửa G1) cho cả REST và WebSocket | TK-01, TK-02, TK-03, TK-04 | `users`, `sessions` |
+| `auth` | Đăng ký, đăng nhập, đăng xuất, đổi mật khẩu; cấp và kiểm tra phiên (cửa G1) cho cả REST và WebSocket | TK-01, TK-02, TK-03, TK-04 | `users`, `sessions` |
 | `users` | Xem/sửa hồ sơ (tên hiển thị); tìm người dùng | TK-05, TK-06 | `users` |
 | `chat` | Mở hội thoại 1-1 không trùng; danh sách hội thoại; gửi tin; lịch sử 50 tin/lần; tải tin bị lỡ; **hàm kiểm tra thành viên dùng chung (cửa G2)** | CH-01, CH-02, CH-03, CH-06, NH-02 | `conversations`, `conversation_members`, `messages` |
 | `groups` | Tạo nhóm; thêm/xóa thành viên; đổi tên; rời nhóm và chuyển quyền (cửa G3); sinh tin hệ thống trong cùng giao dịch | NH-01, NH-03, NH-04 | `conversations`, `conversation_members`, `messages`, `message_read_cursors` |
@@ -290,7 +290,7 @@ Kiểm chứng: AT-06; phép thử đổi mã hội thoại trong yêu cầu; ph
 | Giới hạn độ dài | Tin ≤ 5.000 ký tự đếm sau chuẩn hóa NFC; tên đăng nhập 3–30, tên hiển thị 1–50, tên nhóm 1–100; giới hạn kích thước gói dữ liệu REST và WebSocket | `[PDF CH-02]`, `[QĐ-07]`, `[GS-02]`, `[GS-28]`, `[OQ-24]` |
 | Hiển thị an toàn | Tin hiển thị dạng chữ thuần; không dùng chức năng chèn HTML thô của React | CH-02 R6 |
 | HTTPS/WSS | Do cổng phía trước đảm nhận (mục 5); local không có | `[PDF §4]`, `[GH-01]` |
-| Bí mật cấu hình | Mã đăng ký tổ chức, đường dẫn CSDL đặt trong biến môi trường; **không** commit vào Git, không ghi trong README | `[QĐ-05]`, `[GĐ-16]` |
+| Bí mật cấu hình | Chuỗi kết nối CSDL đặt trong biến môi trường; **không** commit vào Git, không ghi trong README | `[ĐX]` |
 | Giới hạn số lần thử | Không thuộc MVP (FRS-03 ghi "Ngoài MVP") | – |
 
 ## 9. Triển khai
@@ -307,7 +307,7 @@ Kiểm chứng: AT-06; phép thử đổi mã hội thoại trong yêu cầu; ph
 
 ### 9.2 Demo online – GitHub Codespaces (phương án chính) `[QĐ-02]`
 
-1. Mở Codespace từ repository; cài thư viện; chạy migration; nạp mã đăng ký tổ chức qua biến môi trường (Codespaces secrets), không ghi vào mã nguồn.
+1. Mở Codespace từ repository; cài thư viện; chạy migration; nạp cấu hình qua biến môi trường (Codespaces secrets), không ghi vào mã nguồn.
 2. Đóng gói giao diện (`vite build`); máy chủ Express phục vụ cả tệp giao diện và API ở **một cổng**.
 3. Chuyển tiếp cổng đó, đặt chế độ **công khai**, lấy địa chỉ `https://…` do GitHub cấp. Trình duyệt kết nối bằng HTTPS và WSS tới địa chỉ này; GitHub giải mã rồi chuyển tới máy chủ trong Codespace `[GH-08]`.
 4. Bật cờ `Secure` cho cookie.

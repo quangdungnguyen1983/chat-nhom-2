@@ -17,22 +17,13 @@ function clearSessionCookie(res: Response) {
 
 export const authRouter = Router();
 
-// A0 – SC-01: danh mục cho listbox "Mã đăng ký tổ chức".
-// LƯU Ý: trả mã cho bất kỳ ai mở trang đăng ký, nên mã KHÔNG còn chặn người ngoài (QĐ-05) –
-// quyết định của người dùng ngày 2026-11-14, chờ Product Owner duyệt.
-authRouter.get("/auth/registration-options", (_req, res) => {
-  const e = env();
-  res.set("Cache-Control", "no-store");
-  res.json({ options: [{ label: e.REGISTRATION_ORG_NAME, code: e.REGISTRATION_CODE }] });
-});
-
 // A1 – TK-01, TK-02
 authRouter.post("/auth/register", async (req, res) => {
   const body = parseStrict(
-    { username: str(), password: str(), passwordConfirm: str(), displayName: str(), registrationCode: str() },
+    { username: str(), password: str(), passwordConfirm: str(), displayName: str() },
     req.body,
   );
-  const user = await auth.register(body, env().REGISTRATION_CODE);
+  const user = await auth.register(body);
   res.status(201).json({ user });
 });
 

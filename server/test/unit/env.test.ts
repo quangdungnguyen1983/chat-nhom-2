@@ -3,7 +3,7 @@ import { allowedOrigins, dbProvider, isAllowedOrigin, loadEnv } from "../../src/
 
 const base = {
   NODE_ENV: "test", PORT: "3000", APP_ORIGIN: "http://localhost:5173", DATABASE_URL: "file:x.db",
-  REGISTRATION_CODE: "abcdefgh", SESSION_TTL_HOURS: "8", COOKIE_SECURE: "false",
+  SESSION_TTL_HOURS: "8", COOKIE_SECURE: "false",
 };
 
 describe("config/env", () => {
@@ -12,12 +12,9 @@ describe("config/env", () => {
     expect(e.COOKIE_SECURE).toBe(false);
     expect(e.COOKIE_NAME).toBe("sid");
   });
-  it("dừng khi thiếu REGISTRATION_CODE và không in giá trị bí mật", () => {
-    const { REGISTRATION_CODE: _omit, ...rest } = base;
-    expect(() => loadEnv(rest)).toThrow(/REGISTRATION_CODE/);
-    try { loadEnv({ ...base, REGISTRATION_CODE: "short" }); } catch (e) {
-      expect(String(e)).not.toContain("short");
-    }
+  it("dừng khi thiếu biến bắt buộc", () => {
+    const { APP_ORIGIN: _omit, ...rest } = base;
+    expect(() => loadEnv(rest)).toThrow(/APP_ORIGIN/);
   });
   it("Vercel: chấp nhận Origin của chính bản deploy, không chấp nhận trang khác", () => {
     const e = loadEnv({ ...base, VERCEL: "1", VERCEL_URL: "chat-abc123.vercel.app" });

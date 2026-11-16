@@ -11,9 +11,6 @@ const schema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   APP_ORIGIN: z.url(),
   DATABASE_URL: z.string().min(1),
-  REGISTRATION_CODE: z.string().trim().min(8, "REGISTRATION_CODE phải có ít nhất 8 ký tự"),
-  // Tên hiện trong listbox "Mã đăng ký tổ chức" ở màn hình đăng ký (SC-01).
-  REGISTRATION_ORG_NAME: z.string().trim().max(100).default("").transform((v) => v || "Tổ chức"),
   SESSION_TTL_HOURS: z.coerce.number().positive().default(8), // mặc định 8 giờ như .env.example
   COOKIE_SECURE: boolStr,
   COOKIE_NAME: z.string().regex(/^[A-Za-z0-9_-]+$/).default("sid"),

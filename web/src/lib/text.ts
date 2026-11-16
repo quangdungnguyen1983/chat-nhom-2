@@ -4,7 +4,6 @@ export const M = {
   M02: "Tên đăng nhập dài 3–30 ký tự, chỉ gồm chữ không dấu (a–z), số (0–9), dấu chấm (.) hoặc gạch dưới (_).",
   M03: "Tên hiển thị không được để trống và tối đa 50 ký tự.",
   M04: "Mật khẩu nhập lại không khớp.",
-  M05: "Mã đăng ký tổ chức không đúng. Vui lòng liên hệ đầu mối của tổ chức để nhận mã.",
   M06: "Mật khẩu phải có ít nhất 8 ký tự.",
   M07: "Mật khẩu phải có cả chữ cái và chữ số.",
   M08: "Mật khẩu tối đa 64 ký tự.",

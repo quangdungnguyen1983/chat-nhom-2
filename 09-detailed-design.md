@@ -325,7 +325,6 @@ Tất cả nằm trong `common/validation.ts`, dùng chung cho REST và Socket.I
 | `password`, `newPassword` | `nfc`; **không** `trim` | 8 ≤ `countChars` ≤ 64; có ít nhất một chữ cái `/\p{L}/u` và một chữ số `/[0-9]/` | M-06 / M-08 / M-07 | `[PDF TK-02]`, `[GS-04]`, `[GS-05]` |
 | `passwordConfirm`, `newPasswordConfirm` | `nfc` | Bằng mật khẩu mới | M-04 | `[GU-01]`, `[ĐX]` |
 | `displayName` | `nfc` → `trim` | 1 ≤ `countChars` ≤ 50 | M-03 | `[GS-02]` |
-| `registrationCode` | `trim` | So bằng phép so thời gian cố định (`crypto.timingSafeEqual` trên bản băm) với `REGISTRATION_CODE` | 400 `INVALID_REGISTRATION_CODE` + M-05 | `[QĐ-05]`, `[GU-02]` |
 | `q` (tìm người) | `searchKey` | 1 ≤ `countChars` ≤ 50 | 400 `VALIDATION_ERROR` | `[GS-14]`, `[ĐX]` giới hạn trên |
 | `content` (tin) | `nfc` → `normalizeNewlines`; **không** `trim` | `hasVisibleChar`; `countChars` ≤ 5000 | `MESSAGE_EMPTY`; `MESSAGE_TOO_LONG` + M-17 (kèm `{n}`) | `[PDF CH-02]`, `[GS-19]` |
 | `clientMessageId` | – | UUID v4 (chữ thường) | 400 `VALIDATION_ERROR` | `[GF-12]` |
@@ -363,7 +362,6 @@ Test ST-MSG-06 và IT-GRP-09 kiểm chứng.
 | `code` | HTTP | Câu | Khi nào | Mã SRS |
 |---|---|---|---|---|
 | `VALIDATION_ERROR` | 400 | Câu M-xx của từng trường trong `fields`; `message` chung: "Dữ liệu không hợp lệ." `[ĐX]` | Sai định dạng, trường lạ | nhiều |
-| `INVALID_REGISTRATION_CODE` | 400 | M-05 | Mã tổ chức sai | E-TK01-5 |
 | `USERNAME_TAKEN` | 409 | M-01 | Trùng tên đăng nhập | E-TK01-1 |
 | `INVALID_CREDENTIALS` | 401 | M-09 | Sai tên hoặc mật khẩu (cùng một câu) | E-TK03-1 |
 | `UNAUTHENTICATED` | 401 | M-31 | Không có / hết hạn / đã hủy phiên | E-TK03-2 |
@@ -474,12 +472,12 @@ type ConversationDetailDto = ConversationSummaryDto & {
 ```json
 // Request
 { "username": "NhanVien01", "password": "Matkhau123", "passwordConfirm": "Matkhau123",
-  "displayName": "Nguyễn Văn An", "registrationCode": "<mã do tổ chức cấp>" }
+  "displayName": "Nguyễn Văn An" }
 // 201
 { "user": { "id": 1, "username": "nhanvien01", "displayName": "Nguyễn Văn An", "avatarInitial": "A" } }
 ```
 
-Thứ tự kiểm tra: mã tổ chức (M-05) → định dạng các trường → trùng tên (409). Không tự đăng nhập; giao diện hiện M-40 và chuyển về đăng nhập `[GS-03]`. Lỗi: 400 `INVALID_REGISTRATION_CODE`, 400 `VALIDATION_ERROR`, 409 `USERNAME_TAKEN`.
+Thứ tự kiểm tra: định dạng các trường → trùng tên (409). Không tự đăng nhập; giao diện hiện M-40 và chuyển về đăng nhập `[GS-03]`. Lỗi: 400 `VALIDATION_ERROR`, 409 `USERNAME_TAKEN`.
 
 #### A2 `POST /api/auth/login` – TK-03
 
@@ -1051,7 +1049,6 @@ Phòng Socket.IO là lớp bảo vệ thứ hai: một kết nối chỉ ở tro
 | `PORT` | `3000` | Có | Cổng máy chủ | – |
 | `APP_ORIGIN` | `http://localhost:5173` | Có | Địa chỉ hợp lệ của giao diện, dùng kiểm tra `Origin` (REST và WebSocket). Demo: địa chỉ `https://…` của Codespaces | `[GH-03]` |
 | `DATABASE_URL` | `file:./data/chat.db` | Có | SQLite (mặc định) hoặc chuỗi kết nối PostgreSQL | `[ADR-01]` |
-| `REGISTRATION_CODE` | (đặt riêng, không commit) | Có | Mã đăng ký tổ chức | `[QĐ-05]`, `[GĐ-16]` |
 | `SESSION_TTL_HOURS` | `8` | Có | Thời hạn phiên | `[QĐ-09]` |
 | `COOKIE_SECURE` | `false` | Có | `true` khi chạy sau HTTPS (demo); `false` khi local HTTP | `[GH-01]`, `[GH-03]` |
 | `COOKIE_NAME` | `sid` | Không | Tên cookie phiên | `[ĐX]` |
@@ -1089,7 +1086,7 @@ Kế hoạch; chi tiết bước và dữ liệu ở `11-test-cases.md`. Tầng:
 
 | Endpoint / sự kiện | Mã test | Nội dung kiểm tra chính | Mã yêu cầu |
 |---|---|---|---|
-| A1 | IT-AUTH-01…05 | Đăng ký đúng; trùng tên khác hoa thường (409); mã tổ chức sai; mật khẩu sai quy tắc; tên hiển thị có dấu lưu đúng | TK-01, TK-02 |
+| A1 | IT-AUTH-01…05 | Đăng ký đúng; trùng tên khác hoa thường (409); mật khẩu sai quy tắc; tên hiển thị có dấu lưu đúng | TK-01, TK-02 |
 | A1 | DB-02 | `password_hash` khác chuỗi gốc, có dạng argon2id | TK-02 |
 | A2 | IT-AUTH-06…08 | Đăng nhập đúng đặt cookie HttpOnly; sai mật khẩu và sai tên cho cùng phản hồi; tên viết hoa đăng nhập được | TK-03 |
 | A3 | IT-AUTH-09, ST-SES-01 | Dùng lại cookie cũ sau đăng xuất → 401; socket của phiên nhận `session:revoked` và bị ngắt | TK-03 |

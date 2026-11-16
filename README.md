@@ -33,12 +33,6 @@ Tạo file cấu hình cho máy chủ từ mẫu (file `server/.env` **không** 
 cp .env.example server/.env
 ```
 
-Mở `server/.env` và đặt `REGISTRATION_CODE` (mã đăng ký tổ chức, ≥ 8 ký tự, tự chọn – không chia sẻ công khai). Có thể sinh mã ngẫu nhiên bằng:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(12).toString('base64url'))"
-```
-
 Tạo CSDL (áp migration vào `server/data/chat.db`):
 
 ```bash
@@ -155,8 +149,7 @@ web/
 - Socket.IO chạy một tiến trình (ADR-03); bản Vercel chạy nhiều instance qua Postgres adapter (OQ-28) – xem mục 8.
 - Không có giới hạn số lần đăng nhập sai (PDF không yêu cầu – FRS-03 "Ngoài MVP").
 
-- **Listbox "Mã đăng ký tổ chức" (2026-11-14):** màn hình đăng ký lấy mã từ `GET /api/auth/registration-options` và cho chọn trong listbox.
-  Vì mã hiện công khai trên trang đăng ký, nó **không còn chặn người ngoài** (QĐ-05) – chờ Product Owner xác nhận.
+- **Đăng ký tự do (2026-11-16):** không còn mã đăng ký tổ chức; ai mở được trang cũng tự tạo tài khoản được (QĐ-05 hết hiệu lực).
 
 ## 8. Triển khai lên Vercel
 
@@ -182,8 +175,6 @@ Biến môi trường trên Vercel (Project → Settings → Environment Variabl
 | Biến | Nguồn |
 |---|---|
 | Chuỗi kết nối Neon | Tự có khi kết nối Neon từ Vercel Marketplace. Máy chủ nhận cả khi có tiền tố (`DATABASE_URL_DATABASE_URL`, `DATABASE_URL_POSTGRES_PRISMA_URL`, `DATABASE_URL_UNPOOLED`…) – danh sách ở `server/src/config/db-url.ts` |
-| `REGISTRATION_CODE` | Tự đặt (≥ 8 ký tự), kiểu **Sensitive**; không ghi vào repo |
-| `REGISTRATION_ORG_NAME` | Tên tổ chức hiện trong listbox ở màn hình đăng ký (mặc định "Tổ chức") |
 | `APP_ORIGIN` | Địa chỉ chính thức, ví dụ `https://<tên-dự-án>.vercel.app` |
 | `COOKIE_SECURE` | `true` |
 | `SESSION_TTL_HOURS`, `COOKIE_NAME`, `LOG_LEVEL` | Không bắt buộc (mặc định 8, `sid`, `info`) |

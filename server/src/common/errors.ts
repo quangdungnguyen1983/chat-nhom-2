@@ -3,7 +3,6 @@ import { M } from "./messages.js";
 
 export type ErrorCode =
   | "VALIDATION_ERROR"
-  | "INVALID_REGISTRATION_CODE"
   | "USERNAME_TAKEN"
   | "INVALID_CREDENTIALS"
   | "UNAUTHENTICATED"
@@ -30,7 +29,6 @@ export type ErrorCode =
 
 const table: Record<ErrorCode, { status: number; message: string }> = {
   VALIDATION_ERROR: { status: 400, message: M.VALIDATION },
-  INVALID_REGISTRATION_CODE: { status: 400, message: M.M05 },
   USERNAME_TAKEN: { status: 409, message: M.M01 },
   INVALID_CREDENTIALS: { status: 401, message: M.M09 },
   UNAUTHENTICATED: { status: 401, message: M.M31 },

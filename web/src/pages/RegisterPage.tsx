@@ -1,15 +1,15 @@
 // SCR-01 / SC-01 – Đăng ký (TK-01, TK-02)
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ApiError } from "../api/client";
 import * as authApi from "../api/auth";
-import { Field, SelectField } from "../components/Field";
+import { Field } from "../components/Field";
 import { PasswordChecklist } from "../components/PasswordChecklist";
 import { SubmitButton } from "../components/SubmitButton";
 import { useAuth } from "../auth";
 import { M, checkDisplayName, checkPassword, checkUsername, normalizeUsername } from "../lib/text";
 
-type Form = { username: string; displayName: string; password: string; passwordConfirm: string; registrationCode: string };
+type Form = { username: string; displayName: string; password: string; passwordConfirm: string };
 type Errors = Partial<Record<keyof Form | "_form", string>>;
 
 function validate(f: Form): Errors {
@@ -18,32 +18,15 @@ function validate(f: Form): Errors {
   const d = checkDisplayName(f.displayName); if (d) e.displayName = d;
   const p = checkPassword(f.password); if (p) e.password = p;
   if (!p && f.passwordConfirm !== f.password) e.passwordConfirm = M.M04;
-  if (!f.registrationCode.trim()) e.registrationCode = M.M05;
   return e;
 }
 
 export function RegisterPage() {
-  const [f, setF] = useState<Form>({ username: "", displayName: "", password: "", passwordConfirm: "", registrationCode: "" });
+  const [f, setF] = useState<Form>({ username: "", displayName: "", password: "", passwordConfirm: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const nav = useNavigate();
   const { setNotice } = useAuth();
-  // Danh mục mã đăng ký tổ chức lấy từ máy chủ (mã không nằm trong mã nguồn giao diện).
-  const [orgs, setOrgs] = useState<authApi.RegistrationOption[] | null>(null);
-  const [orgsError, setOrgsError] = useState<string | undefined>();
-
-  useEffect(() => {
-    let alive = true;
-    authApi.registrationOptions()
-      .then((r) => {
-        if (!alive) return;
-        setOrgs(r.options);
-        // Chỉ có một tổ chức → chọn sẵn, người dùng không phải làm gì thêm.
-        if (r.options.length === 1) setF((prev) => (prev.registrationCode ? prev : { ...prev, registrationCode: r.options[0].code }));
-      })
-      .catch(() => { if (alive) { setOrgs([]); setOrgsError(M.M34); } });
-    return () => { alive = false; };
-  }, []);
 
   const set = (k: keyof Form) => (ev: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: ev.target.value });
   const blur = (k: keyof Form) => () => {
@@ -83,11 +66,6 @@ export function RegisterPage() {
         <PasswordChecklist value={f.password} />
         <Field label="Nhập lại mật khẩu" password value={f.passwordConfirm} onChange={set("passwordConfirm")} onBlur={blur("passwordConfirm")}
           error={errors.passwordConfirm} autoComplete="new-password" />
-        <SelectField label="Mã đăng ký tổ chức" value={f.registrationCode}
-          onChange={(ev) => setF({ ...f, registrationCode: ev.target.value })}
-          placeholder={orgs === null ? "Đang tải…" : "— Chọn tổ chức —"} disabled={orgs === null}
-          options={(orgs ?? []).map((o) => ({ value: o.code, label: `${o.label} (${o.code})` }))}
-          error={errors.registrationCode ?? orgsError} />
         <SubmitButton busy={busy}>Đăng ký</SubmitButton>
         <p className="switch"><Link to="/dang-nhap" state={{ username: normalizeUsername(f.username) }}>Đã có tài khoản? Đăng nhập</Link></p>
       </form>

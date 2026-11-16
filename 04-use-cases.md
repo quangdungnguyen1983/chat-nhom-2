@@ -38,13 +38,13 @@
 
 | Actor | Loại | Mô tả | Nguồn |
 |---|---|---|---|
-| Khách | Chính | Người **chưa đăng nhập**. Có thể đăng ký (nếu có mã đăng ký tổ chức) và đăng nhập. | `[PDF TK-01, TK-03]`, `[QĐ-06]` |
+| Khách | Chính | Người **chưa đăng nhập**. Có thể đăng ký và đăng nhập. | `[PDF TK-01, TK-03]` |
 | Người dùng | Chính | Người **đã đăng nhập** với phiên còn hiệu lực. | `[PDF §1]` |
 | Thành viên hội thoại | Chính (vai trò của Người dùng) | Người dùng đang ở trong một hội thoại 1-1 hoặc một nhóm. Chỉ vai trò này mới đọc và gửi tin trong hội thoại đó. | `[PDF §4]` |
 | Trưởng nhóm | Chính (vai trò của Thành viên) | Người tạo nhóm hoặc người được chuyển quyền. Thêm/xóa thành viên, đổi tên nhóm. | `[PDF NH-01, NH-03]`, `[QĐ-03]` |
 | Người ngoài hội thoại | Chính (vai trò của Người dùng) | Người dùng **không** phải thành viên hiện tại của một hội thoại cụ thể, kể cả người đã rời hoặc bị xóa khỏi nhóm. Mọi yêu cầu đọc/gửi vào hội thoại đó đều bị từ chối. | `[PDF §4, §5 bước 6]`, `[QĐ-04]` |
 | Hệ thống | Phụ | Tự sinh tin hệ thống, tự hủy phiên hết hạn, tự đẩy tin realtime. | `[PDF NH-04, TK-03]` |
-| Người triển khai | Hỗ trợ (ngoài luồng) | Cấu hình mã đăng ký tổ chức trước khi hệ thống hoạt động. Không tham gia use case nào. | `[QĐ-06]` |
+| Người triển khai | Hỗ trợ (ngoài luồng) | Cài đặt và cấu hình hệ thống trước khi hoạt động. Không tham gia use case nào. | – |
 
 Không có actor **Quản trị viên** vì gói mở rộng A (QT-01, QT-02) không được đăng ký `[QĐ-01]`.
 
@@ -138,36 +138,33 @@ UC-13 đến UC-16 hợp thành nhóm chức năng **"Quản lý nhóm"** (NH-03
 
 | Mục | Nội dung |
 |---|---|
-| Mục tiêu | Người thuộc tổ chức tự tạo tài khoản để dùng ứng dụng. |
+| Mục tiêu | Nhân viên tự tạo tài khoản để dùng ứng dụng. |
 | Actor chính | Khách |
 | Trigger | Khách yêu cầu tạo tài khoản mới. |
-| Tiền điều kiện | Khách chưa đăng nhập; đã được tổ chức cấp mã đăng ký `[QĐ-06]`. |
+| Tiền điều kiện | Khách chưa đăng nhập. |
 | Hậu điều kiện – thành công | Có thêm một tài khoản; mật khẩu chỉ lưu dạng băm `[PDF TK-02]`. |
 | Hậu điều kiện – thất bại | Không có tài khoản nào được tạo. |
 | Mã SRS | TK-01, TK-02 · TK-01-AC1…AC4, TK-02-AC1…AC4 · NFR-01, NFR-02, NFR-08 · AT-01 |
 
 **Luồng chính**
 1. Khách yêu cầu đăng ký.
-2. Hệ thống yêu cầu: tên đăng nhập, tên hiển thị, mật khẩu, mật khẩu nhập lại, mã đăng ký tổ chức.
+2. Hệ thống yêu cầu: tên đăng nhập, tên hiển thị, mật khẩu, mật khẩu nhập lại.
 3. Khách cung cấp thông tin.
-4. Hệ thống kiểm tra mã đăng ký tổ chức khớp mã đã cấu hình `[QĐ-06]`.
-5. Hệ thống đổi tên đăng nhập sang chữ thường, chuẩn hóa tên hiển thị, rồi kiểm tra định dạng: tên đăng nhập 3–30 ký tự gồm a–z, 0–9, `.`, `_` `[QĐ-07]`; tên hiển thị 1–50 ký tự `[GS-02]`; mật khẩu tối thiểu 8 ký tự, có chữ và số `[PDF]`; hai lần nhập mật khẩu giống nhau.
-6. Hệ thống kiểm tra tên đăng nhập chưa tồn tại, không phân biệt hoa thường `[PDF]`, `[QĐ-07]`.
-7. Hệ thống băm mật khẩu bằng bcrypt hoặc argon2 và lưu tài khoản `[PDF]`.
-8. Hệ thống báo đăng ký thành công và chuyển Khách sang UC-02.
+4. Hệ thống đổi tên đăng nhập sang chữ thường, chuẩn hóa tên hiển thị, rồi kiểm tra định dạng: tên đăng nhập 3–30 ký tự gồm a–z, 0–9, `.`, `_` `[QĐ-07]`; tên hiển thị 1–50 ký tự `[GS-02]`; mật khẩu tối thiểu 8 ký tự, có chữ và số `[PDF]`; hai lần nhập mật khẩu giống nhau.
+5. Hệ thống kiểm tra tên đăng nhập chưa tồn tại, không phân biệt hoa thường `[PDF]`, `[QĐ-07]`.
+6. Hệ thống băm mật khẩu bằng bcrypt hoặc argon2 và lưu tài khoản `[PDF]`.
+7. Hệ thống báo đăng ký thành công và chuyển Khách sang UC-02.
 
 **Luồng lỗi**
-- 4a. Mã đăng ký sai hoặc bỏ trống → hệ thống báo E-TK01-5 và **dừng, không kiểm tra tiếp**. Quay lại bước 3.
-- 5a. Tên đăng nhập sai định dạng → E-TK01-2. Quay lại bước 3.
-- 5b. Mật khẩu không đạt quy tắc → E-TK01-3 (chi tiết E-TK02-1/2/3). Quay lại bước 3.
-- 5c. Tên hiển thị trống hoặc quá dài → E-TK01-4. Quay lại bước 3.
-- 5d. Hai lần nhập mật khẩu không khớp → báo lỗi không khớp `[GU-01]`. Quay lại bước 3.
-- 6a. Tên đăng nhập đã tồn tại → E-TK01-1. Quay lại bước 3.
-- 6b. Hai Khách đăng ký cùng một tên gần như cùng lúc → chỉ một người thành công; người còn lại nhận E-TK01-1.
-- 7a. Lưu dữ liệu thất bại → báo lỗi chung; không tạo tài khoản dở dang.
+- 4a. Tên đăng nhập sai định dạng → E-TK01-2. Quay lại bước 3.
+- 4b. Mật khẩu không đạt quy tắc → E-TK01-3 (chi tiết E-TK02-1/2/3). Quay lại bước 3.
+- 4c. Tên hiển thị trống hoặc quá dài → E-TK01-4. Quay lại bước 3.
+- 4d. Hai lần nhập mật khẩu không khớp → báo lỗi không khớp `[GU-01]`. Quay lại bước 3.
+- 5a. Tên đăng nhập đã tồn tại → E-TK01-1. Quay lại bước 3.
+- 5b. Hai Khách đăng ký cùng một tên gần như cùng lúc → chỉ một người thành công; người còn lại nhận E-TK01-1.
+- 6a. Lưu dữ liệu thất bại → báo lỗi chung; không tạo tài khoản dở dang.
 
 **Kiểm tra bảo mật**
-- Kiểm tra mã đăng ký **trước** các kiểm tra khác, để người ngoài tổ chức không dò được tên đăng nhập nào đã tồn tại `[GU-02]`.
 - Mật khẩu không được ghi log, không trả lại trong phản hồi `[PDF TK-02]`.
 - Dữ liệu chỉ truyền qua HTTPS `[PDF §4]`.
 
@@ -177,11 +174,8 @@ flowchart TD
     classDef default fill:#ffffff,stroke:#000000,color:#000000
     linkStyle default stroke:#000000
     S(["Start"])
-    S --> A["Khách nhập tên đăng nhập, tên hiển thị,<br/>mật khẩu, nhập lại mật khẩu, mã tổ chức"]
-    A --> B{"Mã đăng ký tổ chức đúng?"}
-    B -->|No| X1["Hiển thị<br/>“Mã đăng ký tổ chức không đúng”"]
-    X1 -->|Nhập lại| A
-    B -->|Yes| C{"Tên đăng nhập đúng định dạng?"}
+    S --> A["Khách nhập tên đăng nhập, tên hiển thị,<br/>mật khẩu, nhập lại mật khẩu"]
+    A --> C{"Tên đăng nhập đúng định dạng?"}
     C -->|No| X2["Hiển thị<br/>“Tên đăng nhập không hợp lệ”"]
     X2 -->|Nhập lại| A
     C -->|Yes| D{"Tên hiển thị hợp lệ?"}
@@ -1210,7 +1204,7 @@ Các QĐ, GĐ, GS trong BRD và SRS vẫn giữ hiệu lực. Các giả định
 | Mã | Giả định | Áp dụng |
 |---|---|---|
 | GU-01 | Khi đăng ký, người dùng nhập mật khẩu hai lần; hai lần phải giống nhau | UC-01 |
-| GU-02 | Kiểm tra mã đăng ký tổ chức trước mọi kiểm tra khác | UC-01 |
+| GU-02 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – |
 | GU-03 | Một tài khoản được đăng nhập đồng thời trên nhiều trình duyệt, mỗi nơi một phiên | UC-02, UC-08, UC-11 |
 | GU-04 | Phiên hết hạn thì nội dung đang soạn dở có thể mất | UC-03 |
 | GU-05 | Khi chọn người để thêm vào nhóm, kết quả tìm đã loại người đang trong nhóm | UC-06, UC-13 |

@@ -29,11 +29,11 @@ h2 { font-size: var(--font-size-lg); margin: 0 0 var(--space-3); }
 .field { margin-bottom: var(--space-3); }
 .field label { display: block; font-weight: var(--font-weight-bold); margin-bottom: var(--space-1); }
 .input-wrap { position: relative; display: flex; }
-.field input, .field select, .search { width: 100%; min-height: var(--size-touch); padding: 0 var(--space-2); font: inherit; border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); background: var(--color-bg); color: var(--color-text); }
-.field input:hover, .field select:hover { border-color: var(--color-text); }
-.field input:focus-visible, .field select:focus-visible, .search:focus-visible { outline: none; border: 2px solid var(--color-focus); }
-.field input:disabled, .field select:disabled { background: var(--color-disabled-bg); color: var(--color-disabled-text); cursor: not-allowed; }
-.field input.invalid, .field select.invalid { border: 2px solid var(--color-error); }
+.field input, .search { width: 100%; min-height: var(--size-touch); padding: 0 var(--space-2); font: inherit; border: 1px solid var(--color-text-muted); border-radius: var(--radius-sm); background: var(--color-bg); color: var(--color-text); }
+.field input:hover { border-color: var(--color-text); }
+.field input:focus-visible, .search:focus-visible { outline: none; border: 2px solid var(--color-focus); }
+.field input:disabled { background: var(--color-disabled-bg); color: var(--color-disabled-text); cursor: not-allowed; }
+.field input.invalid { border: 2px solid var(--color-error); }
 .toggle-pw { position: absolute; right: 2px; top: 2px; bottom: 2px; min-width: 56px; border: 0; background: transparent; color: var(--color-primary); font: inherit; font-size: var(--font-size-sm); cursor: pointer; }
 .hint { margin: var(--space-1) 0 0; font-size: var(--font-size-sm); color: var(--color-text-secondary); }
 .error-text { margin: var(--space-1) 0 0; font-size: var(--font-size-sm); color: var(--color-error); }

@@ -43,7 +43,6 @@ Tài liệu mô tả cơ sở dữ liệu (CSDL) lưu **người dùng, phiên �
 | Nội dung | Lý do |
 |---|---|
 | Mật khẩu nguyên văn | Cấm theo `[PDF TK-02]`. Chỉ có cột `password_hash`. |
-| Mã đăng ký tổ chức | Là cấu hình do người triển khai đặt `[QĐ-05]`, `[GĐ-16]`, không phải dữ liệu người dùng. Chi tiết ở `08`/`09`. |
 | Ảnh đại diện | Avatar là chữ cái đầu, tính từ tên hiển thị khi hiển thị `[PDF TK-05]`, `[GS-11]`. |
 | Trạng thái online, "đã nhận / đã xem" từng tin, file đính kèm, sửa / thu hồi tin | Thuộc phần mở rộng PDF §6 (CH-04, CH-05, NH-05, TN-xx…), dự án không đăng ký `[QĐ-01]`. Xem mục 11. |
 
@@ -178,7 +177,7 @@ Cột "Nguồn" cho biết quy định đến từ PDF hay là lựa chọn thi�
 Ghi chú:
 
 - Tìm người dùng (TK-06) so khớp "chứa từ khóa", không phân biệt hoa thường, **có** phân biệt dấu `[PDF §4]`, `[GS-13]`, `[GĐ-10]`. Câu tìm phải "thoát" ký tự `%` và `_` trong từ khóa, vì `_` là ký tự hợp lệ trong tên đăng nhập `[ĐX]`. Việc đổi chữ hoa/thường với chữ có dấu (ví dụ "Đ" ↔ "đ") phụ thuộc cài đặt ngôn ngữ của CSDL, nên phải kiểm chứng bằng TK-06-AC3 `[GE-04]`.
-- Không có cột mã đăng ký tổ chức, avatar, email hay trạng thái khóa (QT-01, TK-07…11 là NOT MVP).
+- Không có cột avatar, email hay trạng thái khóa (QT-01, TK-07…11 là NOT MVP).
 
 ### 6.2 `sessions` – phiên đăng nhập
 

@@ -93,7 +93,7 @@ flowchart TD
 
 | Bước | Người dùng làm | Màn hình / trạng thái | Hệ thống phản hồi | Mã |
 |---|---|---|---|---|
-| 1 | Nhập tên đăng nhập, tên hiển thị, mật khẩu hai lần, mã tổ chức; bấm "Đăng ký" | SC-01 | Thành công: sang SC-02, hiện M-40, điền sẵn tên đăng nhập. Lỗi: hiện dưới từng ô (SC-01b) | TK-01, TK-02, UC-01 |
+| 1 | Nhập tên đăng nhập, tên hiển thị, mật khẩu hai lần; bấm "Đăng ký" | SC-01 | Thành công: sang SC-02, hiện M-40, điền sẵn tên đăng nhập. Lỗi: hiện dưới từng ô (SC-01b) | TK-01, TK-02, UC-01 |
 | 2 | Nhập tên đăng nhập, mật khẩu; Enter | SC-02 | Đúng: vào SC-03. Sai: M-09 (SC-02b) | TK-03, UC-02 |
 | 3 | Gõ tên đồng nghiệp vào ô "Tìm đồng nghiệp…" | SC-03e | Kết quả sau khoảng 0,3 giây; không có thì M-14 | TK-06, UC-06 |
 | 4 | Chọn một người | SC-04 | Mở hội thoại 1-1 (cũ nếu đã có) | CH-01, UC-07 |
@@ -127,7 +127,7 @@ flowchart LR
 
 | Mã | Tên | Mục đích | Thành phần chính | Mã SRS | Use case | User story |
 |---|---|---|---|---|---|---|
-| SC-01 | Đăng ký | Tạo tài khoản | Ô: tên đăng nhập, tên hiển thị, mật khẩu (có nút hiện/ẩn), nhập lại, listbox mã tổ chức (chọn sẵn khi chỉ có một); danh sách kiểm tra mật khẩu; nút "Đăng ký"; liên kết "Đã có tài khoản? Đăng nhập" | TK-01, TK-02 | UC-01 | US-01, US-02 |
+| SC-01 | Đăng ký | Tạo tài khoản | Ô: tên đăng nhập, tên hiển thị, mật khẩu (có nút hiện/ẩn), nhập lại; danh sách kiểm tra mật khẩu; nút "Đăng ký"; liên kết "Đã có tài khoản? Đăng nhập" | TK-01, TK-02 | UC-01 | US-01, US-02 |
 | SC-02 | Đăng nhập | Vào ứng dụng | Ô: tên đăng nhập, mật khẩu; nút "Đăng nhập"; liên kết "Chưa có tài khoản? Đăng ký" | TK-03 | UC-02, UC-03 | US-03, US-04 |
 | SC-03 | Trang chính | Thấy mọi hội thoại, tìm người, tạo nhóm | Đầu trang (tên ứng dụng, badge tổng, avatar của mình); ô "Tìm đồng nghiệp…"; nút "Tạo nhóm"; danh sách hội thoại (avatar, tên, trích tin cuối, thời gian, badge) | CH-06, TB-01, TK-06, CH-01 | UC-06, UC-07, UC-10 | US-07, US-08, US-13, US-14 |
 | SC-04 | Hội thoại | Đọc và gửi tin | Đầu khung (1-1: avatar + tên; nhóm: tên nhóm, số thành viên, nút "Thông tin nhóm"); khung tin (50 tin/lần, tin hệ thống); ô soạn nhiều dòng, bộ đếm ký tự, nút "Gửi" | CH-02, CH-03, NH-02, NH-04, TB-01 | UC-08, UC-09, UC-11 | US-09, US-10, US-11, US-12, US-15, US-17, US-22 |
@@ -147,7 +147,7 @@ Mỗi trạng thái có một khung trong `wireframe.html`.
 | Mã | Màn hình | Trạng thái | Hiển thị | Mã |
 |---|---|---|---|---|
 | SC-01a | Đăng ký | Đang nhập | Danh sách kiểm tra mật khẩu đổi dấu ✓ theo từng điều kiện | TK-02 |
-| SC-01b | Đăng ký | Lỗi | Lỗi đỏ dưới ô tương ứng (M-01…M-08, M-05); ô lỗi có viền đỏ **và** biểu tượng | TK-01, TK-02 |
+| SC-01b | Đăng ký | Lỗi | Lỗi đỏ dưới ô tương ứng (M-01…M-04, M-06…M-08); ô lỗi có viền đỏ **và** biểu tượng | TK-01, TK-02 |
 | SC-02a | Đăng nhập | Bình thường / đang gửi | Nút khóa, hiện biểu tượng chờ (FRS NT-05) | TK-03 |
 | SC-02b | Đăng nhập | Lỗi | M-09 phía trên nút; hoặc M-31 khi bị đẩy ra do hết phiên | TK-03 |
 | SC-03a | Trang chính | Có hội thoại, có tin chưa đọc | Dòng có tin chưa đọc: tên đậm + badge số; hiện "99+" khi > 99; badge tổng ở đầu trang; tiêu đề tab "(5) Chat nội bộ" | CH-06, TB-01 |
@@ -307,8 +307,8 @@ Câu thông báo M-xx dùng **nguyên văn** từ `03-frs.md` mục 5; bảng d�
 |---|---|---|
 | Chung | Tên ứng dụng / tiêu đề tab | "Chat nội bộ" · có tin chưa đọc: "(5) Chat nội bộ" `[GĐ-15]` |
 | SC-01 | Tiêu đề / nút / liên kết | "Tạo tài khoản" · "Đăng ký" · "Đã có tài khoản? Đăng nhập" |
-| SC-01 | Nhãn ô | "Tên đăng nhập" · "Tên hiển thị" · "Mật khẩu" · "Nhập lại mật khẩu" · "Mã đăng ký tổ chức" |
-| SC-01 | Placeholder / gợi ý | "vd: an.nguyen" · "vd: Nguyễn Văn An" · gợi ý dưới tên đăng nhập: "3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới" · listbox mã tổ chức: "Đang tải…" / "— Chọn tổ chức —", mỗi mục "Tên tổ chức (mã)" (thay đổi 2026-11-14, xem 03-frs mục 4.1) |
+| SC-01 | Nhãn ô | "Tên đăng nhập" · "Tên hiển thị" · "Mật khẩu" · "Nhập lại mật khẩu" |
+| SC-01 | Placeholder / gợi ý | "vd: an.nguyen" · "vd: Nguyễn Văn An" · gợi ý dưới tên đăng nhập: "3–30 ký tự: a–z, 0–9, dấu chấm, gạch dưới" |
 | SC-01, SC-08 | Danh sách kiểm tra mật khẩu | "Ít nhất 8 ký tự" · "Có chữ cái" · "Có chữ số" |
 | SC-01, SC-02, SC-08 | Nút hiện/ẩn mật khẩu | `aria-label`: "Hiện mật khẩu" / "Ẩn mật khẩu" |
 | SC-02 | Tiêu đề / nút / liên kết | "Đăng nhập" · "Đăng nhập" · "Chưa có tài khoản? Đăng ký" |
@@ -330,7 +330,7 @@ Câu thông báo M-xx dùng **nguyên văn** từ `03-frs.md` mục 5; bảng d�
 
 | Màn hình | Thông báo dùng |
 |---|---|
-| SC-01 | M-01, M-02, M-03, M-04, M-05, M-06, M-07, M-08, M-34; thành công M-40 (hiện ở SC-02) |
+| SC-01 | M-01, M-02, M-03, M-04, M-06, M-07, M-08, M-34; thành công M-40 (hiện ở SC-02) |
 | SC-02 | M-09, M-31, M-34, M-35, M-40 |
 | SC-03 | M-14, M-15, M-16, M-23, M-24, M-30, M-34 |
 | SC-04 | M-17, M-20, M-21, M-22, M-30, M-31, M-32, M-33, M-34; câu tin trống của `09` (`MESSAGE_EMPTY`, chờ OQ-38) – thực tế nút "Gửi" đã khóa nên ít gặp |

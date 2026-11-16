@@ -3,7 +3,6 @@ import { createApp } from "../../src/app.js";
 import { initDatabase } from "../../src/storage/prisma.js";
 
 export const ORIGIN = "http://localhost:5173";
-export const REG_CODE = "test-only-registration-code";
 
 let ready: Promise<void> | null = null;
 export async function makeAgent() {
@@ -20,7 +19,6 @@ export function registerBody(over: Partial<Record<string, string>> = {}) {
     password: "Matkhau123",
     passwordConfirm: "Matkhau123",
     displayName: "Nguyễn Văn An",
-    registrationCode: REG_CODE,
     ...over,
   };
 }

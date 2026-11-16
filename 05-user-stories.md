@@ -39,7 +39,7 @@ Mức ưu tiên lấy theo PDF. **Không story nào ở mức Must bị hạ xu�
 | **Should** | Nên có, PDF ghi "khuyến khích" | Tự kết nối lại, gửi lại tin lỗi | `[PDF §4 – Khả dụng]` |
 | **Could** | Điểm cộng | Toàn bộ mã PDF §6. Dự án **không đăng ký** nên không có story | `[PDF §6]`, `[QĐ-01]` |
 
-Các quy tắc do Product Owner bổ sung (QĐ-03, QĐ-05…QĐ-10) nằm **bên trong** story Must của mã gốc tương ứng. Chúng không tạo ra mã yêu cầu mới.
+Các quy tắc do Product Owner bổ sung (QĐ-03, QĐ-06…QĐ-10) nằm **bên trong** story Must của mã gốc tương ứng. Chúng không tạo ra mã yêu cầu mới.
 
 ## 2. Lát cắt dọc khuyến nghị
 
@@ -81,19 +81,18 @@ Lưu ý: kiểm tra **quyền thành viên** (US-23) không đợi tới S5 mớ
 
 ### S1 – Đăng ký / đăng nhập
 
-#### US-01 – Đăng ký bằng mã tổ chức
+#### US-01 – Tự đăng ký tài khoản
 
-**Là** nhân viên mới, **tôi muốn** tự tạo tài khoản bằng tên đăng nhập, tên hiển thị, mật khẩu và mã đăng ký của tổ chức, **để** bắt đầu dùng ứng dụng mà không phải nhờ ai tạo hộ.
+**Là** nhân viên mới, **tôi muốn** tự tạo tài khoản bằng tên đăng nhập, tên hiển thị, mật khẩu, **để** bắt đầu dùng ứng dụng mà không phải nhờ ai tạo hộ.
 
 | Ưu tiên | Điểm `[ĐX]` | Lát | SRS | UC | Phụ thuộc |
 |---|---|---|---|---|---|
-| Must | 3 | S1 | TK-01 (QĐ-05, QĐ-06, QĐ-07) | UC-01 | US-02 |
+| Must | 3 | S1 | TK-01 (QĐ-07) | UC-01 | US-02 |
 
 Tiêu chí chấp nhận:
-- ✅ **Cho trước** mã tổ chức đúng và tên `nhanvien01` chưa tồn tại, **khi** tôi đăng ký với mật khẩu `Matkhau123`, tên hiển thị `Nguyễn Văn An`, **thì** tài khoản được tạo và tôi đăng nhập được ngay bằng thông tin đó (TK-01-AC1, AT-01).
+- ✅ **Cho trước** tên `nhanvien01` chưa tồn tại, **khi** tôi đăng ký với mật khẩu `Matkhau123`, tên hiển thị `Nguyễn Văn An`, **thì** tài khoản được tạo và tôi đăng nhập được ngay bằng thông tin đó (TK-01-AC1, AT-01).
 - ✅ **Cho trước** tên hiển thị `Đặng Thị Ẩn`, **khi** đăng ký thành công, **thì** tên được lưu và hiển thị lại đúng từng ký tự (TK-01-AC4).
 - ❌ **Cho trước** `nhanvien01` đã tồn tại, **khi** tôi đăng ký `NhanVien01`, **thì** hệ thống báo trùng (E-TK01-1) và tổng số tài khoản không đổi (TK-01-AC2).
-- ❌ **Khi** tôi đăng ký với mã tổ chức sai, **thì** hệ thống báo lỗi E-TK01-5, không tạo tài khoản và không kiểm tra tiếp tên đăng nhập (TK-01-AC3).
 - ❌ **Khi** tên đăng nhập là `ab` hoặc `an nguyen`, **thì** hệ thống báo sai định dạng (E-TK01-2).
 
 #### US-02 – Mật khẩu đủ mạnh và được bảo vệ
@@ -479,7 +478,7 @@ Lưu ý: story này **không** gồm trạng thái "đang gửi / đã gửi / �
 Tiêu chí chấp nhận:
 - ✅ **Khi** giảng viên mở địa chỉ demo trên trình duyệt, **thì** chạy được trọn AT-01…AT-06 (QĐ-02).
 - ✅ **Khi** một người không tham gia phát triển làm theo README, **thì** chạy được ứng dụng ở máy cá nhân, gồm cả phần máy chủ và phần web (PDF §8; ĐX-04 của BRD).
-- ❌ **Khi** rà soát repository, **thì** không thấy mật khẩu, khóa bí mật hay mã đăng ký tổ chức thật trong mã nguồn và README (QĐ-06).
+- ❌ **Khi** rà soát repository, **thì** không thấy mật khẩu hay khóa bí mật thật trong mã nguồn và README (QĐ-06).
 
 Ghi chú: "Ghi chú thiết kế 1–2 trang" (PDF §8) là tài liệu, được theo dõi ở `08-high-level-design.md`, không phải story phát triển.
 
@@ -494,7 +493,7 @@ Một story chỉ được đánh dấu **Xong** khi đạt **toàn bộ** các 
 - [ ] Mọi kiểm tra dữ liệu và **kiểm tra quyền thành viên / trưởng nhóm** được làm **ở máy chủ**, không chỉ ở giao diện `[PDF §4]`.
 - [ ] Không lưu, không ghi log, không trả lại mật khẩu dạng gốc `[PDF TK-02]`.
 - [ ] Văn bản tiếng Việt được chuẩn hóa NFC; giao diện hoàn toàn tiếng Việt `[PDF §4]`.
-- [ ] Không có mật khẩu, khóa bí mật hay mã đăng ký tổ chức thật trong mã nguồn; cấu hình nằm ở biến môi trường.
+- [ ] Không có mật khẩu hay khóa bí mật thật trong mã nguồn; cấu hình nằm ở biến môi trường.
 - [ ] Không thêm chức năng thuộc PDF §6 (CH-04, CH-05, TN-xx…) `[QĐ-01]`.
 
 ### 5.2 Kiểm thử (test)
@@ -524,7 +523,7 @@ Một story chỉ được đánh dấu **Xong** khi đạt **toàn bộ** các 
 
 | Mã US | Tên | Epic | Lát | Ưu tiên | Điểm `[ĐX]` | Trạng thái |
 |---|---|---|---|---|---|---|
-| US-01 | Đăng ký bằng mã tổ chức | EP-TK | S1 | Must | 3 | Chưa bắt đầu |
+| US-01 | Tự đăng ký tài khoản | EP-TK | S1 | Must | 3 | Chưa bắt đầu |
 | US-02 | Mật khẩu đủ mạnh và được bảo vệ | EP-TK | S1 | Must | 2 | Chưa bắt đầu |
 | US-03 | Đăng nhập | EP-TK | S1 | Must | 3 | Chưa bắt đầu |
 | US-04 | Đăng xuất và hết hạn phiên | EP-TK | S1 | Must | 3 | Chưa bắt đầu |

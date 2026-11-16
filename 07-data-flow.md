@@ -108,7 +108,6 @@ flowchart LR
     SENDER["Người gửi<br/>nhân viên soạn và gửi tin,<br/>có thể là trưởng nhóm"]
     RECEIVER["Người nhận<br/>thành viên khác của hội thoại"]
     OUTSIDER["Tài khoản ngoài hội thoại<br/>đã đăng nhập nhưng không phải thành viên"]
-    DEPLOYER["Người triển khai"]
     SYS(["0. Ứng dụng chat nội bộ"])
 
     SENDER -- "thông tin đăng ký, tên đăng nhập và mật khẩu" --> SYS
@@ -121,7 +120,6 @@ flowchart LR
     SYS -- "trang lịch sử, danh sách hội thoại" --> RECEIVER
     OUTSIDER -- "yêu cầu đọc hoặc gửi vào hội thoại không thuộc về mình" --> SYS
     SYS -- "từ chối M-30, không kèm dữ liệu" --> OUTSIDER
-    DEPLOYER -- "mã đăng ký tổ chức trong cấu hình" --> SYS
 ```
 
 | Tác nhân | Vai trò | Nguồn |
@@ -129,7 +127,6 @@ flowchart LR
 | Người gửi | Nhân viên đã đăng nhập, đang gửi tin hoặc thao tác nhóm. Mỗi người lúc gửi là "người gửi", lúc nhận là "người nhận" | `[PDF §1]` |
 | Người nhận | Thành viên **hiện tại** khác của cùng hội thoại | `[PDF CH-02, NH-02]`, `[QĐ-04]` |
 | Tài khoản ngoài hội thoại | Người đã đăng nhập nhưng không phải thành viên (gồm cả người đã rời hoặc bị xóa khỏi nhóm). Chỉ nhận lời từ chối | `[PDF §4, §5 bước 6]`, `[QĐ-04]` |
-| Người triển khai | Đặt mã đăng ký tổ chức trong cấu hình máy chủ; không dùng giao diện | `[QĐ-05]`, `[GĐ-16]` |
 
 ## 5. DFD mức 1
 
@@ -156,7 +153,7 @@ flowchart LR
         D6[("D6 message_read_cursors")]
     end
 
-    SENDER -- "tên đăng nhập, mật khẩu, tên hiển thị, mã tổ chức" --> P1
+    SENDER -- "tên đăng nhập, mật khẩu, tên hiển thị" --> P1
     P1 -- "token phiên hoặc lỗi M-09" --> SENDER
     P1 == "tài khoản mới kèm password_hash" ==> D1
     D1 == "password_hash để so khớp" ==> P1
@@ -270,13 +267,11 @@ flowchart LR
 | D5 | `messages` | messages – tin nhắn | `type`, `content`, `sender_id`, `client_msg_id`, `event_type`, `event_data` |
 | D6 | `message_read_cursors` | read cursor – mốc đã đọc | `last_read_message_id` |
 
-Mã đăng ký tổ chức **không** nằm trong kho nào; P1 đọc từ cấu hình máy chủ `[GĐ-16]`, `06-erd.md` mục 1.
-
 ### 5.4 Danh mục dữ liệu trên mũi tên
 
 | Mã | Tên dữ liệu | Gồm | Kênh | Ghi chú |
 |---|---|---|---|---|
-| F-01 | Thông tin đăng ký | tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị, mã tổ chức | HTTPS | Mật khẩu chỉ đi trên đường truyền mã hóa và bị băm ngay ở máy chủ `[PDF TK-02]` |
+| F-01 | Thông tin đăng ký | tên đăng nhập, mật khẩu, nhập lại mật khẩu, tên hiển thị | HTTPS | Mật khẩu chỉ đi trên đường truyền mã hóa và bị băm ngay ở máy chủ `[PDF TK-02]` |
 | F-02 | Thông tin đăng nhập | tên đăng nhập, mật khẩu | HTTPS | `[PDF TK-03]` |
 | F-03 | Token phiên | chuỗi ngẫu nhiên; máy chủ chỉ lưu bản băm `token_hash` | HTTPS | Hạn 8 giờ `[QĐ-09]`; chi tiết lưu ở trình duyệt chốt tại `09` |
 | F-04 | Tin gửi đi | `conversation_id`, nội dung, `client_msg_id` | WSS | ≤ 5.000 ký tự `[PDF CH-02]` |
@@ -364,9 +359,9 @@ sequenceDiagram
     participant DB as CSDL
 
     Note over U,DB: Đăng ký – HTTPS
-    U->>B: Nhập tên đăng nhập, mật khẩu, tên hiển thị, mã tổ chức
+    U->>B: Nhập tên đăng nhập, mật khẩu, tên hiển thị
     B->>API: F-01 thông tin đăng ký
-    API->>API: So mã tổ chức với cấu hình, đổi tên đăng nhập sang chữ thường, kiểm tra mật khẩu đủ 8 ký tự có chữ và số
+    API->>API: Đổi tên đăng nhập sang chữ thường, kiểm tra mật khẩu đủ 8 ký tự có chữ và số
     API->>DB: Tìm username trong users
     alt Tên đã tồn tại hoặc dữ liệu sai
         API-->>B: Lỗi tương ứng, không tạo tài khoản

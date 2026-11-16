@@ -42,7 +42,6 @@ Biến các nhu cầu nghiệp vụ trong BRD (BR-01…BR-19) thành yêu cầu 
 | Tài khoản | Danh tính của một nhân viên trong ứng dụng, gồm tên đăng nhập, mật khẩu và tên hiển thị. |
 | Tên đăng nhập | Tên dùng để đăng nhập, không trùng với ai trong hệ thống. |
 | Tên hiển thị | Tên người khác nhìn thấy (ví dụ "Nguyễn Văn An"); được phép trùng nhau. |
-| Mã đăng ký tổ chức | Mã người đăng ký phải nhập để chứng minh mình thuộc tổ chức (QĐ-05, giả định GĐ-16). |
 | Phiên đăng nhập | Khoảng thời gian một người được coi là đã đăng nhập trên một trình duyệt. Phiên có hạn dùng và bị hủy khi đăng xuất. |
 | Hội thoại 1-1 | Cuộc trò chuyện riêng giữa đúng hai tài khoản. |
 | Nhóm | Hội thoại có từ 3 thành viên trở lên, có tên và một trưởng nhóm. |
@@ -67,7 +66,6 @@ flowchart LR
     NV["Nhân viên<br/>(trình duyệt web)"] -- "HTTPS: đăng ký, đăng nhập,<br/>tìm người, lịch sử" --> HT["Ứng dụng chat nội bộ<br/>(máy chủ)"]
     NV <-- "WSS: gửi / nhận tin realtime,<br/>cập nhật số chưa đọc" --> HT
     HT -- "đọc / ghi" --> CSDL[("Cơ sở dữ liệu<br/>tài khoản, hội thoại, tin nhắn")]
-    TK["Người triển khai"] -. "cấu hình mã đăng ký tổ chức (GĐ-16)" .-> HT
 ```
 
 Ứng dụng gồm phần chạy trên trình duyệt và phần máy chủ dùng chung cho API và realtime; dữ liệu lưu trong cơ sở dữ liệu `[PDF §2]`. Không có hệ thống bên ngoài nào khác trong MVP.
@@ -76,11 +74,11 @@ flowchart LR
 
 | Actor | Mô tả | Quyền trong MVP |
 |---|---|---|
-| Khách | Người chưa đăng nhập | Đăng ký (cần mã đăng ký tổ chức), đăng nhập |
+| Khách | Người chưa đăng nhập | Đăng ký, đăng nhập |
 | Người dùng | Nhân viên đã đăng nhập | Đổi mật khẩu, sửa hồ sơ, tìm người, chat 1-1, tạo nhóm, xem hội thoại **mình đang là thành viên** |
 | Thành viên nhóm | Người dùng đang ở trong một nhóm | Đọc và gửi tin trong nhóm đó, tự rời nhóm |
 | Trưởng nhóm | Thành viên giữ quyền trưởng nhóm | Như thành viên, cộng thêm: thêm/xóa thành viên, đổi tên nhóm, chuyển quyền trưởng nhóm (QĐ-03) |
-| Người triển khai | Người cài đặt hệ thống | Cấu hình mã đăng ký tổ chức (GĐ-16); không có giao diện quản trị |
+| Người triển khai | Người cài đặt hệ thống | Cấu hình hệ thống; không có giao diện quản trị |
 
 Không có vai trò **quản trị hệ thống** vì gói mở rộng A (QT-01, QT-02) không được đăng ký (QĐ-01).
 
@@ -137,7 +135,7 @@ Quy tắc chung cho mọi chức năng cần đăng nhập:
 | Thuộc tính | Nội dung |
 |---|---|
 | Actor | Khách |
-| Đầu vào | Tên đăng nhập; mật khẩu; tên hiển thị `[PDF]`; mã đăng ký tổ chức `[QĐ-05, GĐ-16]` |
+| Đầu vào | Tên đăng nhập; mật khẩu; tên hiển thị `[PDF]` |
 | Đầu ra | Tài khoản mới được tạo. Người dùng được chuyển tới màn hình đăng nhập `[GS-03]` |
 
 **Quy tắc**
@@ -145,7 +143,6 @@ Quy tắc chung cho mọi chức năng cần đăng nhập:
 - R2. Định dạng tên đăng nhập: 3–30 ký tự, chỉ gồm chữ cái không dấu a–z, chữ số 0–9, dấu chấm `.` và gạch dưới `_` `[GS-01]`.
 - R3. Mật khẩu phải thỏa TK-02.
 - R4. Tên hiển thị: 1–50 ký tự sau khi bỏ khoảng trắng đầu/cuối; cho phép tiếng Việt có dấu; được phép trùng với người khác `[GS-02]`.
-- R5. Mã đăng ký tổ chức phải khớp mã do người triển khai cấu hình `[QĐ-05, GĐ-16]`. Mã này không xuất hiện trong mã nguồn công khai hay README.
 
 **Trạng thái lỗi**
 
@@ -155,12 +152,12 @@ Quy tắc chung cho mọi chức năng cần đăng nhập:
 | E-TK01-2 | Tên đăng nhập sai định dạng (R2) | Báo lỗi định dạng; không tạo tài khoản |
 | E-TK01-3 | Mật khẩu không đạt TK-02 | Báo lỗi theo TK-02; không tạo tài khoản |
 | E-TK01-4 | Tên hiển thị trống hoặc quá dài (R4) | Báo lỗi; không tạo tài khoản |
-| E-TK01-5 | Mã đăng ký tổ chức sai hoặc bỏ trống | Báo lỗi; không tạo tài khoản; không cho biết mã đúng |
+| E-TK01-5 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – |
 
 **Tiêu chí chấp nhận**
-- TK-01-AC1: Cho trước mã tổ chức đúng và tên `nhanvien01` chưa tồn tại. Khi đăng ký với mật khẩu `Matkhau123` và tên hiển thị `Nguyễn Văn An`, thì tài khoản được tạo và đăng nhập được ngay bằng thông tin đó.
+- TK-01-AC1: Cho trước tên `nhanvien01` chưa tồn tại. Khi đăng ký với mật khẩu `Matkhau123` và tên hiển thị `Nguyễn Văn An`, thì tài khoản được tạo và đăng nhập được ngay bằng thông tin đó.
 - TK-01-AC2: Cho trước `nhanvien01` đã tồn tại. Khi đăng ký `NhanVien01`, thì nhận lỗi E-TK01-1 và tổng số tài khoản không đổi.
-- TK-01-AC3: Khi đăng ký với mã tổ chức sai, thì nhận lỗi E-TK01-5 và không có tài khoản nào được tạo.
+- TK-01-AC3: *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.*
 - TK-01-AC4: Tên hiển thị `Đặng Thị Ẩn` được lưu và hiển thị lại đúng từng ký tự.
 
 ---
@@ -677,7 +674,7 @@ Các mã dưới đây có trong PDF §6. Dự án **không đăng ký** `[QĐ-0
 ## 9. Giả định & câu hỏi mở
 
 ### 9.1 ASSUMPTIONS – Giả định của SRS
-Giả định của BRD (GĐ-01…GĐ-19) và quyết định QĐ-01…QĐ-05 vẫn giữ hiệu lực. Bảng dưới chỉ gồm giả định mới.
+Giả định của BRD (GĐ-01…GĐ-19) và quyết định QĐ-01…QĐ-04 vẫn giữ hiệu lực (QĐ-05 hết hiệu lực từ 2026-11-16). Bảng dưới chỉ gồm giả định mới.
 
 | Mã | Giả định | Áp dụng | Câu hỏi |
 |---|---|---|---|
@@ -723,7 +720,7 @@ Giả định của BRD (GĐ-01…GĐ-19) và quyết định QĐ-01…QĐ-05 v�
 | OQ-06 | Tin hệ thống có tính vào số chưa đọc không? | GĐ-08: không | TB-01, AT-04 | Mở (từ BRD) |
 | OQ-07 | Thời hạn phiên đăng nhập là bao lâu? | GS-06: 8 giờ | TK-03 | Mở (từ BRD) |
 | OQ-08 | Tìm người dùng có bỏ qua dấu tiếng Việt không? | GĐ-10: không | TK-06 | Mở (từ BRD) |
-| OQ-09 | Xác định "người thuộc tổ chức" bằng cách nào? Ai giữ và cấp mã? | GĐ-16: một mã đăng ký chung | TK-01, AT-01 | Mở (từ BRD) – **ưu tiên cao** |
+| OQ-09 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – | – | Đã đóng |
 | OQ-10 | Có tin hệ thống khi chuyển quyền trưởng nhóm không? | GĐ-19: có | NH-04 | Mở (từ BRD) |
 | OQ-11 | Trưởng nhóm là người cuối cùng thì xử lý thế nào? | GĐ-18: không cho rời | NH-03 | Mở (từ BRD) |
 | OQ-12 | Quy tắc tên đăng nhập (độ dài, ký tự cho phép, phân biệt hoa thường)? | GS-01 | TK-01, TK-03, TK-06 | Mở – **ưu tiên cao** |

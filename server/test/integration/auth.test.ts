@@ -3,20 +3,11 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../src/storage/prisma.js";
 import { hashToken } from "../../src/modules/auth/session.service.js";
 import { M } from "../../src/common/messages.js";
-import { ORIGIN, REG_CODE, login, makeAgent, register, type Agent } from "../helpers/app.js";
+import { ORIGIN, login, makeAgent, register, type Agent } from "../helpers/app.js";
 
 let agent: Agent;
 beforeAll(async () => {
   agent = await makeAgent();
-});
-
-describe("A0 GET /api/auth/registration-options – SC-01 listbox", () => {
-  it("trả danh mục gồm tên tổ chức và mã đang cấu hình, không cần đăng nhập, không lưu cache", async () => {
-    const res = await agent.get("/api/auth/registration-options");
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ options: [{ label: "Tổ chức", code: REG_CODE }] });
-    expect(res.headers["cache-control"]).toBe("no-store");
-  });
 });
 
 describe("A1 POST /api/auth/register – TK-01, TK-02", () => {
@@ -38,15 +29,12 @@ describe("A1 POST /api/auth/register – TK-01, TK-02", () => {
     expect(await prisma().user.count()).toBe(before);
   });
 
-  it("TK-01-AC3: mã tổ chức sai → 400 M-05, không tạo tài khoản, kiểm tra TRƯỚC các trường khác", async () => {
-    const before = await prisma().user.count();
-    // Tên đã tồn tại + mã sai: vẫn chỉ báo M-05 (không lộ tên tồn tại).
-    const res = await register(agent, { username: "nhanvien01", registrationCode: "sai-ma" });
-    expect(res.status).toBe(400);
-    expect(res.body.error).toMatchObject({ code: "INVALID_REGISTRATION_CODE", message: M.M05 });
-    const empty = await register(agent, { username: "moi01", registrationCode: "" });
-    expect(empty.body.error.code).toBe("INVALID_REGISTRATION_CODE");
-    expect(await prisma().user.count()).toBe(before);
+  it("đăng ký tự do: không cần mã tổ chức; gửi kèm registrationCode bị từ chối như trường lạ", async () => {
+    const res = await register(agent, { username: "tudo01" });
+    expect(res.status).toBe(201);
+    const extra = await register(agent, { username: "tudo02", registrationCode: "bat-ky" });
+    expect(extra.status).toBe(400);
+    expect(extra.body.error.fields.registrationCode).toBeDefined();
   });
 
   it("TK-02-AC2: mật khẩu sai quy tắc bị từ chối với đúng câu", async () => {
@@ -79,7 +67,7 @@ describe("A1 POST /api/auth/register – TK-01, TK-02", () => {
 
   it("chế độ nghiêm: trường lạ bị từ chối (GT-07)", async () => {
     const res = await agent.post("/api/auth/register").set("Origin", ORIGIN)
-      .send({ username: "x01", password: "Matkhau123", passwordConfirm: "Matkhau123", displayName: "X", registrationCode: "test-only-registration-code", role: "admin" });
+      .send({ username: "x01", password: "Matkhau123", passwordConfirm: "Matkhau123", displayName: "X", role: "admin" });
     expect(res.status).toBe(400);
     expect(res.body.error.fields.role).toBeDefined();
   });

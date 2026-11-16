@@ -1,5 +1,4 @@
 // Nghiệp vụ tài khoản: TK-01, TK-02, TK-03, TK-04. Không import express (08 mục 4.3).
-import { createHash, timingSafeEqual } from "node:crypto";
 import { AppError, validationError, type FieldErrors } from "../../common/errors.js";
 import { M } from "../../common/messages.js";
 import {
@@ -14,23 +13,12 @@ import { getDummyHash, hashPassword, verifyPassword } from "./password.js";
 import { createSession, revoke, type AuthContext } from "./session.service.js";
 import { disconnectSession } from "../notifications/realtime.js";
 
-const sha = (s: string) => createHash("sha256").update(s, "utf8").digest();
-
-/** So mã tổ chức bằng phép so thời gian cố định trên bản băm (09 mục 4.2). */
-export function registrationCodeMatches(input: string, expected: string): boolean {
-  return timingSafeEqual(sha(input.trim()), sha(expected.trim()));
-}
-
 export type RegisterInput = {
-  username: string; password: string; passwordConfirm: string; displayName: string; registrationCode: string;
+  username: string; password: string; passwordConfirm: string; displayName: string;
 };
 
-export async function register(input: RegisterInput, expectedCode: string): Promise<UserDto> {
-  // 1) Mã tổ chức TRƯỚC TIÊN – sai thì dừng, không lộ tên nào đã tồn tại (FRS-01 bước 2).
-  if (!registrationCodeMatches(input.registrationCode, expectedCode)) {
-    throw new AppError("INVALID_REGISTRATION_CODE", { registrationCode: M.M05 });
-  }
-  // 2) Định dạng các trường.
+export async function register(input: RegisterInput): Promise<UserDto> {
+  // 1) Định dạng các trường.
   const username = normalizeUsername(input.username);
   const displayName = normalizeDisplayName(input.displayName);
   const password = normalizePassword(input.password);
@@ -42,7 +30,7 @@ export async function register(input: RegisterInput, expectedCode: string): Prom
   if (!p && confirm !== password) fields.passwordConfirm = M.M04;
   if (Object.keys(fields).length) throw validationError(fields);
 
-  // 3) Trùng tên: kiểm tra trước, vẫn bắt lỗi UNIQUE của CSDL khi hai người đăng ký cùng lúc.
+  // 2) Trùng tên: kiểm tra trước, vẫn bắt lỗi UNIQUE của CSDL khi hai người đăng ký cùng lúc.
   if (await users.findByUsername(username)) throw new AppError("USERNAME_TAKEN", { username: M.M01 });
   const passwordHash = await hashPassword(password);
   try {

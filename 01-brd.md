@@ -16,6 +16,7 @@
 |---|---|---|
 | 1.0 | 2026-11-13 | Bản nháp đầu tiên, dựa trên PDF |
 | 1.1 | 2026-11-13 | Cập nhật 5 quyết định của Product Owner (QĐ-01 → QĐ-05); bổ sung giả định và câu hỏi mở phát sinh |
+| 1.2 | 2026-11-16 | Bỏ mã đăng ký tổ chức: QĐ-05, GĐ-16, OQ-09, PT-06, R-08 hết hiệu lực; ai cũng tự đăng ký được |
 
 **Quy ước ký hiệu trong tài liệu**
 
@@ -33,7 +34,7 @@
 
 ## 1. Tóm tắt điều hành
 
-Tổ chức cần một ứng dụng nhắn tin nội bộ chạy trên trình duyệt web để nhân viên trao đổi với nhau 1-1 và theo nhóm, có lưu lịch sử và báo số tin chưa đọc `[PDF §1]`. Dự án lần này ở mức MVP: chỉ làm tập tính năng cốt lõi gồm 15 mã yêu cầu bắt buộc (nhóm TK, CH, NH, TB) cùng các yêu cầu phi chức năng tối thiểu `[PDF §3, §4]`. Sản phẩm được coi là ĐẠT khi chạy trọn vẹn 6 bước nghiệm thu tại PDF §5. Các tính năng nâng cao như trạng thái tin nhắn, trạng thái online, gửi file, sửa/thu hồi tin hay quản trị tài khoản chỉ là điểm cộng `[PDF §6]`, và dự án đã quyết định không đăng ký phần này `[QĐ-01]`. Các điểm PDF chưa chốt được ghi thành quyết định, giả định và câu hỏi mở ở phần 10; đáng chú ý là chỉ người thuộc tổ chức mới được đăng ký tài khoản `[QĐ-05]`.
+Tổ chức cần một ứng dụng nhắn tin nội bộ chạy trên trình duyệt web để nhân viên trao đổi với nhau 1-1 và theo nhóm, có lưu lịch sử và báo số tin chưa đọc `[PDF §1]`. Dự án lần này ở mức MVP: chỉ làm tập tính năng cốt lõi gồm 15 mã yêu cầu bắt buộc (nhóm TK, CH, NH, TB) cùng các yêu cầu phi chức năng tối thiểu `[PDF §3, §4]`. Sản phẩm được coi là ĐẠT khi chạy trọn vẹn 6 bước nghiệm thu tại PDF §5. Các tính năng nâng cao như trạng thái tin nhắn, trạng thái online, gửi file, sửa/thu hồi tin hay quản trị tài khoản chỉ là điểm cộng `[PDF §6]`, và dự án đã quyết định không đăng ký phần này `[QĐ-01]`. Các điểm PDF chưa chốt được ghi thành quyết định, giả định và câu hỏi mở ở phần 10.
 
 ## 2. Bối cảnh & vấn đề cần giải quyết
 
@@ -59,7 +60,7 @@ Cột "Trước" là **giả định minh họa `[GĐ-01]`** vì PDF không mô 
 
 | Bước | Trước (giả định GĐ-01, chưa xác minh) | Sau khi có MVP (theo PDF) |
 |---|---|---|
-| 1. Định danh | Chưa có tài khoản nhắn tin do tổ chức quản lý. | Người thuộc tổ chức tự đăng ký (QĐ-05), đăng nhập bằng tên đăng nhập và mật khẩu (TK-01, TK-03). |
+| 1. Định danh | Chưa có tài khoản nhắn tin do tổ chức quản lý. | Nhân viên tự đăng ký, đăng nhập bằng tên đăng nhập và mật khẩu (TK-01, TK-03). |
 | 2. Tìm người cần trao đổi | Phải biết sẵn liên hệ qua kênh khác. | Tìm theo tên đăng nhập hoặc tên hiển thị trong ứng dụng (TK-06). |
 | 3. Trao đổi 1-1 | Dùng kênh rời rạc không do tổ chức quản lý. | Mở hội thoại 1-1, mỗi cặp chỉ có một hội thoại, tin đến realtime (CH-01, CH-02). |
 | 4. Trao đổi nhóm | Không có nơi trao đổi nhóm tập trung. | Tạo nhóm, nhắn tin nhóm, thấy tên người gửi cạnh mỗi tin (NH-01, NH-02). |
@@ -149,7 +150,7 @@ Các mã trên **không** được chuyển thành MVP. PDF ghi rõ các mã kh�
 | Tải ảnh đại diện lên | `[PDF TK-05]` "chưa cần upload ảnh" |
 | Lưu trữ file / ảnh | Chỉ cần khi làm gói B `[PDF §6.2, §7]` |
 | Toàn bộ mã ở PDF §6 | Không thuộc điều kiện ĐẠT `[PDF §9]`; dự án không đăng ký `[QĐ-01]` |
-| Xác minh email khi đăng ký | Thuộc gói C (TK-07…11), không đăng ký `[QĐ-01]`; giới hạn trong tổ chức dùng cơ chế khác `[GĐ-16]` |
+| Xác minh email khi đăng ký | Thuộc gói C (TK-07…11), không đăng ký `[QĐ-01]` |
 | Gọi thoại / gọi video | PDF không đề cập → coi là ngoài phạm vi `[GĐ]` |
 | Tìm kiếm nội dung tin nhắn | PDF chỉ yêu cầu tìm người dùng (TK-06) → ngoài phạm vi `[GĐ]` |
 | Kết nối danh bạ / đăng nhập một lần với hệ thống khác của tổ chức | PDF không đề cập → ngoài phạm vi `[GĐ]` |
@@ -166,7 +167,7 @@ Mức ảnh hưởng là đánh giá của nhóm `[ĐX]`.
 | Thành viên nhóm | Người được thêm vào nhóm chat | Nhắn tin nhóm, tự rời nhóm | Trung bình | `[PDF NH-02, NH-03]` |
 | Người quản trị hệ thống | Chỉ tồn tại nếu làm gói mở rộng A (QT-01, QT-02). **Không có trong dự án này** vì không đăng ký phần mở rộng | Không áp dụng | Không áp dụng | `[PDF §6.1]`, `[QĐ-01]` |
 | Lãnh đạo nghiệm thu / giảng viên | Người chấm và quyết định ĐẠT | Chạy trọn 6 bước nghiệm thu, đáp ứng yêu cầu phi chức năng, chất lượng mã và README | Rất cao | `[PDF §5, §9]` |
-| Nhóm dự án (BA, Architect, Dev, QA, Designer) | Người xây dựng và nộp sản phẩm | Phạm vi rõ ràng, đủ thời gian, tiêu chí nghiệm thu đo được; triển khai bản demo trực tuyến và cấu hình giới hạn đăng ký cho tổ chức | Cao | Theo phân công dự án; `[QĐ-02]`, `[GĐ-16]` |
+| Nhóm dự án (BA, Architect, Dev, QA, Designer) | Người xây dựng và nộp sản phẩm | Phạm vi rõ ràng, đủ thời gian, tiêu chí nghiệm thu đo được; triển khai bản demo trực tuyến | Cao | Theo phân công dự án; `[QĐ-02]` |
 
 ## 6. Yêu cầu nghiệp vụ cấp cao (BR)
 
@@ -174,7 +175,7 @@ Quy ước ưu tiên MoSCoW: **Must** = bắt buộc theo PDF §3–5; **Should*
 
 | Mã | Nhu cầu nghiệp vụ | Liên kết mã đề bài | MoSCoW | Nguồn |
 |---|---|---|---|---|
-| BR-01 | Nhân viên tự tạo tài khoản với tên đăng nhập không trùng, tên hiển thị và mật khẩu đủ mạnh; chỉ người thuộc tổ chức mới đăng ký được | TK-01, TK-02 | Must | PDF + QĐ-05 |
+| BR-01 | Nhân viên tự tạo tài khoản với tên đăng nhập không trùng, tên hiển thị và mật khẩu đủ mạnh | TK-01, TK-02 | Must | PDF |
 | BR-02 | Nhân viên đăng nhập, đăng xuất; phiên tự hết hạn và bị hủy khi đăng xuất | TK-03; NFR Bảo mật | Must | PDF |
 | BR-03 | Nhân viên tự đổi mật khẩu khi đã đăng nhập, phải xác nhận mật khẩu cũ | TK-04 | Must | PDF |
 | BR-04 | Nhân viên xem và sửa tên hiển thị; mỗi người có avatar mặc định hoặc chữ cái đầu | TK-05 | Must | PDF |
@@ -209,8 +210,6 @@ Sản phẩm ĐẠT khi chạy trọn vẹn **cả 6 bước** dưới đây **v
 
 Các mã TK-04, TK-05 không xuất hiện trực tiếp trong 6 bước nhưng vẫn là yêu cầu bắt buộc ở PDF §3 và cần được kiểm thử riêng.
 
-Theo QĐ-05, hai người dùng ở bước 1 phải đăng ký được với tư cách người thuộc tổ chức (theo cơ chế ở GĐ-16). Cơ chế giới hạn không được làm bước 1 thất bại với người hợp lệ.
-
 **Sản phẩm cần nộp `[PDF §8]`**: mã nguồn trên Git kèm README hướng dẫn cài đặt và chạy local; bản demo chạy đúng 6 bước (PDF cho phép triển khai online **hoặc** video 3–5 phút; dự án chọn **triển khai online** `[QĐ-02]`); ghi chú thiết kế 1–2 trang (sơ đồ cơ sở dữ liệu, cách xử lý realtime, cách kiểm soát quyền truy cập).
 
 **Điểm cộng `[PDF §9]`**: mỗi hạng mục mở rộng hoàn thiện và demo được; chất lượng kỹ thuật (cấu trúc mã rõ ràng, README đầy đủ, xử lý lỗi và bảo mật hợp lý).
@@ -238,7 +237,7 @@ Ngân sách, số nhân sự dự án, quy mô người dùng của tổ chức:
 | PT-03 | Kho Git để nộp mã nguồn và README | Thiếu sản phẩm nộp `[PDF §8]` |
 | PT-04 | Mạng ổn định khi đo thời gian tin đến | Số đo BO-02 không đại diện |
 | PT-05 | Trả lời các câu hỏi mở ở phần 10.3 | Thiết kế phải dựa trên giả định, có thể phải làm lại |
-| PT-06 | Chốt cơ chế giới hạn đăng ký trong tổ chức (OQ-09) | Chưa thiết kế được chức năng đăng ký (TK-01) |
+| PT-06 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – |
 
 ## 9. Rủi ro
 
@@ -253,7 +252,7 @@ Khả năng và ảnh hưởng là đánh giá định tính của nhóm `[ĐX]`
 | R-05 | Làm thêm tính năng ngoài phạm vi, thiếu thời gian cho MVP | Trung bình | Cao | Không làm phần mở rộng (QĐ-01); mọi yêu cầu mới phải được Product Owner duyệt |
 | R-06 | Thời gian thực hiện ngắn (khung 13~14/11/2026) | Cao | Cao | Ưu tiên tuyệt đối các BR "Must"; ghi nhận phần chưa xong |
 | R-07 | Số tin chưa đọc sai khi một người mở nhiều tab | Trung bình | Trung bình | Làm rõ định nghĩa "đã đọc" (GĐ-08) và kiểm thử nhiều tab |
-| R-08 | Cơ chế giới hạn đăng ký trong tổ chức chưa chốt; nếu quá chặt có thể làm hỏng bước 1, nếu lộ mã đăng ký thì người ngoài vẫn đăng ký được | Trung bình | Cao | Chốt OQ-09 sớm; có test case đăng ký hợp lệ và không hợp lệ; không công khai mã đăng ký trong mã nguồn hay README |
+| R-08 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – | – | – |
 | R-09 | Hiển thị lỗi trên Safari hoặc màn hình nhỏ | Trung bình | Trung bình | Kiểm thử trên đủ 4 trình duyệt và ít nhất một kích thước màn hình nhỏ |
 | R-10 | Môi trường demo trực tuyến gặp sự cố đúng buổi nghiệm thu | Trung bình | Cao | Triển khai sớm và diễn tập trên chính môi trường online (ĐX-03); có thể quay thêm video dự phòng `[ĐX]`, nhưng hình thức demo chính vẫn là online (QĐ-02) |
 | R-11 | Trưởng nhóm muốn rời nhưng nhóm không còn thành viên nào khác để nhận quyền | Thấp | Trung bình | Xử lý theo GĐ-18; chốt OQ-11 |
@@ -262,7 +261,7 @@ Khả năng và ảnh hưởng là đánh giá định tính của nhóm `[ĐX]`
 
 ### 10.1 Quyết định đã xác nhận
 
-Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ngày 2026-11-13. QĐ-03 và QĐ-05 bổ sung quy tắc mà PDF không nêu; chúng không thay đổi hay thêm mã yêu cầu nào của PDF.
+Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ngày 2026-11-13. QĐ-03 bổ sung quy tắc mà PDF không nêu; chúng không thay đổi hay thêm mã yêu cầu nào của PDF.
 
 | Mã | Quyết định | Trả lời câu hỏi | Ảnh hưởng tới |
 |---|---|---|---|
@@ -270,7 +269,7 @@ Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ng�
 | QĐ-02 | Hình thức demo: triển khai trực tuyến | OQ-02 | Mục 7, PT-01, R-10 |
 | QĐ-03 | Trưởng nhóm được rời nhóm; khi rời **bắt buộc** chuyển quyền trưởng nhóm cho một thành viên khác | OQ-03 | NH-03, BR-12, R-11 |
 | QĐ-04 | Người bị xóa hoặc tự rời nhóm **không** xem được lịch sử cũ của nhóm | OQ-04 | NH-03, BR-15, NFR Bảo mật |
-| QĐ-05 | Chỉ người thuộc tổ chức được đăng ký tài khoản | OQ-05 | TK-01, BR-01, R-08; cơ chế cụ thể còn mở (OQ-09) |
+| QĐ-05 | *Hết hiệu lực (2026-11-16): đăng ký tự do, không giới hạn trong tổ chức* | OQ-05 | TK-01 |
 
 ### 10.2 ASSUMPTIONS – Giả định (có hiệu lực cho tới khi được xác nhận hoặc thay thế)
 
@@ -279,7 +278,7 @@ Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ng�
 | GĐ-01 | Hiện trạng giao tiếp ở cột "Trước" (phần 2.3) là minh họa, chưa xác minh | Phần 2.3 |
 | GĐ-02 | *Hết hiệu lực – thay bằng QĐ-01* | – |
 | GĐ-03 | Tổ chức sử dụng là tổ chức giả định của bài tập; không có số liệu quy mô, ngân sách | Phần 8.2 |
-| GĐ-04 | *Hết hiệu lực – thay bằng QĐ-05* | – |
+| GĐ-04 | *Hết hiệu lực* | – |
 | GĐ-05 | "Chọn từ 2 thành viên trở lên" (NH-01) nghĩa là chọn ít nhất 2 người khác ngoài người tạo, nên nhóm có tối thiểu 3 người (khớp bước 3 PDF §5) | NH-01 |
 | GĐ-06 | *Hết hiệu lực – thay bằng QĐ-03* | – |
 | GĐ-07 | *Hết hiệu lực – thay bằng QĐ-04* | – |
@@ -291,7 +290,7 @@ Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ng�
 | GĐ-13 | *Hết hiệu lực – thay bằng QĐ-02* | – |
 | GĐ-14 | Không tạo hội thoại 1-1 với chính mình | CH-01 |
 | GĐ-15 | "Tổng số trên tab/icon ứng dụng" (TB-01) được hiểu là hiển thị tổng số chưa đọc trên tiêu đề tab trình duyệt và trên biểu tượng trong giao diện ứng dụng | TB-01 |
-| GĐ-16 | "Người thuộc tổ chức" được xác định bằng một **mã đăng ký của tổ chức**: người đăng ký phải nhập đúng mã này. Mã do người triển khai cấu hình, không ghi trong mã nguồn công khai hay README. Lý do chọn tạm: không cần email (gói C không làm) và không cần người quản trị (gói A không làm) | TK-01, QĐ-05; OQ-09 |
+| GĐ-16 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – |
 | GĐ-17 | Người nhận quyền trưởng nhóm do trưởng nhóm tự chọn, và phải là thành viên đang ở trong nhóm | QĐ-03 |
 | GĐ-18 | Nếu nhóm chỉ còn trưởng nhóm, trưởng nhóm không rời được vì không có người nhận quyền | QĐ-03; OQ-11 |
 | GĐ-19 | Việc chuyển quyền trưởng nhóm (kể cả khi rời nhóm) hiện thành một dòng tin hệ thống. PDF NH-04 không liệt kê sự kiện này | NH-04; OQ-10 |
@@ -304,10 +303,10 @@ Người xác nhận: người yêu cầu dự án (vai trò Product Owner), ng�
 | OQ-02 | Hình thức demo chính? | Product Owner | – | Đã đóng → QĐ-02 |
 | OQ-03 | Trưởng nhóm có được rời nhóm không? | Product Owner | – | Đã đóng → QĐ-03 |
 | OQ-04 | Người rời nhóm có xem được lịch sử cũ không? | Product Owner | – | Đã đóng → QĐ-04 |
-| OQ-05 | Đăng ký tự do hay giới hạn trong tổ chức? | Product Owner | – | Đã đóng → QĐ-05 |
+| OQ-05 | Đăng ký tự do hay giới hạn trong tổ chức? | Product Owner | – | Đã đóng – đăng ký tự do (2026-11-16) |
 | OQ-06 | Tin hệ thống trong nhóm có được tính vào số chưa đọc không? | Product Owner | GĐ-08 | Mở |
 | OQ-07 | Thời hạn phiên đăng nhập mong muốn là bao lâu? | Product Owner, Architect | GĐ-09 | Mở |
 | OQ-08 | Tìm người dùng có cần bỏ qua dấu tiếng Việt không? | Product Owner | GĐ-10 | Mở |
-| OQ-09 | Xác định "người thuộc tổ chức" bằng cách nào (mã đăng ký chung, danh sách tên đăng nhập cho phép, cách khác)? Ai giữ và cấp mã? | Product Owner, Architect | GĐ-16 | Mở |
+| OQ-09 | *Đã bỏ (2026-11-16): không còn mã đăng ký tổ chức – đăng ký tự do.* | – | – | Đã đóng |
 | OQ-10 | Có hiển thị tin hệ thống khi chuyển quyền trưởng nhóm không? | Product Owner | GĐ-19 | Mở |
 | OQ-11 | Khi trưởng nhóm là người cuối cùng trong nhóm thì xử lý thế nào (không cho rời, hay giải tán nhóm)? | Product Owner | GĐ-18 | Mở |

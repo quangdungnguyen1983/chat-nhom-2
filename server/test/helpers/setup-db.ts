@@ -14,8 +14,6 @@ Object.assign(process.env, {
   PORT: "3999",
   APP_ORIGIN: "http://localhost:5173",
   DATABASE_URL: `file:${dbFile}`,
-  // Giá trị CHỈ dùng cho test, không phải mã thật.
-  REGISTRATION_CODE: "test-only-registration-code",
   SESSION_TTL_HOURS: "8",
   COOKIE_SECURE: "false",
   COOKIE_NAME: "sid",
