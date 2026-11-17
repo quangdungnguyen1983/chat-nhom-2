@@ -7,12 +7,14 @@ import { log } from "../../common/logger.js";
 import * as sessions from "../../storage/sessions.repo.js";
 import type { SocketData } from "../auth/socket-auth.js";
 import * as chat from "./chat.service.js";
+import { formatSchema } from "../../common/message-format.js";
 
 // Chế độ nghiêm: payload có trường lạ (vd senderId) → VALIDATION_ERROR, không lưu (09 mục 4.4).
 const sendSchema = z.object({
   conversationId: z.number().int().positive(),
   content: z.string().max(20_000), // chặn chuỗi quá lớn trước khi chuẩn hóa; giới hạn thật 5000 ký tự ở service
   clientMessageId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/),
+  format: formatSchema.optional(), // phông/cỡ/màu chữ – chỉ nhận khóa trong danh mục
 }).strict();
 
 type Ack = (r: unknown) => void;

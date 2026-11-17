@@ -1,4 +1,5 @@
 // Kiểu dữ liệu trả ra API / sự kiện (09-detailed-design.md mục 6.2).
+import { toFormatDto, type MessageFormat } from "./message-format.js";
 import { avatarInitial } from "./avatar.js";
 
 export type UserDto = {
@@ -21,6 +22,7 @@ export type MessageDto = {
   eventType: string | null;
   clientMessageId: string | null;
   createdAt: string;
+  format: MessageFormat | null; // phông/cỡ/màu chữ người gửi chọn; null = mặc định
 };
 
 export type MessageRow = {
@@ -31,6 +33,9 @@ export type MessageRow = {
   eventType: string | null;
   clientMsgId: string | null;
   createdAt: Date;
+  fmtFont?: string | null;
+  fmtSize?: string | null;
+  fmtColor?: string | null;
   sender: { id: number; username: string; displayName: string } | null;
 };
 
@@ -44,6 +49,7 @@ export function toMessageDto(m: MessageRow): MessageDto {
     eventType: m.eventType,
     clientMessageId: m.clientMsgId,
     createdAt: m.createdAt.toISOString(),
+    format: m.type === "text" ? toFormatDto(m) : null,
   };
 }
 

@@ -1,4 +1,5 @@
 // CH-01, CH-02, CH-03, CH-06. Không import express / socket.io (08 mục 4.3).
+import { toStoredFormat, type MessageFormatInput } from "../../common/message-format.js";
 import { AppError, validationError } from "../../common/errors.js";
 import { M } from "../../common/messages.js";
 import {
@@ -127,7 +128,7 @@ export async function getMessages(me: number, conversationId: number, q: { befor
   return { messages: page.map(toMessageDto), hasMore, nextCursor: page[0]?.id ?? null };
 }
 
-export type SendInput = { conversationId: number; content: string; clientMessageId: string };
+export type SendInput = { conversationId: number; content: string; clientMessageId: string; format?: MessageFormatInput };
 
 /**
  * CH-02: kiểm tra → LƯU CSDL (giao dịch) → trả kết quả. Chỉ SAU KHI giao dịch thành công
@@ -151,7 +152,7 @@ export async function sendMessage(me: number, input: SendInput): Promise<{ messa
         if (prev.conversationId !== input.conversationId) throw validationError({ clientMessageId: "Mã tạm đã dùng cho hội thoại khác." });
         return { message: toMessageDto(prev), duplicate: true };
       }
-      const msg = await msgRepo.createText(tx, input.conversationId, me, content, input.clientMessageId);
+      const msg = await msgRepo.createText(tx, input.conversationId, me, content, input.clientMessageId, toStoredFormat(input.format));
       await convRepo.setLastMessage(tx, input.conversationId, msg.id, msg.createdAt);
       return { message: toMessageDto(msg), duplicate: false };
     }, { lockConversationId: input.conversationId }); // GE-10: ghi lần lượt trong một hội thoại

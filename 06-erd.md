@@ -134,6 +134,9 @@ erDiagram
         bigint event_actor_id FK "người thực hiện sự kiện"
         bigint event_target_id FK "người chịu tác động"
         jsonb event_data "tên hiển thị tại thời điểm sự kiện"
+        varchar fmt_font "phông chữ, NULL = mặc định"
+        varchar fmt_size "cỡ chữ, NULL = mặc định"
+        varchar fmt_color "màu chữ, NULL = mặc định"
         timestamptz created_at "giờ máy chủ nhận tin"
     }
     message_read_cursors {
@@ -244,6 +247,9 @@ Vì sao giữ dòng khi rời nhóm thay vì xóa: (1) khóa ngoại tác giả 
 | `event_actor_id` | BIGINT | Không | FK → `users.id` | Người thực hiện (ví dụ trưởng nhóm thêm người) | `[ĐX]` |
 | `event_target_id` | BIGINT | Không | FK → `users.id` | Người chịu tác động (người được thêm/bị xóa/nhận quyền) | `[ĐX]` |
 | `event_data` | JSONB | Không | – | Tên hiển thị của các bên **tại thời điểm sự kiện**, tên nhóm mới | `[GS-32]` |
+| `fmt_font` | VARCHAR | Không | CHECK ∈ {co-chan, viet-tay, but-long, danh-may}; chỉ tin văn bản | Phông chữ người gửi chọn; NULL = mặc định | `[YC-2026-11-17]` |
+| `fmt_size` | VARCHAR | Không | CHECK ∈ {nho, lon, rat-lon}; chỉ tin văn bản | Cỡ chữ; NULL = vừa | `[YC-2026-11-17]` |
+| `fmt_color` | VARCHAR | Không | CHECK ∈ {do, cam, xanh-la, xanh-duong, tim, hong, nau}; chỉ tin văn bản | Màu chữ; NULL = mặc định | `[YC-2026-11-17]` |
 | `created_at` | TIMESTAMPTZ | Có | Mặc định giờ máy chủ | Lúc máy chủ nhận và lưu tin | `[GS-20]` |
 
 Giá trị `event_type` (khớp danh mục HT ở FRS-14):

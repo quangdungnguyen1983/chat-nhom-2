@@ -1,8 +1,10 @@
 import { api, type UserDto } from "./client";
+import type { MessageFormat } from "../lib/message-format";
 
 export type MessageDto = {
   id: number; conversationId: number; type: "text" | "system"; content: string;
   sender: UserDto | null; eventType: string | null; clientMessageId: string | null; createdAt: string;
+  format?: MessageFormat | null; // phông/cỡ/màu chữ người gửi chọn
 };
 export type ConversationSummaryDto = {
   id: number; type: "direct" | "group"; title: string; avatarInitial: string; otherUser: UserDto | null;

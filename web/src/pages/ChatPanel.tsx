@@ -7,6 +7,8 @@ import { dayLabel, hhmm, sameDay } from "../lib/datetime";
 import { Avatar } from "../components/Avatar";
 import { EmojiPicker, isEmojiOnly } from "../components/EmojiPicker";
 import { ChatBackgroundPicker, useChatBackground } from "../components/ChatBackground";
+import { FormatPicker } from "../components/FormatPicker";
+import { formatClass, loadFormat, saveFormat, toPayload, type MessageFormat } from "../lib/message-format";
 import { M, MAX_MESSAGE_CHARS, countChars, formatCount, hasVisibleChar, normalizeContent, tooLongMessage } from "../lib/text";
 
 type Item = MessageDto & { pending?: boolean; failed?: boolean };
@@ -133,6 +135,7 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
     try {
       const ack = (await socket.timeout(10_000).emitWithAck("message:send", {
         conversationId: convId, content: item.content, clientMessageId: item.clientMessageId,
+        ...(item.format ? { format: toPayload(item.format) } : {}),
       })) as SendAck;
       if (ack.ok) {
         setItems((prev) => {
@@ -161,6 +164,7 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
     const pending: Item = {
       id: -Date.now(), conversationId: convId, type: "text", content, sender: null, eventType: null,
       clientMessageId: crypto.randomUUID(), createdAt: new Date().toISOString(), pending: true,
+      format: toPayload(fmt) ? fmt : null,
     };
     stickBottom.current = true;
     setItems((prev) => [...prev, pending]);
@@ -170,6 +174,8 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [bg, setBg] = useChatBackground(meId);
+  const [fmt, setFmtState] = useState<MessageFormat>(() => loadFormat(meId));
+  const setFmt = (f: MessageFormat) => { setFmtState(f); saveFormat(meId, f); };
   /** Chèn emoji vào đúng vị trí con trỏ rồi trả focus về ô soạn tin. */
   function insertEmoji(ch: string) {
     const el = inputRef.current;
@@ -230,9 +236,9 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
             {day}
             <div className={`bubble-row ${mine ? "mine" : "theirs"}`}>
               {showSender && <Avatar user={m.sender!} size={32} />}
-              <div className={`bubble ${m.failed ? "failed" : ""} ${isEmojiOnly(m.content) ? "emoji-only" : ""}`}>
+              <div className={`bubble ${m.failed ? "failed" : ""} ${isEmojiOnly(m.content) ? "emoji-only" : ""} ${m.format?.color ? "has-color" : ""}`}>
                 {showSender && <div className="bubble-sender">{m.sender!.displayName}</div>}
-                <div className="bubble-text">{m.content}</div>
+                <div className={`bubble-text ${formatClass(m.format)}`}>{m.content}</div>
                 <div className="bubble-meta">
                   {m.pending ? <em>đang gửi…</em> : m.failed ? (
                     <>
@@ -253,8 +259,11 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
       {newBelow && <button type="button" className="btn btn-secondary new-below" onClick={scrollToBottom}>Có tin nhắn mới ↓</button>}
       <form className="composer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <label htmlFor="composer" className="sr-only">Nhập tin nhắn</label>
-        <EmojiPicker onPick={insertEmoji} />
-        <textarea ref={inputRef} id="composer" rows={2} value={draft} placeholder="Nhập tin nhắn…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
+        <div className="composer-tools">
+          <EmojiPicker onPick={insertEmoji} />
+          <FormatPicker value={fmt} onChange={setFmt} />
+        </div>
+        <textarea ref={inputRef} id="composer" className={formatClass(fmt)} rows={2} value={draft} placeholder="Nhập tin nhắn…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
           aria-invalid={tooLong || undefined} aria-describedby="composer-count" />
         <button type="submit" className="btn btn-primary send" disabled={!canSend}>Gửi</button>
         {(n > 4500 || sendError) && (

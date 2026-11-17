@@ -640,7 +640,7 @@ Trả 204. **Kiểm tra: thành viên hiện tại (404), là nhóm (400 `NOT_A_
 
 | Sự kiện | Chiều | Gửi tới | Payload | Ack | Mã yêu cầu |
 |---|---|---|---|---|---|
-| `message:send` | Trình duyệt → máy chủ | – | `{ conversationId: number, content: string, clientMessageId: string }`. **Không** có `senderId` (có thì bị từ chối) | Có (mục 7.3) | CH-02, NH-02 |
+| `message:send` | Trình duyệt → máy chủ | – | `{ conversationId: number, content: string, clientMessageId: string, format?: { font?, size?, color? } }`. `format` chỉ nhận khóa trong danh mục `server/src/common/message-format.ts` (sai → `VALIDATION_ERROR`); tin trả về có `format` (null = mặc định) `[YC-2026-11-17]`. **Không** có `senderId` (có thì bị từ chối) | Có (mục 7.3) | CH-02, NH-02 |
 | `message:new` | Máy chủ → trình duyệt | `conv:<conversationId>` (mọi thành viên hiện tại, kể cả các tab của người gửi) | `{ message: MessageDto }` | Không | CH-02, NH-02, NH-04 |
 | `conversation:updated` | Máy chủ → trình duyệt | `user:<userId>` của **từng** thành viên hiện tại, tính riêng cho người đó | `{ conversation: ConversationSummaryDto }` | Không | CH-06, TB-01 |
 | `unread:update` | Máy chủ → trình duyệt | `user:<userId>` | `{ conversationId: number, unreadCount: number, lastReadMessageId: number }` | Không | TB-01 |

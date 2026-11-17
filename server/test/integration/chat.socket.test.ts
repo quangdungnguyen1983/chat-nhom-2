@@ -250,3 +250,33 @@ describe("Phiên bị hủy → socket bị ngắt (TK-03 R4)", () => {
     expect(await countMessages()).toBe(before);
   });
 });
+
+describe("Định dạng tin nhắn (phông, cỡ, màu chữ) – 2026-11-17", () => {
+  it("người gửi chọn định dạng → lưu CSDL, ack và người nhận thấy đúng; khóa mặc định lưu là NULL", async () => {
+    const a = await srv.connect(u["sock.a"].cookie);
+    const b = await srv.connect(u["sock.b"].cookie);
+    const gotB = waitFor<any>(b, "message:new");
+    const ack = await send(a, { conversationId: convAB, content: "Chữ đỏ, viết tay", clientMessageId: randomUUID(),
+      format: { font: "viet-tay", size: "vua", color: "do" } });
+    expect(ack.ok).toBe(true);
+    expect(ack.message.format).toEqual({ font: "viet-tay", size: null, color: "do" });
+    expect((await gotB).message.format).toEqual({ font: "viet-tay", size: null, color: "do" });
+    const row = await prisma().message.findUnique({ where: { id: ack.message.id } });
+    expect(row).toMatchObject({ fmtFont: "viet-tay", fmtSize: null, fmtColor: "do" });
+
+    const plain = await send(a, { conversationId: convAB, content: "Tin thường", clientMessageId: randomUUID() });
+    expect(plain.message.format).toBeNull();
+    a.disconnect(); b.disconnect();
+  });
+
+  it("khóa ngoài danh mục (mã màu tùy ý, phông lạ, trường lạ) → VALIDATION_ERROR, không lưu", async () => {
+    const a = await srv.connect(u["sock.a"].cookie);
+    const before = await countMessages();
+    for (const format of [{ color: "#ff0000" }, { font: "Comic Sans" }, { size: "lon", css: "x" }]) {
+      const ack = await send(a, { conversationId: convAB, content: "x", clientMessageId: randomUUID(), format });
+      expect(ack).toMatchObject({ ok: false, error: { code: "VALIDATION_ERROR" } });
+    }
+    expect(await countMessages()).toBe(before);
+    a.disconnect();
+  });
+});

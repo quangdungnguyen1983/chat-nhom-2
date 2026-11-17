@@ -6,8 +6,10 @@ export function findBySenderClientId(senderId: number, clientMsgId: string, tx?:
   return (tx ?? prisma()).message.findUnique({ where: { senderId_clientMsgId: { senderId, clientMsgId } }, include });
 }
 
-export function createText(tx: Tx, conversationId: number, senderId: number, content: string, clientMsgId: string) {
-  return tx.message.create({ data: { conversationId, senderId, type: "text", content, clientMsgId }, include });
+export type StoredFormat = { fmtFont: string | null; fmtSize: string | null; fmtColor: string | null };
+
+export function createText(tx: Tx, conversationId: number, senderId: number, content: string, clientMsgId: string, format: StoredFormat) {
+  return tx.message.create({ data: { conversationId, senderId, type: "text", content, clientMsgId, ...format }, include });
 }
 
 /**

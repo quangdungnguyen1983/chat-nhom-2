@@ -494,6 +494,8 @@ Cột "Kiểm tra" áp dụng **cả ở trình duyệt và máy chủ** (NT-01)
 | Đầu trang | Thông tin | 1-1: avatar + tên người kia. Nhóm: tên nhóm, số thành viên, nút "Thông tin nhóm" | – |
 | Khung tin | Danh sách | 50 tin/lần, cuộn lên tải thêm (FRS-09); tin hệ thống theo FRS-14; nhóm có tên + avatar cạnh mỗi tin (FRS-12) | M-21, M-22 |
 | Ô soạn tin | Ô chữ nhiều dòng | Không trống; ≤ 5.000 ký tự sau chuẩn hóa `[PDF]` | M-17 |
+| Nút "😊" | Bảng chọn | Chèn emoji vào vị trí con trỏ (emoji là ký tự trong nội dung) `[YC-2026-11-16]` | – |
+| Nút "Aa" – Định dạng chữ | Bảng chọn | Phông (Mặc định, Có chân, Viết tay, Bút lông, Đánh máy), cỡ (Nhỏ, Vừa, Lớn, Rất lớn), màu (Mặc định + 7 màu); áp dụng cho cả tin, người nhận thấy đúng như người gửi; lựa chọn được nhớ trên trình duyệt; ô soạn hiển thị xem trước `[YC-2026-11-17]` | – |
 | Bộ đếm ký tự | Chữ | Hiện khi > 4.500 ký tự `[GF-11]` | – |
 | Nút "Gửi" | Nút | Khóa khi trống hoặc > 5.000 ký tự | – |
 
