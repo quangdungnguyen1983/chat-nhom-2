@@ -14,6 +14,10 @@ export type ErrorCode =
   | "USER_NOT_FOUND"
   | "CONVERSATION_FORBIDDEN"
   | "MESSAGE_EMPTY"
+  | "FILE_TOO_LARGE"
+  | "FILE_TYPE_NOT_ALLOWED"
+  | "FILE_EMPTY"
+  | "ATTACHMENT_NOT_FOUND"
   | "MESSAGE_TOO_LONG"
   | "GROUP_NAME_INVALID"
   | "GROUP_TOO_FEW_MEMBERS"
@@ -42,6 +46,10 @@ const table: Record<ErrorCode, { status: number; message: string }> = {
   // 09 GT-08 đề xuất 404; slice 2 dùng 403 theo yêu cầu review – xem PR.
   CONVERSATION_FORBIDDEN: { status: 403, message: M.M30 },
   MESSAGE_EMPTY: { status: 400, message: M.MESSAGE_EMPTY },
+  FILE_TOO_LARGE: { status: 413, message: M.M40 },
+  FILE_TYPE_NOT_ALLOWED: { status: 415, message: M.M41 },
+  FILE_EMPTY: { status: 400, message: M.M42 },
+  ATTACHMENT_NOT_FOUND: { status: 404, message: M.M43 },
   MESSAGE_TOO_LONG: { status: 400, message: M.M17 },
   // Nhóm (09 mục 5). 403 NOT_GROUP_OWNER chỉ trả cho người ĐÃ là thành viên (không lộ thông tin).
   GROUP_NAME_INVALID: { status: 400, message: M.M25 },

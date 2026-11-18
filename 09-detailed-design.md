@@ -407,6 +407,8 @@ Auth: **Không** = không cần phiên; **Phiên** = cần phiên hợp lệ (G1
 | C3 | GET | `/api/conversations/:id` | Chi tiết hội thoại + danh sách thành viên | Thành viên | 200 | R-09 | CH-01, NH-02, NH-03 |
 | C4 | GET | `/api/conversations/:id/messages?before=&after=&limit=` | Trang tin (tối đa 50) | Thành viên | 200 | R-09 | CH-03 |
 | C5 | POST | `/api/conversations/:id/read` | Báo đã đọc | Thành viên | 200 | R-10 | TB-01 |
+| C7 | POST | `/api/conversations/:id/attachments` | Gửi tệp đính kèm. Thân = nội dung tệp (`application/octet-stream`, ≤ 4 MB); header `X-File-Name`, `X-Client-Message-Id`, `X-Caption` (tùy chọn, mã hóa URI). Lỗi 413 / 415 / 400 (M-40…M-42). Phát `message:new` như tin thường | Thành viên | 201 (200 nếu gửi lại cùng mã tạm) | – | `[YC-2026-11-18]` |
+| C8 | GET | `/api/attachments/:id` | Tải tệp. Ảnh `inline`, loại khác `attachment`; header CSP `sandbox`. Không phải thành viên / tin trước mốc được xem → 404 (M-43) | Thành viên | 200 | – | `[YC-2026-11-18]` |
 | G1 | POST | `/api/conversations/group` | Tạo nhóm | Phiên | 201 | R-12 | NH-01, NH-04 |
 | G2 | PATCH | `/api/conversations/:id` | Đổi tên nhóm | Trưởng nhóm | 200 | R-15 | NH-03, NH-04 |
 | G3 | POST | `/api/conversations/:id/members` | Thêm thành viên | Trưởng nhóm | 201 | R-13 | NH-03, NH-04 |

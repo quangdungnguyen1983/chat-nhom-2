@@ -9,7 +9,7 @@ import { env } from "./config/env.js";
 import { checkOrigin } from "./modules/auth/session.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
-import { conversationsRouter } from "./modules/chat/conversations.routes.js";
+import { attachmentsRouter, conversationsRouter } from "./modules/chat/conversations.routes.js";
 import { readRouter } from "./modules/notifications/read.routes.js";
 import { groupsRouter } from "./modules/groups/groups.routes.js";
 import { log } from "./common/logger.js";
@@ -44,6 +44,7 @@ export function createApp() {
   api.use(readRouter);
   api.use(groupsRouter);
   api.use(conversationsRouter);
+  api.use(attachmentsRouter);
   api.use((_req, _res, next) => next(new AppError("NOT_FOUND")));
   app.use("/api", api);
 

@@ -2,7 +2,8 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { Socket } from "socket.io-client";
 import { ApiError } from "../api/client";
-import { getMessages, getMessagesAfter, markRead, type ConversationSummaryDto, type MessageDto } from "../api/chat";
+import { attachmentUrl, getMessages, getMessagesAfter, markRead, sendAttachment, type ConversationSummaryDto, type MessageDto } from "../api/chat";
+import { ACCEPT, MAX_CAPTION_CHARS, checkFile, fileIcon, formatBytes } from "../lib/attachments";
 import { dayLabel, hhmm, sameDay } from "../lib/datetime";
 import { Avatar } from "../components/Avatar";
 import { EmojiPicker, isEmojiOnly } from "../components/EmojiPicker";
@@ -11,7 +12,7 @@ import { FormatPicker } from "../components/FormatPicker";
 import { formatClass, loadFormat, saveFormat, toPayload, type MessageFormat } from "../lib/message-format";
 import { M, MAX_MESSAGE_CHARS, countChars, formatCount, hasVisibleChar, normalizeContent, tooLongMessage } from "../lib/text";
 
-type Item = MessageDto & { pending?: boolean; failed?: boolean };
+type Item = MessageDto & { pending?: boolean; failed?: boolean; localFile?: File };
 type SendAck = { ok: true; message: MessageDto; duplicate: boolean } | { ok: false; error: { code: string; message: string; retryable: boolean } };
 
 const time = hhmm;
@@ -130,7 +131,24 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
     }
   }
 
+  /** Gửi tin có tệp qua REST (tệp tối đa 4 MB không đi qua WebSocket). */
+  async function deliverFile(item: Item, file: File) {
+    const caption = item.content === `📎 ${file.name}` ? undefined : item.content;
+    try {
+      const r = await sendAttachment(convId, file, file.name, item.clientMessageId!, caption);
+      setItems((prev) => {
+        const without = prev.filter((m) => !(m.pending !== undefined && m.clientMessageId === item.clientMessageId));
+        return without.some((m) => m.id === r.message.id) ? without : [...without, r.message].sort((a, b) => a.id - b.id);
+      });
+    } catch (e) {
+      if (e instanceof ApiError && e.body.code === "CONVERSATION_FORBIDDEN") return onForbidden();
+      setItems((prev) => prev.map((m) => (m.clientMessageId === item.clientMessageId && m.pending !== undefined ? { ...m, pending: false, failed: true } : m)));
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500) setSendError(e.body.message);
+    }
+  }
+
   async function deliver(item: Item) {
+    if (item.localFile) return deliverFile(item, item.localFile);
     if (!socket) return;
     try {
       const ack = (await socket.timeout(10_000).emitWithAck("message:send", {
@@ -157,18 +175,33 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
   const content = normalizeContent(draft);
   const n = countChars(content);
   const tooLong = n > MAX_MESSAGE_CHARS;
-  const canSend = hasVisibleChar(content) && !tooLong && !!socket;
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionTooLong = !!file && n > MAX_CAPTION_CHARS;
+  const canSend = (file ? !captionTooLong : hasVisibleChar(content) && !tooLong && !!socket);
+
+  function pickFile(f: File | undefined) {
+    if (fileInputRef.current) fileInputRef.current.value = ""; // cho phép chọn lại cùng tệp
+    if (!f) return;
+    const err = checkFile(f);
+    if (err) { setSendError(err); return; }
+    setSendError(null);
+    setFile(f);
+    inputRef.current?.focus();
+  }
 
   function submit() {
     if (!canSend) return;
     const pending: Item = {
-      id: -Date.now(), conversationId: convId, type: "text", content, sender: null, eventType: null,
+      id: -Date.now(), conversationId: convId, type: "text", sender: null, eventType: null,
+      content: file && !hasVisibleChar(content) ? `📎 ${file.name}` : content,
       clientMessageId: crypto.randomUUID(), createdAt: new Date().toISOString(), pending: true,
-      format: toPayload(fmt) ? fmt : null,
+      format: !file && toPayload(fmt) ? fmt : null,
+      ...(file ? { localFile: file, attachment: { id: 0, fileName: file.name, mimeType: file.type, size: file.size, isImage: false } } : {}),
     };
     stickBottom.current = true;
     setItems((prev) => [...prev, pending]);
-    setDraft(""); setSendError(null);
+    setDraft(""); setSendError(null); setFile(null);
     void deliver(pending);
   }
 
@@ -238,7 +271,23 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
               {showSender && <Avatar user={m.sender!} size={32} />}
               <div className={`bubble ${m.failed ? "failed" : ""} ${isEmojiOnly(m.content) ? "emoji-only" : ""} ${m.format?.color ? "has-color" : ""}`}>
                 {showSender && <div className="bubble-sender">{m.sender!.displayName}</div>}
-                <div className={`bubble-text ${formatClass(m.format)}`}>{m.content}</div>
+                {m.attachment && (m.attachment.isImage && m.attachment.id ? (
+                  <a className="att-image" href={attachmentUrl(m.attachment.id)} target="_blank" rel="noopener" title={`Mở ảnh ${m.attachment.fileName}`}>
+                    <img src={attachmentUrl(m.attachment.id)} alt={m.attachment.fileName} loading="lazy" />
+                  </a>
+                ) : (
+                  <a className="att-file" href={m.attachment.id ? attachmentUrl(m.attachment.id) : undefined} download={m.attachment.fileName}
+                    aria-disabled={!m.attachment.id || undefined} title={m.attachment.id ? `Tải xuống ${m.attachment.fileName}` : undefined}>
+                    <span className="att-icon" aria-hidden="true">{fileIcon(m.attachment.fileName)}</span>
+                    <span className="att-info">
+                      <span className="att-name">{m.attachment.fileName}</span>
+                      <span className="att-size">{formatBytes(m.attachment.size)}{m.attachment.id ? " · Tải xuống" : ""}</span>
+                    </span>
+                  </a>
+                ))}
+                {!(m.attachment && m.content === `📎 ${m.attachment.fileName}`) && (
+                  <div className={`bubble-text ${formatClass(m.format)}`}>{m.content}</div>
+                )}
                 <div className="bubble-meta">
                   {m.pending ? <em>đang gửi…</em> : m.failed ? (
                     <>
@@ -259,13 +308,28 @@ export function ChatPanel({ conversation, meId, socket, onBack, onForbidden, onS
       {newBelow && <button type="button" className="btn btn-secondary new-below" onClick={scrollToBottom}>Có tin nhắn mới ↓</button>}
       <form className="composer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <label htmlFor="composer" className="sr-only">Nhập tin nhắn</label>
+        {file && (
+          <div className="att-chip" role="status">
+            <span aria-hidden="true">{fileIcon(file.name)}</span>
+            <span className="att-chip-name">{file.name}</span>
+            <span className="att-chip-size">{formatBytes(file.size)}</span>
+            <button type="button" className="att-chip-remove" aria-label={`Bỏ tệp ${file.name}`} onClick={() => setFile(null)}>✕</button>
+          </div>
+        )}
         <div className="composer-tools">
+          <input ref={fileInputRef} type="file" accept={ACCEPT} hidden onChange={(e) => pickFile(e.target.files?.[0])} />
+          <button type="button" className="attach-toggle" aria-label="Đính kèm tệp" title="Đính kèm tệp (tối đa 4 MB)" onClick={() => fileInputRef.current?.click()}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </button>
           <EmojiPicker onPick={insertEmoji} />
           <FormatPicker value={fmt} onChange={setFmt} />
         </div>
-        <textarea ref={inputRef} id="composer" className={formatClass(fmt)} rows={2} value={draft} placeholder="Nhập tin nhắn…" onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
+        <textarea ref={inputRef} id="composer" className={formatClass(fmt)} rows={2} value={draft} placeholder={file ? "Thêm chú thích (không bắt buộc)…" : "Nhập tin nhắn…"} onChange={(e) => setDraft(e.target.value)} onKeyDown={onKey}
           aria-invalid={tooLong || undefined} aria-describedby="composer-count" />
         <button type="submit" className="btn btn-primary send" disabled={!canSend}>Gửi</button>
+        {captionTooLong && <p className="error-text" role="alert">Chú thích kèm tệp tối đa {formatCount(MAX_CAPTION_CHARS)} ký tự.</p>}
         {(n > 4500 || sendError) && (
           <p id="composer-count" className={tooLong || sendError ? "error-text" : "hint"} role={tooLong ? "alert" : undefined}>
             {tooLong ? tooLongMessage(n) : sendError ?? `${formatCount(n)} / ${formatCount(MAX_MESSAGE_CHARS)}`}

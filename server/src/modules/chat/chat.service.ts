@@ -1,5 +1,6 @@
 // CH-01, CH-02, CH-03, CH-06. Không import express / socket.io (08 mục 4.3).
 import { toStoredFormat, type MessageFormatInput } from "../../common/message-format.js";
+import { ALLOWED_TYPES, IMAGE_MIMES, MAX_CAPTION_CHARS, MAX_FILE_BYTES, extensionOf, fileLabel, imageSignatureMatches, sanitizeFileName } from "../../common/attachments.js";
 import { AppError, validationError } from "../../common/errors.js";
 import { M } from "../../common/messages.js";
 import {
@@ -165,6 +166,61 @@ export async function sendMessage(me: number, input: SendInput): Promise<{ messa
 
   if (!saved.duplicate) await broadcastMessages(saved.message.conversationId, [saved.message]);
   return saved;
+}
+
+export type SendFileInput = { conversationId: number; clientMessageId: string; fileName: string; caption?: string; data: Uint8Array };
+
+/**
+ * Gửi tệp đính kèm (yêu cầu 2026-11-18): kiểm tra loại + dung lượng → lưu tin và tệp trong CÙNG
+ * giao dịch → phát message:new như tin thường. Chống gửi trùng bằng clientMessageId như CH-02.
+ */
+export async function sendFile(me: number, input: SendFileInput): Promise<{ message: MessageDto; duplicate: boolean }> {
+  const fileName = sanitizeFileName(input.fileName);
+  if (!fileName) throw validationError({ fileName: "Thiếu tên tệp." });
+  if (input.data.byteLength === 0) throw new AppError("FILE_EMPTY");
+  if (input.data.byteLength > MAX_FILE_BYTES) throw new AppError("FILE_TOO_LARGE");
+  const mimeType = ALLOWED_TYPES[extensionOf(fileName)];
+  if (!mimeType) throw new AppError("FILE_TYPE_NOT_ALLOWED");
+  if (IMAGE_MIMES.has(mimeType) && !imageSignatureMatches(mimeType, input.data)) throw new AppError("FILE_TYPE_NOT_ALLOWED");
+
+  const caption = normalizeContent(input.caption ?? "");
+  if (countChars(caption) > MAX_CAPTION_CHARS) throw validationError({ caption: `Chú thích tối đa ${MAX_CAPTION_CHARS} ký tự.` });
+  const content = hasVisibleChar(caption) ? caption : fileLabel(fileName);
+
+  let saved: { message: MessageDto; duplicate: boolean };
+  try {
+    saved = await withWriteTx(async (tx) => {
+      await assertActiveMember(input.conversationId, me, tx);
+      const prev = await msgRepo.findBySenderClientId(me, input.clientMessageId, tx);
+      if (prev) {
+        if (prev.conversationId !== input.conversationId) throw validationError({ clientMessageId: "Mã tạm đã dùng cho hội thoại khác." });
+        return { message: toMessageDto(prev), duplicate: true };
+      }
+      const msg = await msgRepo.createWithAttachment(tx, input.conversationId, me, content, input.clientMessageId,
+        { fileName, mimeType, sizeBytes: input.data.byteLength, data: input.data });
+      await convRepo.setLastMessage(tx, input.conversationId, msg.id, msg.createdAt);
+      return { message: toMessageDto(msg), duplicate: false };
+    }, { lockConversationId: input.conversationId });
+  } catch (err) {
+    if (!isUniqueViolation(err)) throw err;
+    const prev = await msgRepo.findBySenderClientId(me, input.clientMessageId);
+    if (!prev || prev.conversationId !== input.conversationId) throw err;
+    saved = { message: toMessageDto(prev), duplicate: true };
+  }
+  if (!saved.duplicate) await broadcastMessages(saved.message.conversationId, [saved.message]);
+  return saved;
+}
+
+/**
+ * Tải tệp: chỉ thành viên HIỆN TẠI của hội thoại và chỉ với tin họ được xem (từ mốc vào nhóm –
+ * visible_from_message_id). Mọi trường hợp không đủ quyền đều trả cùng một lỗi 404 để không lộ tệp có thật.
+ */
+export async function getAttachment(me: number, attachmentId: number) {
+  const file = await msgRepo.findAttachment(attachmentId);
+  if (!file) throw new AppError("ATTACHMENT_NOT_FOUND");
+  const member = await members.findActiveMember(file.conversationId, me);
+  if (!member || file.messageId < member.visibleFromMessageId) throw new AppError("ATTACHMENT_NOT_FOUND");
+  return { fileName: file.fileName, mimeType: file.mimeType, data: file.data, isImage: IMAGE_MIMES.has(file.mimeType) };
 }
 
 /**

@@ -437,3 +437,37 @@ body { -webkit-font-smoothing: antialiased; }
   .composer { grid-template-columns: auto 1fr auto; }
   .composer-tools { flex-direction: column; }
 }
+
+/* =====================================================================
+   Tệp đính kèm (2026-11-18)
+   ===================================================================== */
+.attach-toggle {
+  width: var(--size-touch); height: var(--size-touch); border: 0; border-radius: 50%; background: transparent; cursor: pointer;
+  color: var(--color-text-secondary); display: inline-flex; align-items: center; justify-content: center;
+}
+.attach-toggle:hover { background: var(--jade-soft); color: var(--jade-dark); }
+.att-chip {
+  grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-2); width: max-content; max-width: 100%;
+  padding: 6px 6px 6px 12px; border-radius: 999px; background: var(--jade-soft); color: var(--jade-dark); font-size: var(--font-size-sm);
+}
+.att-chip-name { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; min-width: 0; }
+.att-chip-size { color: var(--color-text-secondary); white-space: nowrap; }
+.att-chip-remove { width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; cursor: pointer; color: inherit; }
+.att-chip-remove:hover { background: rgba(14,122,109,.15); }
+
+.att-image { display: block; margin: -2px -4px 6px; border-radius: 12px; overflow: hidden; line-height: 0; }
+.att-image img { display: block; max-width: min(320px, 100%); max-height: 320px; object-fit: cover; background: #E3E8EE; }
+.att-file {
+  display: flex; align-items: center; gap: var(--space-2); min-width: 220px; max-width: 320px; margin-bottom: 6px;
+  padding: 10px 12px; border-radius: 12px; text-decoration: none; color: var(--color-text);
+  background: #F3F6F5; border: 1px solid #DCE4E1;
+}
+a.att-file[href]:hover { border-color: var(--jade); }
+.att-file[aria-disabled] { opacity: .75; }
+.att-icon { font-size: 28px; line-height: 1; }
+.att-info { display: flex; flex-direction: column; min-width: 0; }
+.att-name { font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.att-size { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+/* Bong bóng của mình (nền ngọc): thẻ tệp nền trắng để chữ rõ */
+.bubble-row.mine .att-file { background: rgba(255,255,255,.95); border-color: transparent; }
+.bubble-row.mine .bubble:has(.att-image:only-of-type) .bubble-meta { color: #DDF2EE; }

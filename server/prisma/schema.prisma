@@ -107,6 +107,7 @@ model Message {
   eventActor         User?               @relation("EventActor", fields: [eventActorId], references: [id])
   eventTarget        User?               @relation("EventTarget", fields: [eventTargetId], references: [id])
   lastOfConversation Conversation?       @relation("LastMessage")
+  attachment         Attachment?
 
   @@unique([senderId, clientMsgId])
   @@index([conversationId, id])
@@ -122,4 +123,22 @@ model MessageReadCursor {
 
   @@id([conversationId, userId])
   @@map("message_read_cursors")
+}
+
+/// Tệp đính kèm của một tin văn bản (yêu cầu 2026-11-18). Nội dung tệp lưu trong CSDL;
+/// chỉ thành viên nhìn thấy tin mới tải được (kiểm tra ở chat.service.getAttachment).
+model Attachment {
+  id             Int      @id @default(autoincrement())
+  messageId      Int      @unique @map("message_id")
+  conversationId Int      @map("conversation_id")
+  uploaderId     Int      @map("uploader_id")
+  fileName       String   @map("file_name")
+  mimeType       String   @map("mime_type")
+  sizeBytes      Int      @map("size_bytes")
+  data           Bytes
+  createdAt      DateTime @default(now()) @map("created_at")
+  message        Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("attachments")
 }

@@ -5,7 +5,9 @@ export type MessageDto = {
   id: number; conversationId: number; type: "text" | "system"; content: string;
   sender: UserDto | null; eventType: string | null; clientMessageId: string | null; createdAt: string;
   format?: MessageFormat | null; // phông/cỡ/màu chữ người gửi chọn
+  attachment?: AttachmentDto | null; // tệp đính kèm
 };
+export type AttachmentDto = { id: number; fileName: string; mimeType: string; size: number; isImage: boolean };
 export type ConversationSummaryDto = {
   id: number; type: "direct" | "group"; title: string; avatarInitial: string; otherUser: UserDto | null;
   memberCount: number; myRole: "owner" | "member";
@@ -25,3 +27,15 @@ export const getMessagesAfter = (id: number, after: number) =>
   api<MessagePage>("GET", `/api/conversations/${id}/messages?after=${after}`);
 export const markRead = (id: number) =>
   api<{ conversationId: number; unreadCount: number; totalUnread: number }>("POST", `/api/conversations/${id}/read`, {});
+
+/** Gửi tệp đính kèm (tối đa 4 MB) kèm chú thích tùy chọn. */
+export const sendAttachment = (conversationId: number, file: Blob, fileName: string, clientMessageId: string, caption?: string) =>
+  api<{ message: MessageDto; duplicate: boolean }>("POST", `/api/conversations/${conversationId}/attachments`, file, {
+    headers: {
+      "X-File-Name": encodeURIComponent(fileName),
+      "X-Client-Message-Id": clientMessageId,
+      ...(caption ? { "X-Caption": encodeURIComponent(caption) } : {}),
+    },
+  });
+
+export const attachmentUrl = (id: number) => `/api/attachments/${id}`;

@@ -16,14 +16,16 @@ export function setUnauthorizedHandler(fn: (() => void) | null) {
   onUnauthorized = fn;
 }
 
-export async function api<T>(method: string, url: string, body?: unknown, opts: { authRequired?: boolean } = {}): Promise<T> {
+export async function api<T>(method: string, url: string, body?: unknown, opts: { authRequired?: boolean; headers?: Record<string, string> } = {}): Promise<T> {
   let res: Response;
+  // Blob/File (tệp đính kèm) gửi nguyên nội dung; còn lại gửi JSON.
+  const isFile = body instanceof Blob;
   try {
     res = await fetch(url, {
       method,
       credentials: "same-origin",
-      headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      headers: body !== undefined ? { "Content-Type": isFile ? "application/octet-stream" : "application/json", ...opts.headers } : opts.headers,
+      body: body === undefined ? undefined : isFile ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError(0, CONNECTION_ERROR);

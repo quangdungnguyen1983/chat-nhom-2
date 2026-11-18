@@ -495,6 +495,7 @@ Cột "Kiểm tra" áp dụng **cả ở trình duyệt và máy chủ** (NT-01)
 | Khung tin | Danh sách | 50 tin/lần, cuộn lên tải thêm (FRS-09); tin hệ thống theo FRS-14; nhóm có tên + avatar cạnh mỗi tin (FRS-12) | M-21, M-22 |
 | Ô soạn tin | Ô chữ nhiều dòng | Không trống; ≤ 5.000 ký tự sau chuẩn hóa `[PDF]` | M-17 |
 | Nút "😊" | Bảng chọn | Chèn emoji vào vị trí con trỏ (emoji là ký tự trong nội dung) `[YC-2026-11-16]` | – |
+| Nút 📎 – Đính kèm tệp | Chọn tệp | Một tệp mỗi tin, ≤ 4 MB; ảnh JPG/PNG/GIF/WebP, PDF, Word, Excel, PowerPoint, TXT, CSV, ZIP/RAR/7Z; ô soạn thành chú thích (không bắt buộc, ≤ 1.000 ký tự); ảnh hiện trong khung chat, tệp khác hiện thẻ tải xuống `[YC-2026-11-18]` | M-40, M-41, M-42 |
 | Nút "Aa" – Định dạng chữ | Bảng chọn | Phông (Mặc định, Có chân, Viết tay, Bút lông, Đánh máy), cỡ (Nhỏ, Vừa, Lớn, Rất lớn), màu (Mặc định + 7 màu); áp dụng cho cả tin, người nhận thấy đúng như người gửi; lựa chọn được nhớ trên trình duyệt; ô soạn hiển thị xem trước `[YC-2026-11-17]` | – |
 | Bộ đếm ký tự | Chữ | Hiện khi > 4.500 ký tự `[GF-11]` | – |
 | Nút "Gửi" | Nút | Khóa khi trống hoặc > 5.000 ký tự | – |
@@ -624,6 +625,10 @@ Toàn bộ câu chữ là **đề xuất `[ĐX]`**: PDF chỉ yêu cầu "báo l
 | M-35 | Vui lòng nhập đủ tên đăng nhập và mật khẩu. | Lỗi | TK-03 |
 | M-36 | Người này đã ở trong nhóm hoặc không còn tồn tại. | Lỗi | E-NH03-2 |
 | M-37 | Hãy chọn người nhận quyền trưởng nhóm trước khi rời nhóm. | Lỗi | E-NH03-3 |
+| M-40 | Tệp quá lớn. Mỗi tệp tối đa 4 MB. | Lỗi | Đính kèm tệp |
+| M-41 | Loại tệp này chưa được hỗ trợ. Hãy gửi ảnh (JPG, PNG, GIF, WebP), PDF, Word, Excel, PowerPoint, TXT, CSV hoặc tệp nén (ZIP, RAR, 7Z). | Lỗi | Đính kèm tệp |
+| M-42 | Tệp rỗng hoặc không đọc được. | Lỗi | Đính kèm tệp |
+| M-43 | Không tìm thấy tệp hoặc bạn không có quyền xem tệp này. | Lỗi | Tải tệp |
 | M-40 | Đăng ký thành công. Vui lòng đăng nhập. | Thành công | TK-01 |
 | M-41 | Đổi mật khẩu thành công. Các thiết bị khác đã được đăng xuất. | Thành công | TK-04 |
 | M-42 | Đã lưu tên hiển thị. | Thành công | TK-05 |

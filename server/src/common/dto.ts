@@ -1,5 +1,6 @@
 // Kiểu dữ liệu trả ra API / sự kiện (09-detailed-design.md mục 6.2).
 import { toFormatDto, type MessageFormat } from "./message-format.js";
+import { IMAGE_MIMES } from "./attachments.js";
 import { avatarInitial } from "./avatar.js";
 
 export type UserDto = {
@@ -23,7 +24,10 @@ export type MessageDto = {
   clientMessageId: string | null;
   createdAt: string;
   format: MessageFormat | null; // phông/cỡ/màu chữ người gửi chọn; null = mặc định
+  attachment: AttachmentDto | null; // tệp đính kèm (2026-11-18)
 };
+
+export type AttachmentDto = { id: number; fileName: string; mimeType: string; size: number; isImage: boolean };
 
 export type MessageRow = {
   id: number;
@@ -36,6 +40,7 @@ export type MessageRow = {
   fmtFont?: string | null;
   fmtSize?: string | null;
   fmtColor?: string | null;
+  attachment?: { id: number; fileName: string; mimeType: string; sizeBytes: number } | null;
   sender: { id: number; username: string; displayName: string } | null;
 };
 
@@ -50,6 +55,9 @@ export function toMessageDto(m: MessageRow): MessageDto {
     clientMessageId: m.clientMsgId,
     createdAt: m.createdAt.toISOString(),
     format: m.type === "text" ? toFormatDto(m) : null,
+    attachment: m.attachment
+      ? { id: m.attachment.id, fileName: m.attachment.fileName, mimeType: m.attachment.mimeType, size: m.attachment.sizeBytes, isImage: IMAGE_MIMES.has(m.attachment.mimeType) }
+      : null,
   };
 }
 

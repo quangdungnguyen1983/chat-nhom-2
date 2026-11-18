@@ -29,6 +29,10 @@ export const M = {
   VALIDATION: "Dữ liệu không hợp lệ.",
   // [ĐX] 09 mục 5 / CR-04 – chờ cấp mã M-xx (OQ-38).
   MESSAGE_EMPTY: "Tin nhắn không được để trống.",
+  M40: "Tệp quá lớn. Mỗi tệp tối đa 4 MB.",
+  M41: "Loại tệp này chưa được hỗ trợ. Hãy gửi ảnh (JPG, PNG, GIF, WebP), PDF, Word, Excel, PowerPoint, TXT, CSV hoặc tệp nén (ZIP, RAR, 7Z).",
+  M42: "Tệp rỗng hoặc không đọc được.",
+  M43: "Không tìm thấy tệp hoặc bạn không có quyền xem tệp này.",
   TARGET_NOT_MEMBER: "Người này không còn trong nhóm.",
   CANNOT_REMOVE_SELF: "Trưởng nhóm không thể tự xóa mình. Hãy dùng chức năng Rời nhóm.",
   NOT_A_GROUP: "Thao tác này chỉ áp dụng cho nhóm.",

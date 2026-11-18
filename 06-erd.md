@@ -269,6 +269,24 @@ Index:
 - `ix_messages_conv_unread` trên (`conversation_id`, `id`), kèm `sender_id`, chỉ cho tin `text`: đếm chưa đọc (mục 8).
 - `uq_messages_client_msg`: chống lưu trùng khi gửi lại (GF-12).
 
+### 6.7 `attachments` – tệp đính kèm (yêu cầu 2026-11-18, ngoài MVP gốc)
+
+Mỗi tin văn bản có tối đa một tệp. Nội dung tệp lưu ngay trong CSDL (`data`); danh sách tin chỉ đọc thông tin mô tả, không đọc `data`.
+
+| Cột | Kiểu (PostgreSQL) | Bắt buộc | Ràng buộc | Ý nghĩa | Nguồn |
+|---|---|---|---|---|---|
+| `id` | SERIAL | Có | PK | Mã tệp | `[YC-2026-11-18]` |
+| `message_id` | INTEGER | Có | FK → `messages.id`, UNIQUE, xóa tin thì xóa tệp | Tin chứa tệp | `[YC-2026-11-18]` |
+| `conversation_id` | INTEGER | Có | Index | Hội thoại – dùng kiểm quyền tải | `[YC-2026-11-18]` |
+| `uploader_id` | INTEGER | Có | – | Người gửi | `[YC-2026-11-18]` |
+| `file_name` | TEXT | Có | 1–200 ký tự, đã bỏ đường dẫn/ký tự cấm | Tên tệp gốc | `[YC-2026-11-18]` |
+| `mime_type` | TEXT | Có | Theo danh mục phần mở rộng cho phép | Loại tệp | `[YC-2026-11-18]` |
+| `size_bytes` | INTEGER | Có | CHECK 1 … 4.194.304 (4 MB) | Dung lượng | `[YC-2026-11-18]` |
+| `data` | BYTEA | Có | – | Nội dung tệp | `[YC-2026-11-18]` |
+| `created_at` | TIMESTAMP | Có | Mặc định giờ máy chủ | Lúc lưu | `[YC-2026-11-18]` |
+
+Giới hạn: gói miễn phí Neon có 0,5 GB cho toàn bộ CSDL; khi tệp nhiều cần chuyển nội dung tệp sang kho lưu trữ riêng (ví dụ Vercel Blob).
+
 ### 6.6 `message_read_cursors` – mốc đã đọc
 
 | Cột | Kiểu | Bắt buộc | Ràng buộc | Mô tả | Nguồn |
@@ -456,7 +474,7 @@ Không đề xuất index tìm kiếm toàn văn cho TK-06 trong MVP: câu tìm 
 | CH-04 Trạng thái tin nhắn, NH-05 Đã xem trong nhóm | Ghi nhận "đã nhận / đã xem" theo từng tin hoặc từng người | NOT MVP. `message_read_cursors` chỉ phục vụ đếm chưa đọc TB-01, **không** dùng để hiện "đã xem" |
 | CH-05 Trạng thái online | Thời điểm hoạt động gần nhất | NOT MVP. Không thêm cột vào `users` hay `sessions` |
 | QT-01, QT-02 | Trạng thái khóa tài khoản, vai trò quản trị | NOT MVP |
-| TN-01…TN-07 | Reaction, file, ảnh, trả lời trích dẫn | NOT MVP |
+| TN-01…TN-07 | Reaction, trả lời trích dẫn | NOT MVP. **Gửi tệp / ảnh đã làm theo yêu cầu 2026-11-18** – bảng `attachments` mục 6.7 |
 | TK-07…11 | Email, mã đặt lại mật khẩu | NOT MVP |
 | TN-10…TN-14 | Lịch sử sửa, thu hồi, bản ghi gốc phục vụ kiểm toán | NOT MVP |
 

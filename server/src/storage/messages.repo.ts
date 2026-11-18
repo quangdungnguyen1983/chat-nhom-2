@@ -1,6 +1,8 @@
 import { prisma, type Tx } from "./prisma.js";
 
-const include = { sender: { select: { id: true, username: true, displayName: true } } } as const;
+// Tệp đính kèm: chỉ lấy thông tin mô tả, KHÔNG lấy cột data (nội dung tệp) khi đọc danh sách tin.
+const attachmentMeta = { select: { id: true, fileName: true, mimeType: true, sizeBytes: true } } as const;
+const include = { sender: { select: { id: true, username: true, displayName: true } }, attachment: attachmentMeta } as const;
 
 export function findBySenderClientId(senderId: number, clientMsgId: string, tx?: Tx) {
   return (tx ?? prisma()).message.findUnique({ where: { senderId_clientMsgId: { senderId, clientMsgId } }, include });
@@ -31,5 +33,26 @@ export function pageAfter(conversationId: number, floor: number, after: number, 
     orderBy: { id: "asc" },
     take,
     include,
+  });
+}
+
+export type NewAttachment = { fileName: string; mimeType: string; sizeBytes: number; data: Uint8Array };
+
+/** Tin văn bản kèm một tệp – cùng giao dịch với việc lưu tin. */
+export async function createWithAttachment(
+  tx: Tx, conversationId: number, senderId: number, content: string, clientMsgId: string, file: NewAttachment,
+) {
+  const msg = await tx.message.create({ data: { conversationId, senderId, type: "text", content, clientMsgId }, select: { id: true } });
+  await tx.attachment.create({
+    data: { messageId: msg.id, conversationId, uploaderId: senderId, fileName: file.fileName, mimeType: file.mimeType, sizeBytes: file.sizeBytes, data: Buffer.from(file.data) },
+  });
+  return tx.message.findUniqueOrThrow({ where: { id: msg.id }, include });
+}
+
+/** Đọc tệp để tải về, kèm mã tin để kiểm tra quyền xem. */
+export function findAttachment(id: number) {
+  return prisma().attachment.findUnique({
+    where: { id },
+    select: { fileName: true, mimeType: true, sizeBytes: true, data: true, conversationId: true, messageId: true },
   });
 }
